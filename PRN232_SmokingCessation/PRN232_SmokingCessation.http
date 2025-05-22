@@ -1,0 +1,6 @@
+@PRN232_SmokingCessation_HostAddress = http://localhost:5068
+
+GET {{PRN232_SmokingCessation_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
