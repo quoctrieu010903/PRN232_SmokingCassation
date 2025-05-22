@@ -1,3 +1,4 @@
+using SmokingCessation.Infrastracture.Extentions;
 using SmokingCessation.WebAPI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,9 +9,15 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
+
+
 builder.Services
     // Add Swagger 
-    .AddSwagger();
+    .AddSwagger()
+    //Add infrastructure ( Database ..... ) 
+    .AddInfrastructure(builder.Configuration);
+
+
 
 var app = builder.Build();
 
@@ -20,7 +27,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+
 app.WithSwagger();
+
 
 
 app.UseHttpsRedirection();

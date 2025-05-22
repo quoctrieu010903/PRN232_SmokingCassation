@@ -10,11 +10,11 @@ namespace SmokingCessation.Domain.Entities
 {
     public class QuitPlan : BaseEntity
     {
-        public string reason { get; set; }
+        public string Reason { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime TargetDate { get; set; }
         public int CreateNum { get; set; }
-        public QuitPlanStatus status { get; set; }
+        public QuitPlanStatus Status { get; set; }
 
       
         public Guid UserId { get; set; }
