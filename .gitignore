@@ -14,6 +14,8 @@
 *.userosscache
 *.sln.docstates
 
+
+.idea
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -403,6 +405,8 @@ FodyWeavers.xsd
 Beta
 0 / 0
 used queries
+
+
 
 
 1
