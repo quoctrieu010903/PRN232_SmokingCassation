@@ -1,5 +1,6 @@
 ﻿using SmokingCessation.Application;
 using SmokingCessation.Infrastracture;
+using SmokingCessation.Infrastracture.Extentions;
 
 namespace SmokingCessation.WebAPI.Extensions
 {
@@ -7,7 +8,7 @@ namespace SmokingCessation.WebAPI.Extensions
     {
         public static IServiceCollection AddAppDI(this IServiceCollection services)
         {
-            services.AddInfrastractureDI()
+            services
                     .AddApplicationDI()
                     .ConfigCors();
                     
