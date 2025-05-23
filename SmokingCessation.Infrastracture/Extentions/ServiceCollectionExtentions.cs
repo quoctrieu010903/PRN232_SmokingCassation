@@ -3,25 +3,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmokingCessation.Domain.Entities;
-using SmokingCessation.Infrastracture.Data;
+using SmokingCessation.Infrastracture.Persistence;
+
 
 namespace SmokingCessation.Infrastracture.Extentions
 {
     public static class ServiceCollectionExtentions
     {
-        public static void AddInfrastructure( this IServiceCollection services, IConfiguration configuration)
+        public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-
-            // Configuration to connect to Db 
             var connectionString = configuration.GetConnectionString("SmokingCessationDB");
-            services.AddDbContext<SmokingCassationDBContext>(options => options.UseSqlServer(connectionString)
-                    .EnableSensitiveDataLogging());
-
-
-           
-
-
-
+            services.AddDbContext<SmokingCassationDBContext>(options =>
+                options.UseSqlServer(connectionString).EnableSensitiveDataLogging());
         }
     }
 }

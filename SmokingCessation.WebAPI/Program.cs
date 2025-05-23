@@ -12,11 +12,8 @@ builder.Services.AddOpenApi();
 
 
 builder.Services
-    // Add Swagger 
     .AddSwagger()
-    //Add infrastructure ( Database ..... ) 
     .AddInfrastructure(builder.Configuration);
-
 
 
 var app = builder.Build();
