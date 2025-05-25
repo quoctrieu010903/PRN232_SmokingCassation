@@ -7,18 +7,18 @@ using SmokingCessation.Application.Service.Interface;
 
 namespace SmokingCessation.Application.Extensions
 {
-    public static class ServiceCollectionExtentions 
+    public static class ServiceCollectionExtentions
     {
-        public static void  AddApplication(this IServiceCollection services)
+        public static void AddApplication(this IServiceCollection services)
         {
             #region Add Scoped 
-            services.AddScoped<IUserContext,UserContext>();
+            services.AddScoped<IUserContext, UserContext>();
             #endregion
 
 
 
 
-            services.AddHttpContextAccessor();
+                    services.AddHttpContextAccessor();
         }
     }
 }

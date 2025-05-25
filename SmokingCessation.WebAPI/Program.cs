@@ -1,3 +1,4 @@
+using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Infrastracture.Extentions;
 using SmokingCessation.WebAPI.Extensions;
 
@@ -14,9 +15,14 @@ builder.Services.AddOpenApi();
 builder.Services
     .AddSwagger()
     .AddInfrastructure(builder.Configuration);
+builder.Services.AddEndpointsApiExplorer();
 
 
 var app = builder.Build();
+
+var scope = app.Services.CreateScope();
+var seeder =scope.ServiceProvider.GetRequiredService<ISmokingSessationSeeder>();
+await seeder.Seed();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

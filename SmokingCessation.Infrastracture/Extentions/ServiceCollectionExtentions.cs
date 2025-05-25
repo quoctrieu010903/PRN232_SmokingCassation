@@ -1,10 +1,11 @@
 ﻿
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SmokingCessation.Domain.Entities;
+
+using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Infrastracture.Persistence;
+using SmokingCessation.Infrastracture.Seeder;
 
 
 
@@ -20,10 +21,14 @@ namespace SmokingCessation.Infrastracture.Extentions
             services.AddDbContext<SmokingCassationDBContext>(options =>
                 options.UseSqlServer(connectionString).EnableSensitiveDataLogging());
 
-            //
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                     .AddEntityFrameworkStores<SmokingCassationDBContext>()
-                     .AddDefaultTokenProviders();
+
+            services.AddScoped<ISmokingSessationSeeder, SmokingCessationSeeder>();
+            
+
+            ////
+            //services.AddIdentity<ApplicationUser, IdentityRole>()
+            //         .AddEntityFrameworkStores<SmokingCassationDBContext>()
+            //         .AddDefaultTokenProviders();
 
         }
     }
