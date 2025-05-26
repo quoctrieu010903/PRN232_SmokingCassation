@@ -1,8 +1,7 @@
 ﻿
 using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Interfaces;
-using SmokingCessation.Infrastracture.Persistence;
-
+using SmokingCessation.Infrastracture.Data.Persistence;
 
 namespace SmokingCessation.Infrastracture.Seeder
 {
