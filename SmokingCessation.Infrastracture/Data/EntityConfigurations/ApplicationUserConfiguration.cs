@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SmokingCessation.Domain.Entities;
 
-namespace SmokingCessation.Infrastracture.EntityConfigurations
+namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
 {
     public class ApplicationUserConfiguration : IEntityTypeConfiguration<ApplicationUser>
     {
@@ -16,7 +16,7 @@ namespace SmokingCessation.Infrastracture.EntityConfigurations
                    .HasMaxLength(100);
 
             builder.Property(u => u.MembershipType)
-                   .HasConversion<int>(); 
+                   .HasConversion<int>();
 
             builder.HasMany(u => u.Payments)
                    .WithOne(p => p.User)

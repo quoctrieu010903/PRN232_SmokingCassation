@@ -14,7 +14,13 @@ builder.Services.AddOpenApi();
 
 builder.Services
     .AddSwagger()
+
+    // in the infrastructure (Add Configguration about JWT 
+    .AddJwtAuthentication(builder.Configuration)
+    //in the infrastructure
     .AddInfrastructure(builder.Configuration);
+
+   
 builder.Services.AddEndpointsApiExplorer();
 
 

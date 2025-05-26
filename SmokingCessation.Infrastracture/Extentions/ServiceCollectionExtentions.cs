@@ -4,7 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using SmokingCessation.Domain.Interfaces;
-using SmokingCessation.Infrastracture.Persistence;
+using SmokingCessation.Infrastracture.Data;
+using SmokingCessation.Infrastracture.Data.Persistence;
+using SmokingCessation.Infrastracture.Repository;
 using SmokingCessation.Infrastracture.Seeder;
 
 
@@ -23,7 +25,11 @@ namespace SmokingCessation.Infrastracture.Extentions
 
 
             services.AddScoped<ISmokingSessationSeeder, SmokingCessationSeeder>();
-            
+            // Dependency Injection 
+            services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+
 
             ////
             //services.AddIdentity<ApplicationUser, IdentityRole>()

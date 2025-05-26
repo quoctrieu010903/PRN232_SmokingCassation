@@ -4,44 +4,56 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using SmokingCessation.Domain.Specifications.Interfaces;
 
 namespace SmokingCessation.Domain.Interfaces
 {
-    public interface IGenericRepository<TEntity > where TEntity : class
+    public interface IGenericRepository<TEntity, TKey>
+        where TEntity :class
     {
-        /// <summary>
-        /// Tìm và trả về một thực thể dựa trên khóa chính (ID).
-        /// </summary>
-        /// <param name="id">ID của thực thể cần tìm.</param>
-        /// <param name="cancellationToken">Token để hủy bỏ tác vụ bất đồng bộ nếu cần.</param>
-        /// <param name="includeProperties">Danh sách các thuộc tính dẫn hướng cần include (load kèm theo).</param>
-        /// <returns>Thực thể tương ứng với ID nếu tìm thấy; ngược lại trả về null.</returns>
-        Task<TEntity> FindByIdAsync(Guid id, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties);
+        #region READ DATA
 
-        /// <summary>
-        /// Tìm một thực thể duy nhất thỏa mãn điều kiện cho trước.
-        /// </summary>
-        /// <param name="predicate">Biểu thức điều kiện để lọc thực thể (có thể null để lấy thực thể bất kỳ đầu tiên).</param>
-        /// <param name="cancellationToken">Token để hủy bỏ tác vụ bất đồng bộ nếu cần.</param>
-        /// <param name="includeProperties">Danh sách các thuộc tính dẫn hướng cần include (load kèm theo).</param>
-        /// <returns>Thực thể thỏa mãn điều kiện nếu có; ngược lại trả về null.</returns>
-        Task<TEntity> FindSingleAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includeProperties);
+        ///  Default Procedures
+        Task<IEnumerable<TEntity>> GetAllAsync(bool tracked = true);
+        Task<TEntity?> GetByIdAsync(TKey id);
 
-        /// <summary>
-        /// Tìm tất cả các thực thể thỏa mãn điều kiện cho trước.
-        /// </summary>
-        /// <param name="predicate">Biểu thức điều kiện để lọc thực thể (có thể null để lấy tất cả).</param>
-        /// <param name="includeProperties">Danh sách các thuộc tính dẫn hướng cần include (load kèm theo).</param>
-        /// <returns>Tập truy vấn (IQueryable) các thực thể thỏa mãn điều kiện.</returns>
-        IQueryable<TEntity> FindAll(Expression<Func<TEntity, bool>>? predicate = null, params Expression<Func<TEntity, object>>[] includeProperties);
+        /// Retrieve with specifications
+        Task<TEntity?> GetWithSpecAsync(ISpecification<TEntity> specification, bool tracked = true);
+        Task<TResult?> GetWithSpecAndSelectorAsync<TResult>(ISpecification<TEntity> specification,
+            Expression<Func<TEntity, TResult>> selector, bool tracked = true);
+        Task<IEnumerable<TEntity>> GetAllWithSpecAsync(ISpecification<TEntity> specification, bool tracked = true);
+        Task<IEnumerable<TResult>> GetAllWithSpecAndSelectorAsync<TResult>(ISpecification<TEntity> specification,
+            Expression<Func<TEntity, TResult>> selector, bool tracked = true);
+        Task<int> CountAsync();
+        Task<int> CountAsync(ISpecification<TEntity> specification);
+        Task<int> SumAsync(Expression<Func<TEntity, int>> predicate);
+        Task<int> SumWithSpecAsync(ISpecification<TEntity> specification, Expression<Func<TEntity, int>> predicate);
+        Task<bool> AllAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<bool> AnyAsync(ISpecification<TEntity> specification);
 
+        #endregion
 
+        #region WRITE DATA
+
+        /// Synchronous operation
         void Add(TEntity entity);
-
+        void AddRange(IEnumerable<TEntity> entities);
+        void Delete(TKey id);
         void Update(TEntity entity);
 
-        void Remove(TEntity entity);
+        /// Asynchronous operation
+        Task AddAsync(TEntity entity);
+        Task AddRangeAsync(IEnumerable<TEntity> entities);
+        Task DeleteAsync(TKey id);
+        Task DeleteRangeAsync(TKey[] ids);
+        Task UpdateAsync(TEntity entity);
 
-        void RemoveMultiple(List<TEntity> entities);
+        #endregion
+
+        #region OTHERS
+        bool HasChanges(TEntity original, TEntity modified);
+        bool HasChanges(TEntity entity);
+        #endregion
     }
 }

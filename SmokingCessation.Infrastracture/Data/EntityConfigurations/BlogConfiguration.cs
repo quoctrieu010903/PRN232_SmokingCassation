@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using SmokingCessation.Domain.Entities;
 
-namespace SmokingCessation.Infrastracture.EntityConfigurations
+namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
 {
     public class BlogConfiguration : IEntityTypeConfiguration<Blog>
     {
