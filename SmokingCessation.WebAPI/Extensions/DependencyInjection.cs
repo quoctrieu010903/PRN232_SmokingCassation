@@ -9,9 +9,10 @@ namespace SmokingCessation.WebAPI.Extensions
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddAppDI(this IServiceCollection services)
+        public static IServiceCollection AddAppDI(this IServiceCollection services, IConfiguration configuration)
         {
             services
+                    .AddJwtAuthentication(configuration)
                     .AddApplicationDI()
                     .ConfigCors();
                     
@@ -35,8 +36,12 @@ namespace SmokingCessation.WebAPI.Extensions
 
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
-            var jwtSettings = configuration.GetSection("Jwt");
+            var jwtSettings = configuration.GetSection("JwtConfig");
             var key = jwtSettings.GetValue<string>("Key");
+          
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentException("JWT Key is missing in configuration.");
+
             var issuer = jwtSettings.GetValue<string>("Issuer");
             var audience = jwtSettings.GetValue<string>("Audience");
 

@@ -6,7 +6,15 @@ using SmokingCessation.Domain.Entities;
 
 namespace SmokingCessation.Infrastracture.Data.Persistence
 {
-    public class SmokingCassationDBContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+    public class SmokingCassationDBContext : IdentityDbContext<
+        ApplicationUser,
+        IdentityRole<Guid>,
+        Guid,
+        IdentityUserClaim<Guid>,
+        IdentityUserRole<Guid>,
+        IdentityUserLogin<Guid>,
+        IdentityRoleClaim<Guid>,
+        IdentityUserToken<Guid>>
     {
         public SmokingCassationDBContext(DbContextOptions<SmokingCassationDBContext> options)
             : base(options) { }
