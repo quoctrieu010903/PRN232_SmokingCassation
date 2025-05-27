@@ -17,7 +17,7 @@ builder.Services.AddOpenApi();
 builder.Services
     .AddSwagger()
     .AddInfrastructure(builder.Configuration)
-    .AddApplication();
+    .AddApplication(builder.Configuration);
 
     // in the infrastructure (Add Configguration about JWT 
     //.AddJwtAuthentication(builder.Configuration)
@@ -47,7 +47,9 @@ app.WithSwagger();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 

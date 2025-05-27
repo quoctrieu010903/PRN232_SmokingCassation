@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
+using SmokingCessation.Core.Constants;
 using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
 using static SmokingCessation.Application.DTOs.Response.AuthenticationResponse;
@@ -21,15 +22,17 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserContext _currentUserService;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly IUserContext _userContext;
         private readonly IMapper _mapper;
 
-        public AuthenticationService(ITokenService tokenService, ILogger<AuthenticationService> logger, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<Guid>> roleManager, IMapper mapper)
+        public AuthenticationService(ITokenService tokenService, ILogger<AuthenticationService> logger, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<Guid>> roleManager, IMapper mapper ,IUserContext userContext)
         {
             _tokenService = tokenService;
             _logger = logger;
             _userManager = userManager;
             _roleManager = roleManager;
             _mapper = mapper;
+            _userContext = userContext;
         }
 
         public async Task AssignUserRole(AssignUserRoles request)
@@ -160,43 +163,40 @@ namespace SmokingCessation.Application.Service.Implementations
                 _logger.LogError("Email already exists");
                 throw new Exception("Email already exists");
             }
-                var newUser = _mapper.Map<ApplicationUser>(request);
-                newUser.UserName = GenerateUserName(request.FirstName, request.LastName);
-                var result = await _userManager.CreateAsync(newUser, request.Password);
-             if (!result.Succeeded)
-                {
-                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                    _logger.LogError("Failed to create user: {errors}", errors);
-                    throw new Exception($"Failed to create user: {errors}");
-                }
-                _logger.LogInformation("User created successfully");
-                await _tokenService.GenerateToken(newUser);
-                newUser.CreatedTime = CoreHelper.SystemTimeNow;
-                newUser.LastUpdatedTime = CoreHelper.SystemTimeNow;
-                return _mapper.Map<AuthenticationResponse.UserResponse>(newUser);
+            var newUser = _mapper.Map<ApplicationUser>(request);
+            newUser.UserName = request.FullName;
 
-            }
+            var result = await _userManager.CreateAsync(newUser, request.Password);
+            if (!result.Succeeded)
+                throw new Exception("Failed to create user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+
+           
+            var roleExists = await _roleManager.RoleExistsAsync(request.RoleName);
+            if (!roleExists)
+                throw new Exception($"Role '{request.RoleName}' does not exist. Only predefined roles can be assigned.");
+
+            var currentUser = _userContext.GetCurrentUser();
+            if (request.RoleName == UserRoles.Admin && (currentUser == null || !currentUser.isInRole(UserRoles.Admin)))
+                throw new Exception("Only Admins can assign Admin role.");
+
+            // Gán role
+            await _userManager.AddToRoleAsync(newUser, request.RoleName);
+
+            _logger.LogInformation("User created with role: {Role}", request.RoleName);
+            await _tokenService.GenerateToken(newUser);
+
+            newUser.CreatedTime = CoreHelper.SystemTimeNow;
+            newUser.LastUpdatedTime = CoreHelper.SystemTimeNow;
+
+            return _mapper.Map<AuthenticationResponse.UserResponse>(newUser);
+        }
              /// <summary>
              /// Generates a unique username by concatenating the first name and last name.
              /// </summary>
              /// <param name="firstName">The first name of the user.</param>
              /// <param name="lastName">The last name of the user.</param>
              /// <returns>The generated unique username.</returns>
-        private string GenerateUserName(string firstName, string lastName)
-        {
-            var baseUsername = $"{firstName}{lastName}".ToLower();
-
-            // Check if the username already exists
-            var username = baseUsername;
-            var count = 1;
-            while (_userManager.Users.Any(u => u.UserName == username))
-            {
-                username = $"{baseUsername}{count}";
-                count++;
-            }
-            return username;
-        }
-
+        
         public async Task<AuthenticationResponse.RevokeRefreshTokenResponse> RevokeRefreshToken(AuthenticationRequest.RefreshTokenRequest refreshTokenRemoveRequest)
         {
             _logger.LogInformation("Revoking refresh token");

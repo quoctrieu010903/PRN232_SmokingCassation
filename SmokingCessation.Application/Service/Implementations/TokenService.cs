@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Base;
@@ -23,24 +24,25 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<TokenService> _logger;
 
-        public TokenService(IConfiguration configuration, SymmetricAlgorithm secretkey, string? validIssuer, string? validAudience, int? expires, UserManager<ApplicationUser> userManager, ILogger<TokenService> logger)
+        public TokenService(IOptions<JwtSettings> options,
+                       UserManager<ApplicationUser> userManager,
+                       ILogger<TokenService> logger)
         {
-            var jwtSettings = configuration.GetSection("JwtConfig").Get<JwtSettings>();
-            if (jwtSettings == null || string.IsNullOrEmpty(jwtSettings.SecretKey))
+            var jwtSettings = options.Value;
+
+            if (string.IsNullOrEmpty(jwtSettings.Key))
             {
-                throw new InvalidOperationException("JWT secret key is not configured. ");
+                throw new InvalidOperationException("JWT secret key is not configured.");
             }
-          
-           
-            _secretkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey));
 
-
+            _secretkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key));
             _validIssuer = jwtSettings.Issuer;
             _validAudience = jwtSettings.Audience;
-            _expires = jwtSettings.AccessTokenExpirationMinutes;
+            _expires = jwtSettings.TokenValidityMins;
             _userManager = userManager;
             _logger = logger;
         }
+        
 
         public  string GenerateRefeshToken()
         {
@@ -51,19 +53,25 @@ namespace SmokingCessation.Application.Service.Implementations
             return refeshToken;
         }
 
-        private async Task<List<Claim>> GetClaimsAsync(ApplicationUser user) 
+        private async Task<List<Claim>> GetClaimsAsync(ApplicationUser user)
         {
-          var claims = new List<Claim>();
-           {
-                new Claim(ClaimTypes.Name, user?.UserName ?? String.Empty);
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString());
-                new Claim(ClaimTypes.Email, user?.Email);
-                new Claim("FirstName", user.FullName);
-           };
+            var claims = new List<Claim>
+                {
+
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // chuẩn nhất cho ID
+                    new Claim("UserId" , user.Id.ToString())
+
+
+
+
+                };
+
             var roles = await _userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-            return claims;
 
+            return claims;
         }
 
 
