@@ -1,8 +1,9 @@
 ﻿
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Infrastracture.Data;
 using SmokingCessation.Infrastracture.Data.Persistence;
@@ -16,7 +17,7 @@ namespace SmokingCessation.Infrastracture.Extentions
 {
     public static class ServiceCollectionExtentions
     {
-        public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             
             var connectionString = configuration.GetConnectionString("SmokingCessationDB");
@@ -29,12 +30,15 @@ namespace SmokingCessation.Infrastracture.Extentions
             services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
+                     .AddEntityFrameworkStores<SmokingCassationDBContext>()
+                     .AddDefaultTokenProviders();
 
+            //services.AddTransient<UserManager<ApplicationUser>, UserManager<ApplicationUser>>();
+            //services.AddTransient<SignInManager<ApplicationUser>, SignInManager<ApplicationUser>>();
+            //services.AddTransient<RoleManager<IdentityRole<Guid>>, RoleManager<IdentityRole<Guid>>>();
 
-            ////
-            //services.AddIdentity<ApplicationUser, IdentityRole>()
-            //         .AddEntityFrameworkStores<SmokingCassationDBContext>()
-            //         .AddDefaultTokenProviders();
+            return services;
 
         }
     }

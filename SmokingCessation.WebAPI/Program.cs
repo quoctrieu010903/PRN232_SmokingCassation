@@ -1,3 +1,5 @@
+
+using SmokingCessation.Application.Extensions;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Infrastracture.Extentions;
 using SmokingCessation.WebAPI.Extensions;
@@ -14,11 +16,14 @@ builder.Services.AddOpenApi();
 
 builder.Services
     .AddSwagger()
+    .AddInfrastructure(builder.Configuration)
+    .AddApplication();
 
     // in the infrastructure (Add Configguration about JWT 
-    .AddJwtAuthentication(builder.Configuration)
+    //.AddJwtAuthentication(builder.Configuration)
     //in the infrastructure
-    .AddInfrastructure(builder.Configuration);
+    
+    
 
    
 builder.Services.AddEndpointsApiExplorer();
@@ -27,8 +32,7 @@ builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
 var scope = app.Services.CreateScope();
-var seeder =scope.ServiceProvider.GetRequiredService<ISmokingSessationSeeder>();
-await seeder.Seed();
+var seeder =scope.ServiceProvider.GetRequiredService<ISmokingSessationSeeder>();await seeder.Seed();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

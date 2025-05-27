@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmokingCessation.Infrastracture.Data.Persistence;
 
-
 #nullable disable
 
 namespace SmokingCessation.Infrastracture.Migrations
