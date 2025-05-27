@@ -7,6 +7,7 @@ using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Infrastracture.Data;
 using SmokingCessation.Infrastracture.Data.Persistence;
+using SmokingCessation.Infrastracture.Mapping;
 using SmokingCessation.Infrastracture.Repository;
 using SmokingCessation.Infrastracture.Seeder;
 
@@ -33,10 +34,9 @@ namespace SmokingCessation.Infrastracture.Extentions
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
                      .AddEntityFrameworkStores<SmokingCassationDBContext>()
                      .AddDefaultTokenProviders();
+            services.AddAutoMapper(typeof(MappingProfile ).Assembly);
 
-            //services.AddTransient<UserManager<ApplicationUser>, UserManager<ApplicationUser>>();
-            //services.AddTransient<SignInManager<ApplicationUser>, SignInManager<ApplicationUser>>();
-            //services.AddTransient<RoleManager<IdentityRole<Guid>>, RoleManager<IdentityRole<Guid>>>();
+
 
             return services;
 
