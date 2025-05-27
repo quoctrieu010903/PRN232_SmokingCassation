@@ -9,6 +9,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\SmokingCessation.Application\SmokingCessation.Application.csproj" />
+    <ProjectReference Include="..\SmokingCessation.Core\SmokingCessation.Core.csproj" />
     <ProjectReference Include="..\SmokingCessation.Domain\SmokingCessation.Domain.csproj" />
   </ItemGroup>
 

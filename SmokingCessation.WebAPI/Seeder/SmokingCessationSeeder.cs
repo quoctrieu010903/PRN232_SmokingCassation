@@ -34,13 +34,16 @@ namespace SmokingCessation.Infrastracture.Seeder
                 }
                 if (!_dbContext.Roles.Any())
                 {
-                    var roles = GetRoles();
+                    var roles = GetRoles(); 
                     _dbContext.Roles.AddRange(roles);
-
+                  
                 }
                 await _dbContext.SaveChangesAsync();
+
+
             }
         }
+
         public IEnumerable<IdentityRole<Guid>> GetRoles()
         {
             List<IdentityRole<Guid>> roles =
@@ -61,8 +64,6 @@ namespace SmokingCessation.Infrastracture.Seeder
 
             return roles;
         }
-
-
 
         public static List<ApplicationUser> GetUsers()
         {
