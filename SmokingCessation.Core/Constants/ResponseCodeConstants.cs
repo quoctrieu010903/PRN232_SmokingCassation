@@ -20,6 +20,8 @@ namespace SmokingCessation.Core.Constants
         public const string ERROR = "Error!";
         public const string INVALID_DATE = "INVALID_DATE";
         public const string UNPROCESSABLE_ENTITY = "Unprocessable Entity";
+        public static string JWT_TOKEN_EXPIRED = "JWT Token expired";
+
     }
 
     public static class ErrorMessages
@@ -36,5 +38,6 @@ namespace SmokingCessation.Core.Constants
         public const string ERROR = "Lỗi!";
         public const string UNPROCESSABLE_ENTITY = "Trạng thái hiện tại không thể cập nhật thêm lần nữa";
     }
+ 
 }
 

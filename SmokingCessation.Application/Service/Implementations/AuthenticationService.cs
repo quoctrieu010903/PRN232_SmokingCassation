@@ -20,7 +20,6 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly ITokenService _tokenService;
         private readonly ILogger<AuthenticationService> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IUserContext _currentUserService;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly IUserContext _userContext;
         private readonly IMapper _mapper;
@@ -270,7 +269,14 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<CurrentUserResponse> GetCurrentUserAsync()
         {
-            var user = await _userManager.FindByIdAsync(_currentUserService.GetCurrentUser().UserId);
+            var userId = _userContext.GetUserId();
+            if (string.IsNullOrEmpty(userId))
+            {
+                _logger.LogError("User ID is null or empty");
+                throw new Exception("Invalid user ID");
+            }
+            var user = await _userManager.FindByIdAsync(userId);
+
             if (user == null)
             {
                 _logger.LogError("User not found");

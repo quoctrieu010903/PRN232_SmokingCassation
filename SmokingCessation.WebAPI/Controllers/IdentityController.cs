@@ -50,6 +50,7 @@ namespace SmokingCessation.WebAPI.Controllers
         /// </summary>
         /// <param name="id">The ID of the user.</param>
         /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
+        //[AllowAnonymous]
         [HttpGet("user/{id}")]
         [Authorize]
         public async Task<IActionResult> GetById(Guid id)
@@ -96,6 +97,11 @@ namespace SmokingCessation.WebAPI.Controllers
         [Authorize]
         public async Task<IActionResult> GetCurrentUser()
         {
+           
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized("User is not authenticated.");
+            }
             var response = await _service.GetCurrentUserAsync();
             return Ok(response);
         }
