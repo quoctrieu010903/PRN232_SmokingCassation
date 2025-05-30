@@ -4,6 +4,7 @@ using System.Text;
 using SmokingCessation.Application;
 using SmokingCessation.Infrastracture;
 using SmokingCessation.Infrastracture.Extentions;
+using SmokingCessation.Core.Base;
 
 namespace SmokingCessation.WebAPI.Extensions
 {
@@ -36,36 +37,45 @@ namespace SmokingCessation.WebAPI.Extensions
 
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
-            var jwtSettings = configuration.GetSection("JwtConfig");
-            var key = jwtSettings.GetValue<string>("Key");
-          
-            if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentException("JWT Key is missing in configuration.");
+            var jwtSettings = configuration.GetSection("JwtConfig").Get<JwtSettings>();
 
-            var issuer = jwtSettings.GetValue<string>("Issuer");
-            var audience = jwtSettings.GetValue<string>("Audience");
-
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
+            services
+                .AddAuthentication(options =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
 
-                    ValidIssuer = issuer,
-                    ValidAudience = audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
 
-                    ClockSkew = TimeSpan.Zero  // optional: giảm thời gian chênh lệch token hết hạn
-                };
-            });
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings.Issuer,
+                        ValidAudience = jwtSettings.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(jwtSettings.Key))
+                    };
+
+                    // ✅ Thêm sự kiện xử lý lỗi xác thực
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnChallenge = context =>
+                        {
+                            context.HandleResponse();
+                            context.Response.StatusCode = 401;
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
 
             return services;
         }

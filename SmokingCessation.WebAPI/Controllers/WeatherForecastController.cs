@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SmokingCessation.WebAPI.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -20,7 +20,7 @@ namespace SmokingCessation.WebAPI.Controllers
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        [Authorize]
+  
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

@@ -1,5 +1,6 @@
-﻿
+﻿    
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -17,6 +18,8 @@ namespace SmokingCessation.Application.Service.Implementations
 {
     public class TokenService : ITokenService
     {
+        
+     
         private readonly SymmetricSecurityKey _secretkey;
         private readonly string? _validIssuer;
         private readonly string? _validAudience;
@@ -27,6 +30,7 @@ namespace SmokingCessation.Application.Service.Implementations
         public TokenService(IOptions<JwtSettings> options,
                        UserManager<ApplicationUser> userManager,
                        ILogger<TokenService> logger)
+                        
         {
             var jwtSettings = options.Value;
 
@@ -58,18 +62,15 @@ namespace SmokingCessation.Application.Service.Implementations
             var claims = new List<Claim>
                 {
 
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // chuẩn nhất cho ID
+                    new Claim("Email", user.Email),
+                    new Claim("FullName", user.FullName),
+                    new Claim("UserName", user.UserName), // chuẩn nhất cho ID
                     new Claim("UserId" , user.Id.ToString())
-
-
-
 
                 };
 
             var roles = await _userManager.GetRolesAsync(user);
-            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            claims.AddRange(roles.Select(role => new Claim("Role", role)));
 
             return claims;
         }
@@ -93,7 +94,7 @@ namespace SmokingCessation.Application.Service.Implementations
             return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
         }
-
       
+
     }
 }
