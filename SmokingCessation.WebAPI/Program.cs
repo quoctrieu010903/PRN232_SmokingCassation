@@ -41,8 +41,11 @@ if (app.Environment.IsDevelopment())
 {
     app.WithSwagger();
 }
-app.UseMiddleware<JwtMiddleware>();
+
 app.UseAuthentication();
+
+app.UseMiddleware<JwtMiddleware>();
+
 app.UseAuthorization();
 
 
