@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmokingCessation.Application.Helpers;
+using SmokingCessation.Application.Mapping;
 using SmokingCessation.Application.Service.Implementations;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Base;
@@ -22,14 +23,20 @@ namespace SmokingCessation.Application.Extensions
             services.AddHttpContextAccessor();
 
             #region Add Scoped 
-                   services.AddScoped<JWTHelper>();
+            services.AddAutoMapper(typeof(MappingProfile).Assembly);
+            services.AddScoped<JWTHelper>();
            
           
                 services.AddScoped<CurrentUserResponse>();
-                services.AddScoped<IUserContext, UserContext>();
+            
+
+               
                 services.Configure<JwtSettings>(configuration.GetSection("JwtConfig"));
-                services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IUserContext, UserContext>();    
+            services.AddScoped<ITokenService, TokenService>();
                 services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IMemberShipPackage, MemberShipPackService>();
+
 
 
             #endregion

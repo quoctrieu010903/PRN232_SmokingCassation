@@ -16,7 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmokingCessation.Domain\SmokingCessation.Domain.csproj" />
+    <ProjectReference Include="..\SmokingCessation.Core\SmokingCessation.Core.csproj" />
+    <ProjectReference Include="..\SmokingCessation.Infrastracture\SmokingCessation.Infrastracture.csproj" />
   </ItemGroup>
 
 </Project>

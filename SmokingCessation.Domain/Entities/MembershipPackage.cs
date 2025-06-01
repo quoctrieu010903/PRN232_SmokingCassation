@@ -13,7 +13,7 @@ namespace SmokingCessation.Domain.Entities
         
         public string Name { get; set; }
         public decimal Price { get; set; }
-        public MembershipType Type { get; set; }
+        public MembershipType Type { get; set; } 
         public string Description { get; set; }
 
         public virtual ICollection<Payment> Payments { get; set; }
