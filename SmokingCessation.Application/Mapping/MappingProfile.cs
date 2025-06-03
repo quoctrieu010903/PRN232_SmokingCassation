@@ -25,11 +25,22 @@ namespace SmokingCessation.Application.Mapping
                     .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
 
             CreateMap<MemberShipPackageRequest, MembershipPackage>();
-            // In your AutoMapper profile
+
             CreateMap<MembershipPackage, MemberShipPackageResponse>();
-                
+
+            #endregion
+
+            #region QuitPlant
+            CreateMap<QuitPlan, QuitPlansRequest>();
+          
 
 
+            CreateMap<QuitPlansRequest, QuitPlan>();
+
+            CreateMap<QuitPlan, QuitPlanResponse>()
+                //.ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+                 //.ForMember(dest => dest.PackageName, opt => opt.MapFrom(src => src.MembershipPackage.Name)).ReverseMap();
 
 
             #endregion

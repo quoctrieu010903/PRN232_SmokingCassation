@@ -49,9 +49,9 @@ namespace SmokingCessation.WebAPI.Controllers
             return Ok(new BaseResponseModel(
                  statusCode: StatusCodes.Status200OK,
                  code: ResponseCodeConstants.SUCCESS,
-                 data: "Tạo thành công"));
+                 data: MessageConstants.CREATE_SUCCESS));
         }
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         [Authorize]
 
         public async Task<ActionResult<BaseResponseModel>> Update(Guid id, [FromBody] MemberShipPackageRequest request)
@@ -60,7 +60,7 @@ namespace SmokingCessation.WebAPI.Controllers
             return Ok(new BaseResponseModel<string>(
                  StatusCodes.Status200OK,
                  ResponseCodeConstants.SUCCESS,
-                 "Sửa thành công")); ;
+                 MessageConstants.UPDATE_SUCCESS)); ;
         }
 
         [HttpDelete("{id}")]
@@ -72,7 +72,7 @@ namespace SmokingCessation.WebAPI.Controllers
             return Ok(new BaseResponseModel<string>(
                  StatusCodes.Status200OK,
                  ResponseCodeConstants.SUCCESS,
-                 "Xóa thành công")); ;
+                 MessageConstants.DELETE_SUCCESS)); ;
         }
 
 

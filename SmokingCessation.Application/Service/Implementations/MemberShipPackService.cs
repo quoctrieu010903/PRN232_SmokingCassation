@@ -8,6 +8,7 @@ using SmokingCessation.Application.DTOs.Fillter;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
+using SmokingCessation.Core.Constants;
 using SmokingCessation.Core.Response;
 using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
@@ -44,7 +45,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
             await _unitOfWork.Repository<MembershipPackage, bool>().AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, "SUCCESS", entity);
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, entity);
 
             
         }
@@ -56,7 +57,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var entity = await repo.GetByIdAsync(id);
 
             if (entity == null)
-                return new BaseResponseModel(StatusCodes.Status404NotFound, "NOT_FOUND", "Membership package not found");
+                return new BaseResponseModel(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND,MessageConstants.NOT_FOUND);
 
             entity.LastUpdatedBy = currentUser;
             entity.LastUpdatedTime = CoreHelper.SystemTimeNow;
@@ -67,7 +68,7 @@ namespace SmokingCessation.Application.Service.Implementations
             await repo.UpdateAsync(entity);
 
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, "SUCCESS", "Deleted successfully");
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.DELETE_SUCCESS);
 
         }
 
@@ -94,10 +95,10 @@ namespace SmokingCessation.Application.Service.Implementations
             var entity = await repo.GetByIdAsync(id);
 
             if (entity == null || entity.DeletedTime.HasValue)
-                return new BaseResponseModel(StatusCodes.Status404NotFound, "NOT_FOUND", "Membership package not found");
+                return new BaseResponseModel(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             var result = _mapper.Map<MemberShipPackageResponse>(entity);
-            return new BaseResponseModel(StatusCodes.Status200OK, "SUCCESS", result);
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, result);
 
         }
 
@@ -110,7 +111,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
             var entity = await repo.GetByIdAsync(id);
             if (entity == null)
-                return new BaseResponseModel(404, "NOT_FOUND", "Membership package not found");
+                return new BaseResponseModel(404, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             entity.LastUpdatedBy = currentUser;
             entity.LastUpdatedTime = CoreHelper.SystemTimeNow;
@@ -118,7 +119,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
             await repo.UpdateAsync(entity);
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, "SUCCESS", entity);
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, entity);
 
         }
     }
