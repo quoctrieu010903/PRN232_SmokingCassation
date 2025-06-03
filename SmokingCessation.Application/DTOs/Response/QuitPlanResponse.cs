@@ -9,6 +9,7 @@ namespace SmokingCessation.Application.DTOs.Response
 {
     public class QuitPlanResponse
     {
+        public Guid Id { get; set; }
         public string Reason { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset TargetDate { get; set; }
