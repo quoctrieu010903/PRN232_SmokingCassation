@@ -3,27 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SmokingCessation.Core.Base;
 using SmokingCessation.Domain.Enums;
 
-namespace SmokingCessation.Domain.Entities
+namespace SmokingCessation.Application.DTOs.Response
 {
-    public class QuitPlan : BaseEntity
+    public class QuitPlanResponse
     {
         public string Reason { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset TargetDate { get; set; }
         public int CreateNum { get; set; } // số lần user tạo một plan mới 
         public QuitPlanStatus Status { get; set; }
-
-      
         public Guid UserId { get; set; }
         public Guid PackageId { get; set; }
-
-
-        public virtual ApplicationUser User { get; set; }
-        public ICollection<ProgressLog> ProgressLogs { get; set; }
-  
-        public virtual MembershipPackage? MembershipPackage { get; set; }
     }
 }

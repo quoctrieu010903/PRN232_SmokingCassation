@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SmokingCessation.Infrastracture.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial_Database : Migration
+    public partial class initial_Database : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -336,8 +336,8 @@ namespace SmokingCessation.Infrastracture.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Reason = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TargetDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    TargetDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     CreateNum = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -371,8 +371,8 @@ namespace SmokingCessation.Infrastracture.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     QuitPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LogDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SmokedToday = table.Column<bool>(type: "bit", nullable: false),
+                    LogDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    SmokedToday = table.Column<int>(type: "int", nullable: false),
                     Note = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),

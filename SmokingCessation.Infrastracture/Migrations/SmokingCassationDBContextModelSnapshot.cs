@@ -471,8 +471,8 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<DateTimeOffset>("LastUpdatedTime")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTime>("LogDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("LogDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Note")
                         .IsRequired()
@@ -482,8 +482,8 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<Guid>("QuitPlanId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("SmokedToday")
-                        .HasColumnType("bit");
+                    b.Property<int>("SmokedToday")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -527,14 +527,14 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("TargetDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("TargetDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");

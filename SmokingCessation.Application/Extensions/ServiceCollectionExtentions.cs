@@ -36,6 +36,7 @@ namespace SmokingCessation.Application.Extensions
             services.AddScoped<ITokenService, TokenService>();
                 services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IMemberShipPackage, MemberShipPackService>();
+           services.AddScoped<IQuitPlanService, QuitPlanService>();
 
 
 
