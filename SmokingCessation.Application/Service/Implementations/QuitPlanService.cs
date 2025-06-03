@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using SmokingCessation.Application.DTOs.Fillter;
@@ -121,7 +117,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var entity = await _unitOfWork.Repository<QuitPlan, Guid>().GetByIdAsync(id);
             if (entity == null)
             {
-                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "The Quit Plan NotFound ");
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
             }
             var result = _mapper.Map<QuitPlanResponse>(entity);
 
@@ -136,10 +132,11 @@ namespace SmokingCessation.Application.Service.Implementations
             var existedEntity = await _unitOfWork.Repository<QuitPlan,Guid>().GetByIdAsync(id);
             if(existedEntity == null)
             {
-                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "The QuitPlan Not Found");
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
             }
             existedEntity.LastUpdatedBy = currentUser;
             existedEntity.LastUpdatedTime = CoreHelper.SystemTimeNow;
+
             _mapper.Map(request, existedEntity);
             await _unitOfWork.Repository<QuitPlan,QuitPlan>().UpdateAsync(existedEntity);
             await _unitOfWork.SaveChangesAsync();
