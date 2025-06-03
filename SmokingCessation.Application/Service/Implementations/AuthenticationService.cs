@@ -156,36 +156,41 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<AuthenticationResponse.UserResponse> RegisterAsync(AuthenticationRequest.UserRegisterRequest request)
         {
-           var existingUser = await _userManager.FindByEmailAsync(request.Email);
+            string userId = _userContext.GetUserId();
+            var existingUser = await _userManager.FindByEmailAsync(request.Email);
             if (existingUser != null)
             {
-                _logger.LogError("Email already exists");
                 throw new Exception("Email already exists");
             }
+              var existingUserName = await _userManager.FindByNameAsync(request.DesiredUserName);
+            if (existingUserName != null)
+            {
+               
+                throw new Exception("Username already exists.");
+            }
+
             var newUser = _mapper.Map<ApplicationUser>(request);
-            newUser.UserName = request.FullName;
+         
+            newUser.UserName = request.DesiredUserName;
+            newUser.CreatedTime = CoreHelper.SystemTimeNow;
+            newUser.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            newUser.CreatedBy = userId;
+            newUser.LastUpdatedBy = userId;
+
+
 
             var result = await _userManager.CreateAsync(newUser, request.Password);
             if (!result.Succeeded)
                 throw new Exception("Failed to create user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
 
            
-            var roleExists = await _roleManager.RoleExistsAsync(request.RoleName);
-            if (!roleExists)
-                throw new Exception($"Role '{request.RoleName}' does not exist. Only predefined roles can be assigned.");
-
-            var currentUser = _userContext.GetCurrentUser();
-            if (request.RoleName == UserRoles.Admin && (currentUser == null || !currentUser.isInRole(UserRoles.Admin)))
-                throw new Exception("Only Admins can assign Admin role.");
-
+           
             // Gán role
-            await _userManager.AddToRoleAsync(newUser, request.RoleName);
+            await _userManager.AddToRoleAsync(newUser, UserRoles.Member);
 
-            _logger.LogInformation("User created with role: {Role}", request.RoleName);
             await _tokenService.GenerateToken(newUser);
 
-            newUser.CreatedTime = CoreHelper.SystemTimeNow;
-            newUser.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            
 
             return _mapper.Map<AuthenticationResponse.UserResponse>(newUser);
         }

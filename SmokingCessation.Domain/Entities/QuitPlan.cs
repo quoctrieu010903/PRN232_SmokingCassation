@@ -18,9 +18,12 @@ namespace SmokingCessation.Domain.Entities
 
       
         public Guid UserId { get; set; }
+        public Guid PackageId { get; set; }
 
-    
+
         public virtual ApplicationUser User { get; set; }
         public ICollection<ProgressLog> ProgressLogs { get; set; }
+  
+        public virtual MembershipPackage? MembershipPackage { get; set; }
     }
 }

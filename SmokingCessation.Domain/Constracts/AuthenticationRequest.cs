@@ -10,8 +10,8 @@ namespace SmokingCessation.Application.DTOs.Request
             public string FullName { get; set; }
             public string Email { get; set; }
             public string Password { get; set; }
-            public string RoleName { get; set; } = UserRoles.Member;
-           
+            public string DesiredUserName { get; set; }
+
 
         }
         public class UserLoginRequest
