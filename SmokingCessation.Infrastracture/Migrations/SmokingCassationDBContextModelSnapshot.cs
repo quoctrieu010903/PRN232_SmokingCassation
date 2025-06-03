@@ -3,21 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmokingCessation.Infrastracture.Data.Persistence;
-
 
 #nullable disable
 
 namespace SmokingCessation.Infrastracture.Migrations
 {
     [DbContext(typeof(SmokingCassationDBContext))]
-    [Migration("20250523070924_InitialDatabase")]
-    partial class InitialDatabase
+    partial class SmokingCassationDBContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -379,6 +375,12 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<int>("DurationMonths")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Features")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -517,6 +519,9 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<DateTimeOffset>("LastUpdatedTime")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<Guid>("PackageId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasMaxLength(1000)
@@ -535,6 +540,8 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PackageId");
 
                     b.HasIndex("UserId");
 
@@ -718,11 +725,17 @@ namespace SmokingCessation.Infrastracture.Migrations
 
             modelBuilder.Entity("SmokingCessation.Domain.Entities.QuitPlan", b =>
                 {
+                    b.HasOne("SmokingCessation.Domain.Entities.MembershipPackage", "MembershipPackage")
+                        .WithMany("QuitPlans")
+                        .HasForeignKey("PackageId");
+
                     b.HasOne("SmokingCessation.Domain.Entities.ApplicationUser", "User")
                         .WithMany("QuitPlans")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MembershipPackage");
 
                     b.Navigation("User");
                 });
@@ -778,6 +791,8 @@ namespace SmokingCessation.Infrastracture.Migrations
             modelBuilder.Entity("SmokingCessation.Domain.Entities.MembershipPackage", b =>
                 {
                     b.Navigation("Payments");
+
+                    b.Navigation("QuitPlans");
                 });
 
             modelBuilder.Entity("SmokingCessation.Domain.Entities.QuitPlan", b =>

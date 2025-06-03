@@ -1,7 +1,10 @@
 ﻿
+using AutoMapper.Features;
 using Microsoft.AspNetCore.Identity;
 using SmokingCessation.Core.Constants;
+using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
+using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Infrastracture.Data.Persistence;
 
@@ -22,12 +25,6 @@ namespace SmokingCessation.Infrastracture.Seeder
                 {
                     _dbContext.Achievements.AddRange(GetAchievements());
                 }
-
-                if (!_dbContext.UserAchievements.Any())
-                {
-                    _dbContext.UserAchievements.AddRange(GetUserAchievements());
-                }
-
                 if (!_dbContext.Blogs.Any())
                 {
                     _dbContext.Blogs.AddRange(GetBlogs());
@@ -37,6 +34,10 @@ namespace SmokingCessation.Infrastracture.Seeder
                     var roles = GetRoles();
                     _dbContext.Roles.AddRange(roles);
 
+                }
+                if (!_dbContext.MembershipPackages.Any()) // Giả sử bạn có DbSet<MembershipPackage> MembershipPackages trong DbContext
+                {
+                    _dbContext.MembershipPackages.AddRange(GetMembershipPackages());
                 }
                 await _dbContext.SaveChangesAsync();
             }
@@ -131,14 +132,16 @@ namespace SmokingCessation.Infrastracture.Seeder
             {
                new Achievement
                 {
-                    Id = Guid.Parse("aaaa1111-1111-1111-1111-111111111111"),
+                
+                    Id = Guid.Parse("365B7E24-1CB1-4128-8D63-7C60604CD977"),
                     Title = "1 Week Smoke-Free",
                     Description = "Reached 7 days without smoking",
                     IconUrl = "https://cdn-icons-png.flaticon.com/512/2921/2921222.png"
                 },
                 new Achievement
                 {
-                    Id = Guid.Parse("aaaa2222-2222-2222-2222-222222222222"),
+               
+                    Id = Guid.Parse("AB1FE570-A021-4541-8553-A4AF695D73B8"),
                     Title = "First Quit Plan",
                     Description = "Created a quit plan",
                     IconUrl = "https://cdn-icons-png.flaticon.com/512/1828/1828843.png"
@@ -146,24 +149,64 @@ namespace SmokingCessation.Infrastracture.Seeder
             };
         }
 
-        public static List<UserAchievement> GetUserAchievements()
+        public static List<MembershipPackage> GetMembershipPackages()
         {
-            return new List<UserAchievement>
+            return new List<MembershipPackage> {
+                new MembershipPackage
             {
-                new UserAchievement
+                  
+                Id = Guid.Parse("C9ABEC75-07BB-4C29-8EC3-95939DC3D548"), // Sử dụng Guid duy nhất cho ID
+                Name = "Gói Miễn Phí",
+                Price = 0.00m,
+                Type = MembershipType.Free,
+                Description = "Gói miễn phí với các tính năng cơ bản như theo dõi tiến độ và nhiệm vụ hàng ngày.",
+                DurationMonths = 0, // Gói Free không có thời hạn cố định, hoặc là 0 tháng
+                Features = "Theo dõi tiến độ, nhiệm vụ cơ bản, nhật ký hút thuốc.",
+                CreatedTime = CoreHelper.SystemTimeNow,
+                LastUpdatedTime = CoreHelper.SystemTimeNow
+                // CreatedBy, LastUpdatedBy, DeletedBy, DeletedTime có thể để null
+            },
+                new MembershipPackage
                 {
-                    Id = Guid.NewGuid(),
-                    UserId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"), // John
-                    AchievementId = Guid.Parse("aaaa1111-1111-1111-1111-111111111111")
+                    Id = Guid.Parse("3BF04C57-E0F9-46AB-BC32-03F5A12759CB"),
+                    Name = "Gói Cơ Bản",
+                    Price = 50000.00m, // Ví dụ giá
+                    Type = MembershipType.Basic,
+                    Description = "Gói cơ bản bao gồm các tính năng nâng cao và tài nguyên hỗ trợ.",
+                    DurationMonths = 1, // Gói Basic kéo dài 1 tháng
+                    Features = "Tất cả của Gói Miễn Phí, thêm: Kế hoạch cai thuốc cá nhân hóa, báo cáo tiến độ chi tiết, 10 nhiệm vụ hàng ngày.",
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                    LastUpdatedTime = CoreHelper.SystemTimeNow
                 },
-                new UserAchievement
+                new MembershipPackage
                 {
-                    Id = Guid.NewGuid(),
-                    UserId = Guid.Parse("f77b8d8a-345e-4a63-8928-2ddbdcf7b93b"), // Jane
-                    AchievementId = Guid.Parse("aaaa2222-2222-2222-2222-222222222222")
+                    Id = Guid.Parse("BE990A1B-8667-4421-9FEA-69CFEB6E1E49"),
+                    Name = "Gói Cao Cấp",
+                    Price = 150000.00m, // Ví dụ giá
+                    Type = MembershipType.Premium,
+                    Description = "Gói cao cấp với tất cả tính năng, hỗ trợ cá nhân và quyền truy cập độc quyền.",
+                    DurationMonths = 3, // Gói Premium kéo dài 3 tháng
+                    Features = "Tất cả của Gói Cơ Bản, thêm: Tư vấn 1-1 với chuyên gia (2 buổi/tháng), truy cập thư viện video độc quyền, ưu tiên hỗ trợ, 20 nhiệm vụ hàng ngày.",
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                    LastUpdatedTime = CoreHelper.SystemTimeNow
+                },
+                new MembershipPackage
+                {
+                    
+                    Id = Guid.Parse("8F0467C6-F75B-4F66-B787-EA8BE3AA509B"),
+                    Name = "Gói Doanh Nghiệp",
+                    Price = 500000.00m, // Ví dụ giá
+                    Type = MembershipType.Enterprise,
+                    Description = "Gói dành cho doanh nghiệp, cung cấp giải pháp cai thuốc cho nhân viên.",
+                    DurationMonths = 12, // Gói Enterprise kéo dài 12 tháng
+                    Features = "Tất cả của Gói Cao Cấp, thêm: Bảng điều khiển quản lý nhóm, báo cáo tổng hợp, chương trình sức khỏe tùy chỉnh, hỗ trợ triển khai tại công ty.",
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                    LastUpdatedTime = CoreHelper.SystemTimeNow
                 }
             };
         }
+            
+      
 
         public static List<Blog> GetBlogs()
         {

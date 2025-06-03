@@ -15,6 +15,12 @@ namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
             builder.HasOne(q => q.User)
                    .WithMany(u => u.QuitPlans)
                    .HasForeignKey(q => q.UserId);
+          
+            builder.HasOne(qp => qp.MembershipPackage)
+             .WithMany(mp => mp.QuitPlans) // Bạn cần thêm ICollection<QuitPlan> QuitPlans vào MembershipPackage
+             .HasForeignKey(qp => qp.PackageId)
+             .IsRequired(false); // Hoặc true nếu mọi QuitPlan phải thuộc một Package
+
         }
     }
 }
