@@ -12,7 +12,7 @@ using SmokingCessation.Infrastracture.Data.Persistence;
 namespace SmokingCessation.Infrastracture.Migrations
 {
     [DbContext(typeof(SmokingCassationDBContext))]
-    [Migration("20250605155338_Initial_Database")]
+    [Migration("20250605160109_Initial_Database")]
     partial class Initial_Database
     {
         /// <inheritdoc />
