@@ -332,10 +332,21 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<DateTimeOffset?>("DeletedTime")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("Excerpt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FeaturedImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset>("LastUpdatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("PublishedDate")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<int>("Status")
@@ -345,11 +356,63 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
 
                     b.ToTable("Blogs");
+                });
+
+            modelBuilder.Entity("SmokingCessation.Domain.Entities.Feedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BlogId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsApproved")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("LastUpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlogId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Feedbacks");
                 });
 
             modelBuilder.Entity("SmokingCessation.Domain.Entities.MembershipPackage", b =>
@@ -589,6 +652,51 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.ToTable("Rankings");
                 });
 
+            modelBuilder.Entity("SmokingCessation.Domain.Entities.Rating", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BlogId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("LastUpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("RatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<float>("Start")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BlogId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Rating");
+                });
+
             modelBuilder.Entity("SmokingCessation.Domain.Entities.UserAchievement", b =>
                 {
                     b.Property<Guid>("Id")
@@ -693,6 +801,25 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Navigation("Author");
                 });
 
+            modelBuilder.Entity("SmokingCessation.Domain.Entities.Feedback", b =>
+                {
+                    b.HasOne("SmokingCessation.Domain.Entities.Blog", "Blog")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmokingCessation.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Blog");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SmokingCessation.Domain.Entities.Payment", b =>
                 {
                     b.HasOne("SmokingCessation.Domain.Entities.MembershipPackage", "Package")
@@ -751,6 +878,25 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SmokingCessation.Domain.Entities.Rating", b =>
+                {
+                    b.HasOne("SmokingCessation.Domain.Entities.Blog", "Blog")
+                        .WithMany("Ratings")
+                        .HasForeignKey("BlogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmokingCessation.Domain.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Blog");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SmokingCessation.Domain.Entities.UserAchievement", b =>
                 {
                     b.HasOne("SmokingCessation.Domain.Entities.Achievement", "Achievement")
@@ -786,6 +932,13 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Navigation("Ranking");
 
                     b.Navigation("UserAchievements");
+                });
+
+            modelBuilder.Entity("SmokingCessation.Domain.Entities.Blog", b =>
+                {
+                    b.Navigation("Feedbacks");
+
+                    b.Navigation("Ratings");
                 });
 
             modelBuilder.Entity("SmokingCessation.Domain.Entities.MembershipPackage", b =>

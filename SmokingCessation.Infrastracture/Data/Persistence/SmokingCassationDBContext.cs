@@ -27,6 +27,8 @@ namespace SmokingCessation.Infrastracture.Data.Persistence
         public DbSet<Achievement> Achievements { get; set; }
         public DbSet<UserAchievement> UserAchievements { get; set; }
         public DbSet<Blog> Blogs { get; set; }
+        public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<Rating> Rating { get; set; }
         public DbSet<Ranking> Rankings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

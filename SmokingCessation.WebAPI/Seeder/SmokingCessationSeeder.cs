@@ -1,9 +1,11 @@
 ﻿    
 using Microsoft.AspNetCore.Identity;
 using SmokingCessation.Core.Constants;
+using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Infrastracture.Data.Persistence;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SmokingCessation.Infrastracture.Seeder
 {
@@ -69,14 +71,17 @@ namespace SmokingCessation.Infrastracture.Seeder
         {
             return new List<ApplicationUser>
             {
+
                 new ApplicationUser
                 {
                     Id = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
                     UserName = "john.doe",
                     FullName = "John Doe",
                     Email = "john.doe@example.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                     EmailConfirmed = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                     SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new ApplicationUser
                 {
@@ -84,8 +89,10 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "jane.smith",
                     FullName = "Jane Smith",
                     Email = "jane.smith@example.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                     EmailConfirmed = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                     SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new ApplicationUser
                 {
@@ -93,8 +100,10 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "quoctrieu15",
                     FullName = "Quoc Trieu",
                     Email = "luongquoctrieu165@gmail.com", // Sửa lỗi định dạng email
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                     EmailConfirmed = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                     SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new ApplicationUser
                 {
@@ -102,8 +111,10 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "ThanhVu22",
                     FullName = "Lê Thanh Vũ",
                     Email = "vult2911@gmail.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                     EmailConfirmed = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                     SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new ApplicationUser
                 {
@@ -111,17 +122,21 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "VietQuoc01",
                     FullName = "Nguyễn Trần Việt Quốc",
                     Email = "ntvq88@gmail.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                     EmailConfirmed = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                    SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new ApplicationUser
                 {
                     Id = Guid.Parse("4BD6B6BC-58E9-4A2A-B1CE-3FF3F11D5D4C"),
                     UserName = "NhatTruong02",
                     FullName = "Lê Nhật Trường",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
                     Email = "ltn04098@gmail.com",
                     EmailConfirmed = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                    SecurityStamp = Guid.NewGuid().ToString()
                 }
             };
         }
@@ -176,7 +191,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Title = "My Journey to Quit Smoking",
                     Content = "I started my quit journey this week...",
                     AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
-                    CreatedTime = DateTime.UtcNow
+                    CreatedTime = CoreHelper.SystemTimeNow
                 },
                 new Blog
                 {
@@ -184,7 +199,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Title = "5 Tips to Beat Cravings",
                     Content = "Drink water, exercise, and avoid triggers...",
                     AuthorId = Guid.Parse("f77b8d8a-345e-4a63-8928-2ddbdcf7b93b"),
-                    CreatedTime = DateTime.UtcNow
+                    CreatedTime = CoreHelper.SystemTimeNow
                 }
             };
         }
