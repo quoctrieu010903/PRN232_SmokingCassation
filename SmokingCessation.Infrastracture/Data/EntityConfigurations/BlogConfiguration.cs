@@ -14,6 +14,16 @@ namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
             builder.HasOne(b => b.Author)
                    .WithMany(u => u.Blogs)
                    .HasForeignKey(b => b.AuthorId);
+            builder.HasMany(b=> b.Feedbacks)
+                    .WithOne(f=>f.Blog)
+                    .HasForeignKey(f => f.BlogId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(x=>x.Ratings)
+                    .WithOne(f=>f.Blog)
+                    .HasForeignKey(f=>f.BlogId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }
