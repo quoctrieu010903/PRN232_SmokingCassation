@@ -51,6 +51,7 @@ namespace SmokingCessation.WebAPI.Extensions
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json",
                     "FPTU_SmokingCessation API V1");
+                c.RoutePrefix = "swagger";
             });
 
             return app;
