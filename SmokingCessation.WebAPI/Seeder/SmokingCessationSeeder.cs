@@ -30,10 +30,10 @@ namespace SmokingCessation.Infrastracture.Seeder
                     _dbContext.UserAchievements.AddRange(GetUserAchievements());
                 }
 
-                if (!_dbContext.Blogs.Any())
-                {
-                    _dbContext.Blogs.AddRange(GetBlogs());
-                }
+                //if (!_dbContext.Blogs.Any())
+                //{
+                //    _dbContext.Blogs.AddRange(GetBlogs());
+                //}
                 if (!_dbContext.Roles.Any())
                 {
                     var roles = GetRoles(); 
@@ -180,29 +180,30 @@ namespace SmokingCessation.Infrastracture.Seeder
                 }
             };
         }
-
-        public static List<Blog> GetBlogs()
-        {
-            return new List<Blog>
-            {
-                new Blog
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "My Journey to Quit Smoking",
-                    Content = "I started my quit journey this week...",
-                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
-                    CreatedTime = CoreHelper.SystemTimeNow
-                },
-                new Blog
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "5 Tips to Beat Cravings",
-                    Content = "Drink water, exercise, and avoid triggers...",
-                    AuthorId = Guid.Parse("f77b8d8a-345e-4a63-8928-2ddbdcf7b93b"),
-                    CreatedTime = CoreHelper.SystemTimeNow
-                }
-            };
-        }
+        #region Seeding Blog data
+        //public static List<Blog> GetBlogs()
+        //{
+        //    return new List<Blog>
+        //    {
+        //        new Blog
+        //        {
+        //            Id = Guid.NewGuid(),
+        //            Title = "My Journey to Quit Smoking",
+        //            Content = "I started my quit journey this week...",
+        //            AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+        //            CreatedTime = CoreHelper.SystemTimeNow
+        //        },
+        //        new Blog
+        //        {
+        //            Id = Guid.NewGuid(),
+        //            Title = "5 Tips to Beat Cravings",
+        //            Content = "Drink water, exercise, and avoid triggers...",
+        //            AuthorId = Guid.Parse("f77b8d8a-345e-4a63-8928-2ddbdcf7b93b"),
+        //            CreatedTime = CoreHelper.SystemTimeNow
+        //        }
+        //    };
+        //}
+        #endregion
     }
 
 }

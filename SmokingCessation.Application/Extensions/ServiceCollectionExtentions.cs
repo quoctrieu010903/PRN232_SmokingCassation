@@ -18,27 +18,28 @@ namespace SmokingCessation.Application.Extensions
 {
     public static class ServiceCollectionExtentions
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services , IConfiguration configuration)
+        public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddHttpContextAccessor();
 
             #region Add Scoped 
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
             services.AddScoped<JWTHelper>();
-           
-          
-                services.AddScoped<CurrentUserResponse>();
-            
 
-               
-                services.Configure<JwtSettings>(configuration.GetSection("JwtConfig"));
-            services.AddScoped<IUserContext, UserContext>();    
+
+            services.AddScoped<CurrentUserResponse>();
+
+
+
+            services.Configure<JwtSettings>(configuration.GetSection("JwtConfig"));
+            services.AddScoped<IUserContext, UserContext>();
             services.AddScoped<ITokenService, TokenService>();
-                services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IMemberShipPackage, MemberShipPackService>();
-           services.AddScoped<IQuitPlanService, QuitPlanService>();
-            services.AddScoped<IProgressLogsService , ProgressLogsService>();
+            services.AddScoped<IQuitPlanService, QuitPlanService>();
+            services.AddScoped<IProgressLogsService, ProgressLogsService>();
             services.AddScoped<IBlogService, BlogService>();
+            services.AddScoped<IFeedbackService, FeedbackService>();
 
 
 

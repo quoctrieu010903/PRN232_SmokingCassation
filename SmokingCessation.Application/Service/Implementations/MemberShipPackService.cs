@@ -83,8 +83,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
             var response = await _unitOfWork.Repository<MembershipPackage, MembershipPackage>().GetAllWithSpecAsync(baseSpeci);
             var result = _mapper.Map<List<MemberShipPackageResponse>>(response);
-
-
+            
             return PaginatedList<MemberShipPackageResponse>.Create(result, model.PageNumber,
                 model.PageSize);
         }
