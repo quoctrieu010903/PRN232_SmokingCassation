@@ -37,10 +37,8 @@ app.UseCors(x => x
 
 
 
-if (app.Environment.IsDevelopment())
-{
-    app.WithSwagger();
-}
+
+app.WithSwagger();
 
 app.UseAuthentication();
 
