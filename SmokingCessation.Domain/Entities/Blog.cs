@@ -13,7 +13,6 @@ namespace SmokingCessation.Domain.Entities
         public BlogStatus Status { get; set; }
         public DateTimeOffset PublishedDate { get; set; } = CoreHelper.SystemTimeNow;
         public string FeaturedImageUrl { get; set; }
-        public string Excerpt { get; set; }
         public int ViewCount { get; set; } = 0;
 
         // Navigation properties

@@ -12,7 +12,6 @@ namespace SmokingCessation.Domain.Entities
         public Guid BlogId { get; set; }
         public Guid UserId { get; set; }
         public string Comment { get; set; }
-        public bool IsApproved { get; set; }  = false;
         public Blog Blog { get; set; }
         public ApplicationUser User { get; set; }
     }

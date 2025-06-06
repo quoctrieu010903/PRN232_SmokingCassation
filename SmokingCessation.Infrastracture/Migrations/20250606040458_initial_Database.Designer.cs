@@ -12,8 +12,8 @@ using SmokingCessation.Infrastracture.Data.Persistence;
 namespace SmokingCessation.Infrastracture.Migrations
 {
     [DbContext(typeof(SmokingCassationDBContext))]
-    [Migration("20250605160109_Initial_Database")]
-    partial class Initial_Database
+    [Migration("20250606040458_initial_Database")]
+    partial class initial_Database
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -335,10 +335,6 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<DateTimeOffset?>("DeletedTime")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<string>("Excerpt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FeaturedImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -394,11 +390,6 @@ namespace SmokingCessation.Infrastracture.Migrations
 
                     b.Property<DateTimeOffset?>("DeletedTime")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("IsApproved")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
 
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -685,8 +676,8 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<DateTimeOffset>("RatedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<float>("Start")
-                        .HasColumnType("real");
+                    b.Property<int>("Start")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");

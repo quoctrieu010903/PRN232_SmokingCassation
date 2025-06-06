@@ -25,10 +25,10 @@ namespace SmokingCessation.Infrastracture.Seeder
                 {
                     _dbContext.Achievements.AddRange(GetAchievements());
                 }
-                if (!_dbContext.Blogs.Any())
-                {
-                    _dbContext.Blogs.AddRange(GetBlogs());
-                }
+                //if (!_dbContext.Blogs.Any())
+                //{
+                //    _dbContext.Blogs.AddRange(GetBlogs());
+                //}
                 if (!_dbContext.Roles.Any())
                 {
                     var roles = GetRoles();

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SmokingCessation.Infrastracture.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial_Database : Migration
+    public partial class initial_Database : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -223,7 +223,6 @@ namespace SmokingCessation.Infrastracture.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     PublishedDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     FeaturedImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Excerpt = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ViewCount = table.Column<int>(type: "int", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -377,7 +376,6 @@ namespace SmokingCessation.Infrastracture.Migrations
                     BlogId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
-                    IsApproved = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -409,7 +407,7 @@ namespace SmokingCessation.Infrastracture.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     BlogId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Start = table.Column<float>(type: "real", nullable: false),
+                    Start = table.Column<int>(type: "int", nullable: false),
                     RatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),

@@ -17,8 +17,7 @@ namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
             builder.Property(f => f.Comment)
                 .IsRequired()
                 .HasMaxLength(1000);
-            builder.Property(f => f.IsApproved)
-                .HasDefaultValue(false);
+          
 
             // Relationships
             builder.HasOne(f => f.Blog)
