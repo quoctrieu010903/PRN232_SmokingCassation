@@ -14,8 +14,7 @@ namespace SmokingCessation.Application.Service.Interface
     {
         Task<BaseResponseModel> Create(FeedbackRequest request);
         Task<BaseResponseModel> Update(Guid id, FeedbackRequest request);
-        Task<BaseResponseModel> Delete(Guid id);
-        Task<BaseResponseModel> Approve(Guid id, bool isApproved);
+        Task<BaseResponseModel> Delete(Guid id);    
         Task<PaginatedList<FeedbackResponse>> GetByBlogId(Guid blogId, PagingRequestModel paging);
         Task<PaginatedList<FeedbackResponse>> GetByUserId(Guid userId, PagingRequestModel paging);
         Task<BaseResponseModel<FeedbackResponse>> GetById(Guid id);

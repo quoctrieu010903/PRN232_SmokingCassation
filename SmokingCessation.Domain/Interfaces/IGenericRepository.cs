@@ -15,6 +15,8 @@ namespace SmokingCessation.Domain.Interfaces
 
         ///  Default Procedures
         Task<IEnumerable<TEntity>> GetAllAsync(bool tracked = true);
+        Task<IEnumerable<TEntity>> GetAllWithIncludeAsync( bool tracked = true, params Expression<Func<TEntity, object>>[] includes);
+
         Task<TEntity?> GetByIdAsync(TKey id);
 
         /// Retrieve with specifications

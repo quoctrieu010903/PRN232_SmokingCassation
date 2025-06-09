@@ -64,6 +64,13 @@ namespace SmokingCessation.Application.Mapping
                 .ForMember(dest => dest.BlogTitle, opt => opt.MapFrom(src => src.Blog.Title))
                 .ForMember(dest => dest.UserName , opt => opt.MapFrom(src => src.User.UserName));
             #endregion
+            #region Rating mapper
+            CreateMap<RatingRequest, Rating>();
+            CreateMap<Rating, RatingResponse>()
+                .ForMember(dest => dest.BlogTitle, opt => opt.MapFrom(src => src.Blog.Title))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Value , opt => opt.MapFrom(src => src.Start));
+            #endregion
         }
     }
 }

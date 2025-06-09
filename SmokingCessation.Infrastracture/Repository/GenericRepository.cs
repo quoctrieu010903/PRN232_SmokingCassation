@@ -41,6 +41,23 @@ namespace SmokingCessation.Infrastracture.Repository
 
             return await query.ToListAsync();
         }
+        public async Task<IEnumerable<TEntity>> GetAllWithIncludeAsync(bool tracked = true, params Expression<Func<TEntity, object>>[] includes)
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            if (!tracked)
+                query = query.AsNoTracking();
+
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return await query.ToListAsync();
+        }
 
         public async Task<TEntity?> GetWithSpecAsync(ISpecification<TEntity> specification, bool tracked = true)
         {

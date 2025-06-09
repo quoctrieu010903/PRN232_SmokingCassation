@@ -40,6 +40,7 @@ namespace SmokingCessation.Application.Extensions
             services.AddScoped<IProgressLogsService, ProgressLogsService>();
             services.AddScoped<IBlogService, BlogService>();
             services.AddScoped<IFeedbackService, FeedbackService>();
+            services.AddScoped<IRatingService, RatingService>();
 
 
 

@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 using AutoMapper;
-using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
-using SmokingCessation.Core.CustomExceptionss;
 using SmokingCessation.Core.Response;
 using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
+using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Domain.Specifications;
 
@@ -30,6 +25,24 @@ namespace SmokingCessation.Application.Service.Implementations
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userContext = userContext;
+        }
+
+        public async Task<BaseResponseModel> ChangeStatus(Guid id, BlogStatus status)
+        {
+            var repo = _unitOfWork.Repository<Blog, Guid>();
+            var blog = await repo.GetByIdAsync(id);
+            if (blog == null)
+                return new BaseResponseModel(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+
+            blog.Status = status;
+         
+           
+            blog.LastUpdatedBy = _userContext.GetUserId();
+            blog.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            await repo.UpdateAsync(blog);
+            await _unitOfWork.SaveChangesAsync();
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, "Status updated");
+
         }
 
         public async Task<BaseResponseModel> Create(BlogRequest request)
@@ -67,8 +80,21 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<PaginatedList<BlogResponse>> GetAll(PagingRequestModel model)
         {
-            var blogs = await _unitOfWork.Repository<Blog, Blog>().GetAllAsync();
+            var blogs = await _unitOfWork.Repository<Blog, Blog>().GetAllWithIncludeAsync(true, p=>p.Ratings , p => p.Feedbacks);
+            // Tính average rating cho tất cả blog một lần
+            var avgDict = blogs
+                .Where(b => b.Ratings != null && b.Ratings.Any())
+                .ToDictionary(
+                    b => b.Id,
+                    b => b.Ratings.Average(r => r.Start)
+                );
             var result = _mapper.Map<List<BlogResponse>>(blogs.ToList());
+       
+            foreach (var blog in result)
+            {
+                blog.AverageRating = avgDict.TryGetValue(blog.Id, out var avg) ? avg : 0;
+            
+            }
             return PaginatedList<BlogResponse>.Create(result, model.PageNumber, model.PageSize);
 
         }
@@ -81,8 +107,21 @@ namespace SmokingCessation.Application.Service.Implementations
                 return new BaseResponseModel<BlogResponse>(StatusCodes.Status404NotFound,ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             var result = _mapper.Map<BlogResponse>(blog);
-            return new BaseResponseModel<BlogResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.CREATE_SUCCESS);
+            return new BaseResponseModel<BlogResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS,result, MessageConstants.GET_SUCCESS);
 
+        }
+
+        public async Task<BaseResponseModel> IncreaseViewCount(Guid id)
+        {
+            var repo = _unitOfWork.Repository<Blog, Guid>();
+            var blog = await repo.GetByIdAsync(id);
+            if (blog == null)
+                return new BaseResponseModel(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+
+            blog.ViewCount += 1;
+            await repo.UpdateAsync(blog);
+            await _unitOfWork.SaveChangesAsync();
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, "View count increased");
         }
 
         public async Task<BaseResponseModel> Update(Guid id, BlogRequest request)
@@ -98,5 +137,6 @@ namespace SmokingCessation.Application.Service.Implementations
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.CREATE_SUCCESS);
 
         }
+      
     }
 }
