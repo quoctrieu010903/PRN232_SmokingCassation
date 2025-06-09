@@ -4,7 +4,9 @@ namespace SmokingCessation.Domain.Enums
 {
     public enum BlogStatus
     {
-        Draft,
+        Draft, 
+        PendingApproval, 
+        Rejected,
         Published
     }
 }

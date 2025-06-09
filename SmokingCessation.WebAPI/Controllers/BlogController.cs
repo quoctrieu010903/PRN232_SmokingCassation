@@ -7,6 +7,7 @@ using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
 using SmokingCessation.Core.Response;
+using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Specifications;
 
 namespace SmokingCessation.WebAPI.Controllers
@@ -71,5 +72,15 @@ namespace SmokingCessation.WebAPI.Controllers
                      ResponseCodeConstants.SUCCESS,
                      result));
         }
+
+        [HttpPut("{id}/status")]
+        [Authorize]
+        public async Task<IActionResult> ChangeStatus(Guid id, [FromQuery] BlogStatus status)
+        => StatusCode((await _service.ChangeStatus(id, status)).StatusCode, await _service.ChangeStatus(id, status));
+
+        [HttpPut("{id}/view")]
+        public async Task<IActionResult> IncreaseViewCount(Guid id)
+            => StatusCode((await _service.IncreaseViewCount(id)).StatusCode, await _service.IncreaseViewCount(id));
+
     }
 }

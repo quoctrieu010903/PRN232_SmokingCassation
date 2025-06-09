@@ -30,19 +30,19 @@ namespace SmokingCessation.Application.Service.Implementations
             _userContext = userContext;
         }
 
-        public async Task<BaseResponseModel> Approve(Guid id, bool isApproved)
-        {
-            var repo = _unitOfWork.Repository<Feedback, Guid>();
-            var feedback = await repo.GetByIdAsync(id);
-            if (feedback == null)
-                return new BaseResponseModel(404, "NOT_FOUND", "Feedback not found");
+        //public async Task<BaseResponseModel> Approve(Guid id, bool isApproved)
+        //{
+        //    var repo = _unitOfWork.Repository<Feedback, Guid>();
+        //    var feedback = await repo.GetByIdAsync(id);
+        //    if (feedback == null)
+        //        return new BaseResponseModel(404, "NOT_FOUND", "Feedback not found");
 
            
-            await repo.UpdateAsync(feedback);
-            await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, isApproved ? "Feedback approved" : "Feedback rejected");
+        //    await repo.UpdateAsync(feedback);
+        //    await _unitOfWork.SaveChangesAsync();
+        //    return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, isApproved ? "Feedback approved" : "Feedback rejected");
 
-        }
+        //}
 
         public async Task<BaseResponseModel> Create(FeedbackRequest request)
         {
