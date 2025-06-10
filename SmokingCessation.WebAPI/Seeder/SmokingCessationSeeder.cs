@@ -78,7 +78,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "john.doe",
                     FullName = "John Doe",
                     Email = "john.doe@example.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedTime = CoreHelper.SystemTimeNow,
                      SecurityStamp = Guid.NewGuid().ToString()
@@ -89,7 +89,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "jane.smith",
                     FullName = "Jane Smith",
                     Email = "jane.smith@example.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedTime = CoreHelper.SystemTimeNow,
                      SecurityStamp = Guid.NewGuid().ToString()
@@ -100,7 +100,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "quoctrieu15",
                     FullName = "Quoc Trieu",
                     Email = "luongquoctrieu165@gmail.com", // Sửa lỗi định dạng email
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedTime = CoreHelper.SystemTimeNow,
                      SecurityStamp = Guid.NewGuid().ToString()
@@ -111,7 +111,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "ThanhVu22",
                     FullName = "Lê Thanh Vũ",
                     Email = "vult2911@gmail.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedTime = CoreHelper.SystemTimeNow,
                      SecurityStamp = Guid.NewGuid().ToString()
@@ -122,7 +122,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "VietQuoc01",
                     FullName = "Nguyễn Trần Việt Quốc",
                     Email = "ntvq88@gmail.com",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedTime = CoreHelper.SystemTimeNow,
                     SecurityStamp = Guid.NewGuid().ToString()
@@ -132,7 +132,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Id = Guid.Parse("4BD6B6BC-58E9-4A2A-B1CE-3FF3F11D5D4C"),
                     UserName = "NhatTruong02",
                     FullName = "Lê Nhật Trường",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("123456"),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     Email = "ltn04098@gmail.com",
                     EmailConfirmed = true,
                     CreatedTime = CoreHelper.SystemTimeNow,

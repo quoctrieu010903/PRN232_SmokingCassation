@@ -17,10 +17,7 @@ namespace SmokingCessation.Domain.Entities
         public PaymentStatus Status { get; set; }
       
         public Guid UserId { get; set; }
-        public Guid PackageId { get; set; }
-
-
         public virtual ApplicationUser User { get; set; }
-        public virtual MembershipPackage Package { get; set; }
+      
     }
 }

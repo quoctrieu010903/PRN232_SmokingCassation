@@ -16,9 +16,7 @@ namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
                    .WithMany(u => u.Payments)
                    .HasForeignKey(p => p.UserId);
 
-            builder.HasOne(p => p.Package)
-                   .WithMany(mp => mp.Payments)
-                   .HasForeignKey(p => p.PackageId);
+           
 
         }
     }

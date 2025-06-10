@@ -13,12 +13,7 @@ namespace SmokingCessation.Application.DTOs.Response
             public Guid Id { get; set; }
             public string FullName { get; set; }
             public string Email { get; set; }
-            public string Gender { get; set; }
-            public DateTime CreateAt { get; set; }
-            public DateTime UpdateAt { get; set; }
-            public string? AccessToken { get; set; }
-            public string? RefreshToken { get; set; }
-
+       
 
         }
         public class CurrentUserResponse
