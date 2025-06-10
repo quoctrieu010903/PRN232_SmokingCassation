@@ -24,7 +24,7 @@ namespace SmokingCessation.WebAPI.Controllers
         }
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<BaseResponseModel>> Create([FromBody] BlogRequest request)
+        public async Task<ActionResult<BaseResponseModel>> Create([FromForm] BlogRequest request)
         {
             var result = await _service.Create(request);
             return Ok(new BaseResponseModel(

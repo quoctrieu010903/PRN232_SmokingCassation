@@ -10,6 +10,7 @@ using SmokingCessation.Application.Service.Implementations;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Base;
 using SmokingCessation.Domain.Entities;
+using SmokingCessation.Infrastracture.Photos;
 using static SmokingCessation.Application.DTOs.Response.AuthenticationResponse;
 
 
@@ -32,6 +33,7 @@ namespace SmokingCessation.Application.Extensions
 
 
             services.Configure<JwtSettings>(configuration.GetSection("JwtConfig"));
+            services.Configure<CloundinarySettings>(configuration.GetSection("Cloudinary"));
             services.AddScoped<IUserContext, UserContext>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -41,6 +43,7 @@ namespace SmokingCessation.Application.Extensions
             services.AddScoped<IBlogService, BlogService>();
             services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddScoped<IRatingService, RatingService>();
+            services.AddScoped<IPhotoService, PhotoService>();
 
 
 

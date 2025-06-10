@@ -7,6 +7,7 @@ using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Infrastracture.Data;
 using SmokingCessation.Infrastracture.Data.Persistence;
+using SmokingCessation.Infrastracture.Photos;
 using SmokingCessation.Infrastracture.Repository;
 using SmokingCessation.Infrastracture.Seeder;
 
@@ -34,6 +35,7 @@ namespace SmokingCessation.Infrastracture.Extentions
                      .AddEntityFrameworkStores<SmokingCassationDBContext>()
                      .AddDefaultTokenProviders();
 
+            
             // Add Auto Mapper
             
 

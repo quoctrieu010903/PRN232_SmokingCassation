@@ -19,12 +19,14 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IUserContext _userContext;
+        private readonly IPhotoService _photoService;
 
-        public BlogService(IUnitOfWork unitOfWork, IMapper mapper, IUserContext userContext)
+        public BlogService(IUnitOfWork unitOfWork, IMapper mapper, IUserContext userContext, IPhotoService photoService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userContext = userContext;
+            _photoService = photoService;
         }
 
         public async Task<BaseResponseModel> ChangeStatus(Guid id, BlogStatus status)
@@ -47,9 +49,16 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Create(BlogRequest request)
         {
+            string? imageUrl = null;
+
+            if (request.FeaturedImage != null)
+            {
+                imageUrl = await _photoService.UploadPhotoAsync(request.FeaturedImage);
+            }
             var userId = _userContext.GetUserId();
             var blog = _mapper.Map<Blog>(request);
             blog.AuthorId = Guid.Parse(userId);
+            blog.FeaturedImageUrl = imageUrl;
             blog.PublishedDate = CoreHelper.SystemTimeNow;
             blog.CreatedTime = CoreHelper.SystemTimeNow;
 

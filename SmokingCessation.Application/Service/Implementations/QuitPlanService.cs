@@ -49,8 +49,8 @@ namespace SmokingCessation.Application.Service.Implementations
                 TargetDate = targetDate,
                 Status = request.Status,
                 UserId = Guid.Parse(_userContext.GetUserId()),
-                CreateNum = 1, // hoặc logic khác nếu cần
-                PackageId = package.Id,
+                //CreateNum = 1, // hoặc logic khác nếu cần
+                //PackageId = package.Id,     
                 CreatedBy = _userContext.GetUserId(),
                 LastUpdatedBy = _userContext.GetUserId(),
                 LastUpdatedTime = startDay,

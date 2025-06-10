@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using SmokingCessation.Domain.Entities;
+using System.Reflection.Emit;
 
 namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
 {
@@ -14,12 +15,13 @@ namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
             builder.Property(mp => mp.Description).HasMaxLength(1000);
             builder.Property(p => p.Type).HasConversion<int>();
 
-            builder.HasMany(mp => mp.QuitPlans)
-                  .WithOne(qp => qp.MembershipPackage)
-                  .HasForeignKey(qp => qp.PackageId) // Đảm bảo QuitPlan có FK PackageId
-                  .IsRequired(false); // Có thể QuitPlan không có PackageId (ví dụ: kế hoạch miễn phí)
-            builder.Property(mp => mp.DurationMonths)   
-                  .IsRequired(); // Thời hạn gói là bắt buộc cho mọi loại gói
+
+            builder.Property(mp => mp.DurationMonths);
+            // Relationship: 1 MembershipPackage → many QuitPlanTemplates
+            builder.HasMany(mp => mp.QuitPlanTemplates)
+                .WithOne(qpt => qpt.Package)
+                .HasForeignKey(qpt => qpt.PackageId)
+                .IsRequired();
 
             builder.Property(mp => mp.Features); // Features có thể là null hoặc chuỗi dài
 

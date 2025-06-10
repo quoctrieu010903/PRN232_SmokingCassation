@@ -36,7 +36,6 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task AssignUserRole(AssignUserRoles request)
         {
-            _logger.LogInformation("Assign user role : {@request}", request);
 
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
@@ -109,14 +108,13 @@ namespace SmokingCessation.Application.Service.Implementations
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                _logger.LogError("Failed to update user: {errors}", errors);
-                throw new Exception($"Failed to update user: {errors}");
+            
+                throw new Exception($"Failed to update user ");
             }
 
             var userResponse = _mapper.Map<ApplicationUser, UserResponse>(user);
             userResponse.AccessToken = token;
-            userResponse.RefreshToken = refreshToken;
+        
 
             return userResponse;
 
@@ -162,7 +160,10 @@ namespace SmokingCessation.Application.Service.Implementations
             {
                 throw new Exception("Email already exists");
             }
-              var existingUserName = await _userManager.FindByNameAsync(request.DesiredUserName);
+            // Tự động sinh username và fullname từ email
+            var (username, fullName) = GenerateUsernameAndFullNameFromEmail(request.Email);
+
+            var existingUserName = await _userManager.FindByNameAsync(username);
             if (existingUserName != null)
             {
                
@@ -170,8 +171,9 @@ namespace SmokingCessation.Application.Service.Implementations
             }
 
             var newUser = _mapper.Map<ApplicationUser>(request);
-         
-            newUser.UserName = request.DesiredUserName;
+
+            newUser.UserName = username;
+            newUser.FullName = fullName;
             newUser.CreatedTime = CoreHelper.SystemTimeNow;
             newUser.LastUpdatedTime = CoreHelper.SystemTimeNow;
             newUser.CreatedBy = userId;
@@ -194,13 +196,31 @@ namespace SmokingCessation.Application.Service.Implementations
 
             return _mapper.Map<AuthenticationResponse.UserResponse>(newUser);
         }
-             /// <summary>
-             /// Generates a unique username by concatenating the first name and last name.
-             /// </summary>
-             /// <param name="firstName">The first name of the user.</param>
-             /// <param name="lastName">The last name of the user.</param>
-             /// <returns>The generated unique username.</returns>
-        
+
+
+        /// <summary>
+        /// Generates a unique username by concatenating the first name and last name.
+        /// </summary>
+        /// <param name="firstName">The first name of the user.</param>
+        /// <param name="lastName">The last name of the user.</param>
+        /// <returns>The generated unique username.</returns>
+        public (string username, string fullName) GenerateUsernameAndFullNameFromEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))
+                throw new ArgumentException("Invalid email");
+
+            var localPart = email.Split('@')[0];
+            var username = localPart.Replace(".", "").ToLowerInvariant();
+
+            // Tách số ra khỏi chữ (ví dụ: nguyenvana123 => Nguyenvana 123)
+            var nameParts = System.Text.RegularExpressions.Regex.Split(localPart, @"(?<=\D)(?=\d)|[.\-_]");
+            var fullName = string.Join(" ", nameParts
+                .Where(p => !string.IsNullOrWhiteSpace(p))
+                .Select(p => char.ToUpper(p[0]) + p.Substring(1).ToLower())
+            );
+
+            return (username, fullName);
+        }
         public async Task<AuthenticationResponse.RevokeRefreshTokenResponse> RevokeRefreshToken(AuthenticationRequest.RefreshTokenRequest refreshTokenRemoveRequest)
         {
             _logger.LogInformation("Revoking refresh token");

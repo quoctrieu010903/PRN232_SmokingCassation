@@ -23,6 +23,8 @@ namespace SmokingCessation.Infrastracture.Data.Persistence
         public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<QuitPlan> QuitPlans { get; set; }
+        public DbSet<QuitPlanTemplate> QuitPlanTemplates { get; set; }
+        public DbSet<QuitPlanTask> QuitPlanTasks { get; set; }
         public DbSet<ProgressLog> ProgressLogs { get; set; }
         public DbSet<Achievement> Achievements { get; set; }
         public DbSet<UserAchievement> UserAchievements { get; set; }

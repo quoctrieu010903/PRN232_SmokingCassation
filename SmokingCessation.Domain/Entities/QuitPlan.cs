@@ -13,17 +13,18 @@ namespace SmokingCessation.Domain.Entities
         public string Reason { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset TargetDate { get; set; }
-        public int CreateNum { get; set; } // số lần user tạo một plan mới 
         public QuitPlanStatus Status { get; set; }
 
-      
         public Guid UserId { get; set; }
-        public Guid PackageId { get; set; }
+        public Guid TemplateId { get; set; }
 
-
-        public virtual ApplicationUser User { get; set; }
+    
+     
+        public ApplicationUser User { get; set; }
+        public QuitPlanTemplate Template { get; set; }
         public ICollection<ProgressLog> ProgressLogs { get; set; }
-  
-        public virtual MembershipPackage? MembershipPackage { get; set; }
+
+
+      
     }
 }
