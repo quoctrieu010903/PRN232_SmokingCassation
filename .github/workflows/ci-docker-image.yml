@@ -45,4 +45,4 @@ jobs:
           context: .
           file: ./SmokingCessation.WebAPI/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/smokingcassationflatform:latest, ${{ secrets.DOCKERHUB_USERNAME }}/smokingcassationflatform:${{ github.run_number }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/smokingcessationwebapi:latest, ${{ secrets.DOCKERHUB_USERNAME }}/smokingcessationwebapi:${{ github.run_number }}
