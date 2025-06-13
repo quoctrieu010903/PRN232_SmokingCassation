@@ -43,4 +43,4 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/smokingcessationwebapi:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/smokingcessationwebapi:${{ github.run_number }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/smokingcessationwebapi:5
