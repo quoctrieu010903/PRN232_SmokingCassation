@@ -14,19 +14,19 @@ namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
 
             // Relationships
             builder.HasOne(q => q.User)
-                   .WithMany(u => u.QuitPlans)
-                   .HasForeignKey(q => q.UserId)
-                   .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(q => q.Template)
-                   .WithMany(t => t.QuitPlans)
-                   .HasForeignKey(q => q.TemplateId)
-                   .OnDelete(DeleteBehavior.Cascade); // hoặc Restrict nếu không muốn xóa kế hoạch khi xóa template
+            .WithMany(u => u.QuitPlans)
+            .HasForeignKey(q => q.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(q => q.ProgressLogs)
-                   .WithOne(p => p.QuitPlan)
-                   .HasForeignKey(p => p.QuitPlanId)
-                   .OnDelete(DeleteBehavior.Cascade); // khi xóa QuitPlan thì xóa logs luôn
+                .WithOne(p => p.QuitPlan)
+                .HasForeignKey(p => p.QuitPlanId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(q => q.AdviceLogs)
+                .WithOne(a => a.QuitPlan)
+                .HasForeignKey(a => a.QuitPlanId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

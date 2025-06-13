@@ -19,6 +19,7 @@ namespace SmokingCessation.Domain.Interfaces
 
         Task<TEntity?> GetByIdAsync(TKey id);
 
+
         /// Retrieve with specifications
         Task<TEntity?> GetWithSpecAsync(ISpecification<TEntity> specification, bool tracked = true);
         Task<TResult?> GetWithSpecAndSelectorAsync<TResult>(ISpecification<TEntity> specification,

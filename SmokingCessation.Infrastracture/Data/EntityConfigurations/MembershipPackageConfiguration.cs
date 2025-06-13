@@ -17,12 +17,7 @@ namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
 
 
             builder.Property(mp => mp.DurationMonths);
-            // Relationship: 1 MembershipPackage → many QuitPlanTemplates
-            builder.HasMany(mp => mp.QuitPlanTemplates)
-                .WithOne(qpt => qpt.Package)
-                .HasForeignKey(qpt => qpt.PackageId)
-                .IsRequired();
-
+          
             builder.Property(mp => mp.Features); // Features có thể là null hoặc chuỗi dài
 
         }

@@ -5,6 +5,7 @@ using SmokingCessation.Application;
 using SmokingCessation.Infrastracture;
 using SmokingCessation.Infrastracture.Extentions;
 using SmokingCessation.Core.Base;
+using System.Text.Json;
 
 namespace SmokingCessation.WebAPI.Extensions
 {
@@ -35,50 +36,66 @@ namespace SmokingCessation.WebAPI.Extensions
 
         }
 
-        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
-        {
-            var jwtSettings = configuration.GetSection("JwtConfig").Get<JwtSettings>();
+            public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+            {
+                var jwtSettings = configuration.GetSection("JwtConfig").Get<JwtSettings>();
 
-            services
-                .AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(options =>
-                {
-                    options.RequireHttpsMetadata = false;
-                    options.SaveToken = true;
-
-                    options.TokenValidationParameters = new TokenValidationParameters
+                services
+                    .AddAuthentication(options =>
                     {
-
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwtSettings.Issuer,
-                        ValidAudience = jwtSettings.Audience,
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                                Encoding.UTF8.GetBytes(jwtSettings.Key))
-                    };
-
-                    // ✅ Thêm sự kiện xử lý lỗi xác thực
-                    options.Events = new JwtBearerEvents
+                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    })
+                    .AddJwtBearer(options =>
                     {
-                        OnChallenge = context =>
+                        options.RequireHttpsMetadata = false;
+                        options.SaveToken = true;
+
+                        options.TokenValidationParameters = new TokenValidationParameters
                         {
-                            context.HandleResponse();
-                            context.Response.StatusCode = 401;
-                            return Task.CompletedTask;
-                        }
-                    };
-                });
+
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            ValidIssuer = jwtSettings.Issuer,
+                            ValidAudience = jwtSettings.Audience,
+                            IssuerSigningKey = new SymmetricSecurityKey(
+                                    Encoding.UTF8.GetBytes(jwtSettings.Key))
+                        };
+
+                        // Sửa lại phần xử lý sự kiện OnChallenge
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnChallenge = async context =>
+                            {
+                                // Tắt xử lý mặc định
+                                context.HandleResponse();
+
+                                // Kiểm tra nếu là API request
+                                if (context.Request.Path.StartsWithSegments("/api"))
+                                {
+                                    context.Response.StatusCode = 401;
+                                    context.Response.ContentType = "application/json";
+                                    await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                                    {
+                                        error = "Unauthorized",
+                                        message = "Authentication token is required"
+                                    }));
+                                }
+                                // Chuyển hướng cho MVC request
+                                else
+                                {
+                                    context.Response.Redirect("/Account/Login");
+                                }
+                            }
+                        };
+                    });
 
 
-            return services;
-        }
+                return services;
+            }
 
 
 

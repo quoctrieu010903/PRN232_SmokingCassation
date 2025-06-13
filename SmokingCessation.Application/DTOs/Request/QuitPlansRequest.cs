@@ -9,9 +9,7 @@ namespace SmokingCessation.Application.DTOs.Request
 {
     public class QuitPlansRequest
     {
-        public Guid? PackageId { get; set; }
         public string Reason { get; set; }
-        public QuitPlanStatus Status { get; set; }
-       
+        
     }
 }

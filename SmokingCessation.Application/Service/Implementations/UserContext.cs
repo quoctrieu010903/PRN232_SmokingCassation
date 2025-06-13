@@ -4,6 +4,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using SmokingCessation.Application.Exceptions;
 using SmokingCessation.Application.Service.Interface;
+using SmokingCessation.Domain.Entities;
+using SmokingCessation.Domain.Interfaces;
 
 
 namespace SmokingCessation.Application.Service.Implementations
@@ -62,6 +64,7 @@ namespace SmokingCessation.Application.Service.Implementations
             return userId;
 
         }
+       
     }
 }
 

@@ -5,11 +5,13 @@ using SmokingCessation.Application.DTOs.Fillter;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
+using SmokingCessation.Core.Base;
 using SmokingCessation.Core.Constants;
 using SmokingCessation.Core.CustomExceptionss;
 using SmokingCessation.Core.Response;
 using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
+using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Domain.Specifications;
 
@@ -30,29 +32,41 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Create(QuitPlansRequest request)
         {
+            var userID = _userContext.GetUserId();
+            var currentUser = await _unitOfWork.Repository<ApplicationUser, Guid>().GetByIdAsync(Guid.Parse(userID));
+
+        var baseSpeci = new BaseSpecification<Payment>(f => f.UserId == Guid.Parse(userID) && f.Status== PaymentStatus.Completed);
             var startDay = CoreHelper.SystemTimeNow;
             int targetDay = 0;
-            if (request.PackageId == null)
+            var payments = await _unitOfWork.Repository<Payment, Payment>().GetAllWithSpecAsync(baseSpeci);
+            var latestPaidPackage = payments
+                .OrderByDescending(x => x.CreatedTime)
+                .Select(x => new { x.PackageId, x.CreatedTime })
+                .FirstOrDefault();
+            if (latestPaidPackage == null)
             {
-                throw new ArgumentException("PackageId cannot be null.");
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Người dùng chưa thanh toán gói nào.");
             }
-            var package = await _unitOfWork.Repository<MembershipPackage, Guid>().GetByIdAsync(request.PackageId.Value);
-            if (package is { })
+            // Lấy ra gói package đã thanh toán
+            var package = await _unitOfWork.Repository<MembershipPackage, Guid>().GetByIdAsync(latestPaidPackage.PackageId);
+            if (package == null)
             {
-                targetDay = package.DurationMonths > 0 ? package.DurationMonths * 30 : 30;
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Không tìm thấy gói membership.");
             }
+
+            targetDay = package.DurationMonths > 0 ? package.DurationMonths * 30 : 30;
             var targetDate = startDay.AddDays(targetDay);
+
             var quitPlan = new QuitPlan
             {
                 Reason = request.Reason,
                 StartDate = startDay,
                 TargetDate = targetDate,
-                Status = request.Status,
-                UserId = Guid.Parse(_userContext.GetUserId()),
-                //CreateNum = 1, // hoặc logic khác nếu cần
-                //PackageId = package.Id,     
-                CreatedBy = _userContext.GetUserId(),
-                LastUpdatedBy = _userContext.GetUserId(),
+                Status = QuitPlanStatus.Active,
+                UserId = Guid.Parse(userID),
+                   
+                CreatedBy = userID,
+                LastUpdatedBy = userID,
                 LastUpdatedTime = startDay,
                 CreatedTime = startDay,
             };
@@ -64,11 +78,11 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<BaseResponseModel> Delete(Guid id)
         {
             var currentUser = _userContext.GetUserId();
-            var repo = _unitOfWork.Repository<MembershipPackage, Guid>();
+            var repo = _unitOfWork.Repository<QuitPlan, Guid>();
             var entity = await repo.GetByIdAsync(id);
 
             if (entity == null)
-                return new BaseResponseModel(StatusCodes.Status404NotFound, "NOT_FOUND", "Membership package not found");
+                return new BaseResponseModel(StatusCodes.Status404NotFound, "NOT_FOUND", "QuitPlan not found");
 
             entity.LastUpdatedBy = currentUser;
             entity.LastUpdatedTime = CoreHelper.SystemTimeNow;
