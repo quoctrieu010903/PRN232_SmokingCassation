@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SmokingCessation.Infrastracture.Migrations
 {
     /// <inheritdoc />
-    public partial class initial_Database : Migration
+    public partial class Initial_DataBase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -307,8 +307,8 @@ namespace SmokingCessation.Infrastracture.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PackageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -324,13 +324,13 @@ namespace SmokingCessation.Infrastracture.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Payments_MembershipPackages_PackageId",
                         column: x => x.PackageId,
                         principalTable: "MembershipPackages",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -341,10 +341,9 @@ namespace SmokingCessation.Infrastracture.Migrations
                     Reason = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     StartDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     TargetDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    CreateNum = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PackageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MembershipPackageId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -362,8 +361,8 @@ namespace SmokingCessation.Infrastracture.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_QuitPlans_MembershipPackages_PackageId",
-                        column: x => x.PackageId,
+                        name: "FK_QuitPlans_MembershipPackages_MembershipPackageId",
+                        column: x => x.MembershipPackageId,
                         principalTable: "MembershipPackages",
                         principalColumn: "Id");
                 });
@@ -429,6 +428,32 @@ namespace SmokingCessation.Infrastracture.Migrations
                         name: "FK_Rating_Blogs_BlogId",
                         column: x => x.BlogId,
                         principalTable: "Blogs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CoachAdviceLogs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    QuitPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AdviceDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    AdviceText = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastUpdatedTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DeletedTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CoachAdviceLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CoachAdviceLogs_QuitPlans_QuitPlanId",
+                        column: x => x.QuitPlanId,
+                        principalTable: "QuitPlans",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -512,6 +537,11 @@ namespace SmokingCessation.Infrastracture.Migrations
                 column: "AuthorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CoachAdviceLogs_QuitPlanId",
+                table: "CoachAdviceLogs",
+                column: "QuitPlanId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Feedbacks_BlogId",
                 table: "Feedbacks",
                 column: "BlogId");
@@ -537,9 +567,9 @@ namespace SmokingCessation.Infrastracture.Migrations
                 column: "QuitPlanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_QuitPlans_PackageId",
+                name: "IX_QuitPlans_MembershipPackageId",
                 table: "QuitPlans",
-                column: "PackageId");
+                column: "MembershipPackageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuitPlans_UserId",
@@ -590,6 +620,9 @@ namespace SmokingCessation.Infrastracture.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "CoachAdviceLogs");
 
             migrationBuilder.DropTable(
                 name: "Feedbacks");

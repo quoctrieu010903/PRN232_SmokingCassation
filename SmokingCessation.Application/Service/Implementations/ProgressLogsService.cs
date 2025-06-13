@@ -32,7 +32,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var quitPlan = await _unitOfWork.Repository<QuitPlan, Guid>().GetByIdAsync(request.QuitPlanId);
             if (quitPlan == null)
             {
-                return new BaseResponseModel(StatusCodes.Status404NotFound, ErrorMessages.NOT_FOUND,MessageConstants.NOT_FOUND);
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
             }
             var entity = _mapper.Map<ProgressLog>(request);
             entity.LogDate = DateTimeOffset.UtcNow;
@@ -47,7 +47,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<ProgressLog, Guid>();
             var entity = await repo.GetByIdAsync(id);
             if (entity == null)
-                return new BaseResponseModel(StatusCodes.Status404NotFound, ErrorMessages.NOT_FOUND, MessageConstants.NOT_FOUND);
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             _mapper.Map(request, entity);
             // Optionally update LogDate if you want to allow editing the date
@@ -62,7 +62,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<ProgressLog, Guid>();
             var entity = await repo.GetByIdAsync(id);
             if (entity == null)
-                return new BaseResponseModel(StatusCodes.Status404NotFound, ErrorMessages.NOT_FOUND, MessageConstants.NOT_FOUND);
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             await repo.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
@@ -87,7 +87,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<ProgressLog, Guid>();
             var entity = await repo.GetByIdAsync(id);
             if (entity == null)
-                return new BaseResponseModel<ProgressLogsResponse>(404, "NOT_FOUND", "Progress log not found");
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             var result = _mapper.Map<ProgressLogsResponse>(entity);
             return new BaseResponseModel<ProgressLogsResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.GET_SUCCESS);

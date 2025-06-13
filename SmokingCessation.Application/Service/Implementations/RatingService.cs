@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
+using SmokingCessation.Core.Constants;
+using SmokingCessation.Core.CustomExceptionss;
 using SmokingCessation.Core.Response;
 using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Interfaces;
@@ -45,12 +48,13 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<BaseResponseModel> Update(Guid id, RatingRequest request)
         {
             if (request.Value < 1 || request.Value > 5)
-                return new BaseResponseModel(400, "INVALID_VALUE", "Rating value must be between 1 and 5");
+                throw new ErrorException(400, "INVALID_VALUE", "Rating value must be between 1 and 5");
 
             var repo = _unitOfWork.Repository<Rating, Guid>();
             var rating = await repo.GetByIdAsync(id);
             if (rating == null)
-                return new BaseResponseModel(404, "NOT_FOUND", "Rating not found");
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+
 
             rating.Start = request.Value;
            
@@ -64,7 +68,8 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<Rating, Guid>();
             var rating = await repo.GetByIdAsync(id);
             if (rating == null)
-                return new BaseResponseModel(404, "NOT_FOUND", "Rating not found");
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+
 
             await repo.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
@@ -92,7 +97,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<Rating, Guid>();
             var rating = await repo.GetByIdAsync(id);
             if (rating == null)
-                return new BaseResponseModel<RatingResponse>(404, "NOT_FOUND", "Rating not found");
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             var result = _mapper.Map<RatingResponse>(rating);
             return new BaseResponseModel<RatingResponse>(200, "SUCCESS", result);

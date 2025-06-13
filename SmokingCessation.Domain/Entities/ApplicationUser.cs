@@ -31,11 +31,11 @@ namespace SmokingCessation.Domain.Entities
         public DateTime CreatedAt { get; set; }
 
         // Navigation Properties
-        public ICollection<Payment> Payments { get; set; } = new List<Payment>();
-        public ICollection<QuitPlan> QuitPlans { get; set; } = new List<QuitPlan>();
-        public ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
-        public ICollection<Blog> Blogs { get; set; } = new List<Blog>();
-        public Ranking? Ranking { get; set; }
+        public virtual ICollection<Payment> Payments { get; set; }
+        public virtual ICollection<QuitPlan> QuitPlans { get; set; } 
+        public virtual ICollection<UserAchievement> UserAchievements { get; set; } 
+        public virtual ICollection<Blog> Blogs { get; set; } 
+        public virtual Ranking? Ranking { get; set; }
 
     }
 }

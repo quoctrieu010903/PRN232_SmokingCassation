@@ -362,6 +362,48 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.ToTable("Blogs");
                 });
 
+            modelBuilder.Entity("SmokingCessation.Domain.Entities.CoachAdviceLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("AdviceDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("AdviceText")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("LastUpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("QuitPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuitPlanId");
+
+                    b.ToTable("CoachAdviceLogs");
+                });
+
             modelBuilder.Entity("SmokingCessation.Domain.Entities.Feedback", b =>
                 {
                     b.Property<Guid>("Id")
@@ -552,9 +594,6 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("CreateNum")
-                        .HasColumnType("int");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -573,7 +612,7 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<DateTimeOffset>("LastUpdatedTime")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("PackageId")
+                    b.Property<Guid?>("MembershipPackageId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Reason")
@@ -595,7 +634,7 @@ namespace SmokingCessation.Infrastracture.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PackageId");
+                    b.HasIndex("MembershipPackageId");
 
                     b.HasIndex("UserId");
 
@@ -792,6 +831,17 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Navigation("Author");
                 });
 
+            modelBuilder.Entity("SmokingCessation.Domain.Entities.CoachAdviceLog", b =>
+                {
+                    b.HasOne("SmokingCessation.Domain.Entities.QuitPlan", "QuitPlan")
+                        .WithMany("AdviceLogs")
+                        .HasForeignKey("QuitPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("QuitPlan");
+                });
+
             modelBuilder.Entity("SmokingCessation.Domain.Entities.Feedback", b =>
                 {
                     b.HasOne("SmokingCessation.Domain.Entities.Blog", "Blog")
@@ -816,13 +866,13 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.HasOne("SmokingCessation.Domain.Entities.MembershipPackage", "Package")
                         .WithMany("Payments")
                         .HasForeignKey("PackageId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SmokingCessation.Domain.Entities.ApplicationUser", "User")
                         .WithMany("Payments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Package");
@@ -844,8 +894,8 @@ namespace SmokingCessation.Infrastracture.Migrations
             modelBuilder.Entity("SmokingCessation.Domain.Entities.QuitPlan", b =>
                 {
                     b.HasOne("SmokingCessation.Domain.Entities.MembershipPackage", "MembershipPackage")
-                        .WithMany("QuitPlans")
-                        .HasForeignKey("PackageId");
+                        .WithMany()
+                        .HasForeignKey("MembershipPackageId");
 
                     b.HasOne("SmokingCessation.Domain.Entities.ApplicationUser", "User")
                         .WithMany("QuitPlans")
@@ -935,12 +985,12 @@ namespace SmokingCessation.Infrastracture.Migrations
             modelBuilder.Entity("SmokingCessation.Domain.Entities.MembershipPackage", b =>
                 {
                     b.Navigation("Payments");
-
-                    b.Navigation("QuitPlans");
                 });
 
             modelBuilder.Entity("SmokingCessation.Domain.Entities.QuitPlan", b =>
                 {
+                    b.Navigation("AdviceLogs");
+
                     b.Navigation("ProgressLogs");
                 });
 #pragma warning restore 612, 618

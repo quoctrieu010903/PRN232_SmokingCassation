@@ -5,6 +5,7 @@ using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
+using SmokingCessation.Core.CustomExceptionss;
 using SmokingCessation.Core.Response;
 using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
@@ -34,7 +35,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<Blog, Guid>();
             var blog = await repo.GetByIdAsync(id);
             if (blog == null)
-                return new BaseResponseModel(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             blog.Status = status;
          
@@ -74,7 +75,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<Blog, Guid>();
             var blog = await repo.GetByIdAsync(id);
             if (blog == null)
-                return new BaseResponseModel(StatusCodes.Status404NotFound,ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             blog.DeletedBy = userId;
             blog.DeletedTime = CoreHelper.SystemTimeNow;
@@ -113,7 +114,8 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<Blog, Guid>();
             var blog = await repo.GetByIdAsync(id);
             if (blog == null)
-                return new BaseResponseModel<BlogResponse>(StatusCodes.Status404NotFound,ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+
 
             var result = _mapper.Map<BlogResponse>(blog);
             return new BaseResponseModel<BlogResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS,result, MessageConstants.GET_SUCCESS);
@@ -125,7 +127,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<Blog, Guid>();
             var blog = await repo.GetByIdAsync(id);
             if (blog == null)
-                return new BaseResponseModel(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             blog.ViewCount += 1;
             await repo.UpdateAsync(blog);
@@ -138,7 +140,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<Blog, Guid>();
             var blog = await repo.GetByIdAsync(id);
             if (blog == null)
-                return new BaseResponseModel(StatusCodes.Status404NotFound,ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+               throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             _mapper.Map(request, blog);
             await repo.UpdateAsync(blog);

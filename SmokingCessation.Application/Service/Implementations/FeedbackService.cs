@@ -9,6 +9,7 @@ using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
+using SmokingCessation.Core.CustomExceptionss;
 using SmokingCessation.Core.Response;
 using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
@@ -35,7 +36,7 @@ namespace SmokingCessation.Application.Service.Implementations
         //    var repo = _unitOfWork.Repository<Feedback, Guid>();
         //    var feedback = await repo.GetByIdAsync(id);
         //    if (feedback == null)
-        //        return new BaseResponseModel(404, "NOT_FOUND", "Feedback not found");
+        //       throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
            
         //    await repo.UpdateAsync(feedback);
@@ -70,7 +71,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<Feedback, Guid>();
             var feedback = await repo.GetByIdAsync(id);
             if (feedback == null)
-                return new BaseResponseModel(404, "NOT_FOUND", "Feedback not found");
+               throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             feedback.DeletedBy = userId;
             feedback.DeletedTime = CoreHelper.SystemTimeNow;
@@ -97,7 +98,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<Feedback, Guid>();
             var feedback = await repo.GetByIdAsync(id);
             if (feedback == null)
-                return new BaseResponseModel<FeedbackResponse>(404, "NOT_FOUND", "Feedback not found");
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             var result = _mapper.Map<FeedbackResponse>(feedback);
             return new BaseResponseModel<FeedbackResponse>(200, "SUCCESS", result);
@@ -117,7 +118,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<Feedback, Guid>();
             var feedback = await repo.GetByIdAsync(id);
             if (feedback == null)
-                return new BaseResponseModel(404, "NOT_FOUND", "Feedback not found");
+               throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             feedback.Comment = request.Comment;
             await repo.UpdateAsync(feedback);
