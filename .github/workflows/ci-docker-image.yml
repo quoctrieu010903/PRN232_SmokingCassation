@@ -34,13 +34,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_NAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
+          
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./SmokingCessation.WebAPI/Dockerfile
           push: true
-           tags: |
-            ${{ secrets.DOCKERHUB_NAME }}/smokingcessationwebapi:latest
-            ${{ secrets.DOCKERHUB_NAME }}/smokingcessationwebapi:5
+          tags: |
+            quoctrieu60/smokingcessationwebapi:latest
+            quoctrieu60/smokingcessationwebapi:5
+
