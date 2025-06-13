@@ -43,6 +43,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./LearnSmartCoding.API/Dockerfile
+          file: ./SmokingCessation.WebAPI/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dockerfordotnetapi:latest, ${{ secrets.DOCKERHUB_USERNAME }}/dockerfordotnetapi:${{ github.run_number }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/smokingcassationflatform:latest, ${{ secrets.DOCKERHUB_USERNAME }}/smokingcassationflatform:${{ github.run_number }}
