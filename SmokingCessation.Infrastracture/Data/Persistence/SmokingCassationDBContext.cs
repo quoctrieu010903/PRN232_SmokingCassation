@@ -20,6 +20,7 @@ namespace SmokingCessation.Infrastracture.Data.Persistence
             : base(options) { }
 
         public DbSet<MembershipPackage> MembershipPackages { get; set; }
+        public DbSet<UserPackage> UserPackages { get; set; }
         public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<QuitPlan> QuitPlans { get; set; }

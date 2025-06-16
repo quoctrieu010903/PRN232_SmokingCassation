@@ -20,6 +20,16 @@ namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
           
             builder.Property(mp => mp.Features); // Features có thể là null hoặc chuỗi dài
 
+            builder.HasMany(p => p.Payments)
+             .WithOne(p => p.Package)
+             .HasForeignKey(p => p.PackageId)
+             .OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(x => x.UserPackages)
+                   .WithOne(up => up.Package)
+                   .HasForeignKey(up => up.PackageId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+
         }
     }
 

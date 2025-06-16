@@ -32,8 +32,11 @@ namespace SmokingCessation.Domain.Entities
 
         // Navigation Properties
         public virtual ICollection<Payment> Payments { get; set; }
-        public virtual ICollection<QuitPlan> QuitPlans { get; set; } 
+        public virtual ICollection<QuitPlan> QuitPlans { get; set; }
+        public virtual ICollection<ProgressLog> ProgressLogs { get; set; }
+
         public virtual ICollection<UserAchievement> UserAchievements { get; set; } 
+        public virtual ICollection<UserPackage> UserPackages { get; set; }
         public virtual ICollection<Blog> Blogs { get; set; } 
         public virtual Ranking? Ranking { get; set; }
 

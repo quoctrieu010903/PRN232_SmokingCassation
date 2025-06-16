@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SmokingCessation.Infrastracture.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial_DataBase : Migration
+    public partial class Initial_Database : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -368,6 +368,41 @@ namespace SmokingCessation.Infrastracture.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserPackages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PackageId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StartDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    EndDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CancelledDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LastUpdatedTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DeletedTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserPackages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserPackages_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserPackages_MembershipPackages_PackageId",
+                        column: x => x.PackageId,
+                        principalTable: "MembershipPackages",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Feedbacks",
                 columns: table => new
                 {
@@ -467,6 +502,7 @@ namespace SmokingCessation.Infrastracture.Migrations
                     LogDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     SmokedToday = table.Column<int>(type: "int", nullable: false),
                     Note = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    ApplicationUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -477,6 +513,11 @@ namespace SmokingCessation.Infrastracture.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProgressLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProgressLogs_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProgressLogs_QuitPlans_QuitPlanId",
                         column: x => x.QuitPlanId,
@@ -562,6 +603,11 @@ namespace SmokingCessation.Infrastracture.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProgressLogs_ApplicationUserId",
+                table: "ProgressLogs",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProgressLogs_QuitPlanId",
                 table: "ProgressLogs",
                 column: "QuitPlanId");
@@ -600,6 +646,16 @@ namespace SmokingCessation.Infrastracture.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_UserAchievements_UserId",
                 table: "UserAchievements",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserPackages_PackageId",
+                table: "UserPackages",
+                column: "PackageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserPackages_UserId",
+                table: "UserPackages",
                 column: "UserId");
         }
 
@@ -641,6 +697,9 @@ namespace SmokingCessation.Infrastracture.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserAchievements");
+
+            migrationBuilder.DropTable(
+                name: "UserPackages");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

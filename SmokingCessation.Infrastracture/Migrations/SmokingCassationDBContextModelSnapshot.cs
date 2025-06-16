@@ -549,6 +549,9 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ApplicationUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -582,6 +585,8 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("QuitPlanId");
 
@@ -769,6 +774,57 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.ToTable("UserAchievements");
                 });
 
+            modelBuilder.Entity("SmokingCessation.Domain.Entities.UserPackage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CancelledDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("EndDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastUpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("PackageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PackageId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserPackages");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -882,6 +938,10 @@ namespace SmokingCessation.Infrastracture.Migrations
 
             modelBuilder.Entity("SmokingCessation.Domain.Entities.ProgressLog", b =>
                 {
+                    b.HasOne("SmokingCessation.Domain.Entities.ApplicationUser", null)
+                        .WithMany("ProgressLogs")
+                        .HasForeignKey("ApplicationUserId");
+
                     b.HasOne("SmokingCessation.Domain.Entities.QuitPlan", "QuitPlan")
                         .WithMany("ProgressLogs")
                         .HasForeignKey("QuitPlanId")
@@ -957,6 +1017,25 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SmokingCessation.Domain.Entities.UserPackage", b =>
+                {
+                    b.HasOne("SmokingCessation.Domain.Entities.MembershipPackage", "Package")
+                        .WithMany("UserPackages")
+                        .HasForeignKey("PackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmokingCessation.Domain.Entities.ApplicationUser", "User")
+                        .WithMany("UserPackages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Package");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SmokingCessation.Domain.Entities.Achievement", b =>
                 {
                     b.Navigation("UserAchievements");
@@ -968,11 +1047,15 @@ namespace SmokingCessation.Infrastracture.Migrations
 
                     b.Navigation("Payments");
 
+                    b.Navigation("ProgressLogs");
+
                     b.Navigation("QuitPlans");
 
                     b.Navigation("Ranking");
 
                     b.Navigation("UserAchievements");
+
+                    b.Navigation("UserPackages");
                 });
 
             modelBuilder.Entity("SmokingCessation.Domain.Entities.Blog", b =>
@@ -985,6 +1068,8 @@ namespace SmokingCessation.Infrastracture.Migrations
             modelBuilder.Entity("SmokingCessation.Domain.Entities.MembershipPackage", b =>
                 {
                     b.Navigation("Payments");
+
+                    b.Navigation("UserPackages");
                 });
 
             modelBuilder.Entity("SmokingCessation.Domain.Entities.QuitPlan", b =>
