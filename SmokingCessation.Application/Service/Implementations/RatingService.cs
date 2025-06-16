@@ -32,7 +32,22 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Create(RatingRequest request)
         {
+            if (request.Value < 1 || request.Value > 5)
+                throw new ErrorException(StatusCodes.Status400BadRequest,MessageConstants.INVALID_DATA, "Rating value must be between 1 and 5");
+
             var userId = _userContext.GetUserId();
+            var repo = _unitOfWork.Repository<Rating, Guid>();
+
+            // Check if the user has already rated this blog
+            var existingRating = (await repo.GetAllWithSpecAsync(
+                new BaseSpecification<Rating>(r => r.BlogId == request.BlogId && r.UserId == Guid.Parse(userId))))
+                .FirstOrDefault();
+            
+            if (existingRating != null)
+            {
+                throw new ErrorException(StatusCodes.Status404NotFound, "ALREADY_RATED", "You have already rated this blog.");
+            }
+            
             var rating = new Rating
             {
                 BlogId = request.BlogId,
@@ -42,7 +57,7 @@ namespace SmokingCessation.Application.Service.Implementations
             };
             await _unitOfWork.Repository<Rating, Guid>().AddAsync(rating);
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(200, "SUCCESS", "Rating created");
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.CREATE_SUCCESS);
         }
 
         public async Task<BaseResponseModel> Update(Guid id, RatingRequest request)

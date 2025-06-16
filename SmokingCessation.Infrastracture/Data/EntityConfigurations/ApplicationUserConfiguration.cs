@@ -37,6 +37,13 @@ namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
             builder.HasOne(u => u.Ranking)
                    .WithOne(r => r.User)
                    .HasForeignKey<Ranking>(r => r.UserId);
+
+            builder.HasMany(x => x.UserPackages)
+                  .WithOne(up => up.User)
+                  .HasForeignKey(up => up.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+
         }
     }
 

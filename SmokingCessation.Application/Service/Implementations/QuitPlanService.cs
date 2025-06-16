@@ -35,7 +35,26 @@ namespace SmokingCessation.Application.Service.Implementations
             var userID = _userContext.GetUserId();
             var currentUser = await _unitOfWork.Repository<ApplicationUser, Guid>().GetByIdAsync(Guid.Parse(userID));
 
-        var baseSpeci = new BaseSpecification<Payment>(f => f.UserId == Guid.Parse(userID) && f.Status== PaymentStatus.Completed);
+// check existQUITPlan           
+            var existingQuitPlanSpec = new BaseSpecification<QuitPlan>(
+             x => x.UserId == Guid.Parse(userID) &&
+            x.Status == QuitPlanStatus.Active &&
+            !x.DeletedTime.HasValue
+   );
+
+            var existingQuitPlans = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllWithSpecAsync(existingQuitPlanSpec);
+
+            if (existingQuitPlans.Any())
+            {
+                throw new ErrorException(
+                    StatusCodes.Status400BadRequest,
+                    ResponseCodeConstants.BADREQUEST,
+                    "Người dùng đã có kế hoạch bỏ thuốc đang hoạt động."
+                );
+            }
+
+
+            var baseSpeci = new BaseSpecification<Payment>(f => f.UserId == Guid.Parse(userID) && f.Status== PaymentStatus.Completed);
             var startDay = CoreHelper.SystemTimeNow;
             int targetDay = 0;
             var payments = await _unitOfWork.Repository<Payment, Payment>().GetAllWithSpecAsync(baseSpeci);
@@ -105,7 +124,7 @@ namespace SmokingCessation.Application.Service.Implementations
             {
                 var userIdStr = _userContext.GetUserId();
                 if (!Guid.TryParse(userIdStr, out var userId))
-                    throw new Exception("Invalid or missing user id.");
+                    throw new ErrorException(StatusCodes.Status400BadRequest,ResponseCodeConstants.NOT_FOUND,"Invalid or missing user id.");
                 currentUserId = userId;
             }
 
@@ -140,7 +159,7 @@ namespace SmokingCessation.Application.Service.Implementations
            
         }
 
-        public async Task<BaseResponseModel> Update(QuitPlansRequest request, Guid id)
+        public async Task<BaseResponseModel> Update(UpdateStatusQuitPlan request, Guid id)
         {
             var currentUser = _userContext.GetUserId();
             var existedEntity = await _unitOfWork.Repository<QuitPlan,Guid>().GetByIdAsync(id);
@@ -148,8 +167,11 @@ namespace SmokingCessation.Application.Service.Implementations
             {
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
             }
+         
             existedEntity.LastUpdatedBy = currentUser;
             existedEntity.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            existedEntity.Status = request.Status;
+            
 
             _mapper.Map(request, existedEntity);
             await _unitOfWork.Repository<QuitPlan,QuitPlan>().UpdateAsync(existedEntity);

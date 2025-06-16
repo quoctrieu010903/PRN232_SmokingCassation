@@ -10,5 +10,6 @@ namespace SmokingCessation.Domain.Entities
         public ApplicationUser User { get; set; }
         public Achievement Achievement { get; set; }
 
+
     }
 }

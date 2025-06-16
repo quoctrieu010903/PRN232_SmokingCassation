@@ -1,4 +1,4 @@
-﻿
+﻿    
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SmokingCessation.Domain.Entities;
@@ -16,6 +16,7 @@ namespace SmokingCessation.Infrastracture.Data.EntityConfigurations
             builder.HasOne(ua => ua.Achievement)
                    .WithMany(a => a.UserAchievements)
                    .HasForeignKey(ua => ua.AchievementId);
+           
         }
     }
 }

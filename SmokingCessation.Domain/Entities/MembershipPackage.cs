@@ -19,7 +19,9 @@ namespace SmokingCessation.Domain.Entities
         public string? Features { get; set; } // NEW: Liệt kê các tính năng của gói
 
 
+
+        public virtual ICollection<UserPackage> UserPackages { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
-     
+
     }
 }

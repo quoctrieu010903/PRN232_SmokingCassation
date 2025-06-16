@@ -7,6 +7,7 @@ using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
 using SmokingCessation.Core.Response;
+using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Specifications;
 
 namespace SmokingCessation.WebAPI.Controllers
@@ -55,7 +56,7 @@ namespace SmokingCessation.WebAPI.Controllers
         [HttpPatch("{id}")]
         [Authorize]
 
-        public async Task<ActionResult<BaseResponseModel>> Update(Guid id, [FromBody] QuitPlansRequest request)
+        public async Task<ActionResult<BaseResponseModel>> Update(Guid id, [FromBody] UpdateStatusQuitPlan request)
         {
             var result = await _service.Update(request, id);
             return Ok(new BaseResponseModel<string>(
