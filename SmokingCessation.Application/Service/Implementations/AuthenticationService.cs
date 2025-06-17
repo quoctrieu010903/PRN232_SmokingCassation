@@ -36,7 +36,6 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task AssignUserRole(AssignUserRoles request)
         {
-
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
                 throw new InvalidOperationException($"User with email '{request.Email}' not found.");
@@ -44,14 +43,27 @@ namespace SmokingCessation.Application.Service.Implementations
             var role = await _roleManager.FindByNameAsync(request.RoleName);
             if (role == null)
                 throw new InvalidOperationException($"Role '{request.RoleName}' not found.");
+
+            // Xóa hết các role hiện tại của user
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            if (currentRoles.Any())
+            {
+                var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                if (!removeResult.Succeeded)
+                    throw new InvalidOperationException($"Failed to remove current roles from user '{user.Email}': {string.Join(", ", removeResult.Errors.Select(e => e.Description))}");
+            }
+
+            // Gán role mới
+            var addResult = await _userManager.AddToRoleAsync(user, role.Name);
+            if (!addResult.Succeeded)
+                throw new InvalidOperationException($"Failed to assign role '{role.Name}' to user '{user.Email}': {string.Join(", ", addResult.Errors.Select(e => e.Description))}");
+
+            // Đảm bảo SecurityStamp luôn có giá trị
             if (string.IsNullOrEmpty(user.SecurityStamp))
             {
                 user.SecurityStamp = Guid.NewGuid().ToString();
                 await _userManager.UpdateAsync(user);
             }
-            var result = await _userManager.AddToRoleAsync(user, role.Name);
-            if (!result.Succeeded)
-                throw new InvalidOperationException($"Failed to assign role '{role.Name}' to user '{user.Email}': {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
         public async Task DeleteAsync(Guid id)

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SmokingCessation.Application.Exceptions;
 using SmokingCessation.Core.Constants;
+using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
 using static SmokingCessation.Application.DTOs.Response.AuthenticationResponse;
 
@@ -107,7 +108,7 @@ namespace SmokingCessation.Application.Helpers
             }
 
             var jwtToken = tokenHandler.ReadJwtToken(accessToken);
-            if (jwtToken.ValidTo < DateTime.UtcNow)
+            if (jwtToken.ValidTo < CoreHelper.SystemTimeNow)
             {
                 throw new APIException((int)HttpStatusCode.Unauthorized, ResponseCodeConstants.JWT_TOKEN_EXPIRED);
             }

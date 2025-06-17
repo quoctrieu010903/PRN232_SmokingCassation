@@ -44,6 +44,7 @@ namespace SmokingCessation.Application.Extensions
             services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddScoped<IRatingService, RatingService>();
             services.AddScoped<IPhotoService, PhotoService>();
+            services.AddScoped<IUserPackageService, UserPackageService>();
 
 
 
