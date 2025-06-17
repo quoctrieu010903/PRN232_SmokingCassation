@@ -1,5 +1,4 @@
-﻿    
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -60,17 +59,20 @@ namespace SmokingCessation.Application.Service.Implementations
         private async Task<List<Claim>> GetClaimsAsync(ApplicationUser user)
         {
             var claims = new List<Claim>
-                {
-
-                    new Claim("Email", user.Email),
-                    new Claim("FullName", user.FullName),
-                    new Claim("UserName", user.UserName), // chuẩn nhất cho ID
-                    new Claim("UserId" , user.Id.ToString())
-
-                };
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim("FullName", user.FullName),
+                new Claim("UserId", user.Id.ToString())
+            };
 
             var roles = await _userManager.GetRolesAsync(user);
-            claims.AddRange(roles.Select(role => new Claim("Role", role)));
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+                claims.Add(new Claim("role", role));
+            }
 
             return claims;
         }

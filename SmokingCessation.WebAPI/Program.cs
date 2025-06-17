@@ -1,4 +1,3 @@
-
 using SmokingCessation.Application.Extensions;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Infrastracture.Extentions;
@@ -6,7 +5,6 @@ using SmokingCessation.WebAPI.Extensions;
 using SmokingCessation.WebAPI.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddControllers();
 
@@ -27,6 +25,15 @@ var scope = app.Services.CreateScope();
 var seeder = scope.ServiceProvider.GetRequiredService<ISmokingSessationSeeder>();
 await seeder.Seed();
 
+// Configure the HTTP request pipeline
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
 app.UseRouting();
 
 app.UseCors(x => x
@@ -35,23 +42,13 @@ app.UseCors(x => x
     .SetIsOriginAllowed(origin => true)
     .AllowCredentials());
 
-
-
-
-app.WithSwagger();
-
+// Add authentication middleware before authorization
 app.UseAuthentication();
-
 app.UseMiddleware<JwtMiddleware>();
-
 app.UseAuthorization();
 
-
-app.UseMiddleware<ExceptionHandlingMiddleware>(); // Exception handling middleware
-
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
-
-
 
 app.Run();

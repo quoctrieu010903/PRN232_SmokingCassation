@@ -50,7 +50,7 @@ namespace SmokingCessation.WebAPI.Controllers
                                                 [FromQuery] BlogStatus? status = null
 
             )
-        {
+            {
             var filter = new BlogListFilter { FilterType = filterType, Search = search ,Status = status };
             var result = await _service.GetAll(paging, filter);
 
@@ -100,16 +100,35 @@ namespace SmokingCessation.WebAPI.Controllers
         /// <param name="status">approve </param>
         /// <returns></returns>
         
-        [Authorize(Roles = UserRoles.Admin)]
         [HttpPatch("{id}/approve")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ApproveBlog(Guid id)
-        => StatusCode((await _service.ChangeStatus(id, BlogStatus.Published)).StatusCode, await _service.ChangeStatus(id, BlogStatus.Published));
+        {
+            try
+            {
+                var result = await _service.ChangeStatus(id, BlogStatus.Published);
+                return StatusCode(result.StatusCode, result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
 
-        [Authorize(Roles = UserRoles.Admin)]
         [HttpPatch("{id}/reject")]
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RejectBlog(Guid id)
-       => StatusCode((await _service.ChangeStatus(id, BlogStatus.Rejected)).StatusCode, await _service.ChangeStatus(id, BlogStatus.Rejected));
+        {
+            try
+            {
+                var result = await _service.ChangeStatus(id, BlogStatus.Rejected);
+                return StatusCode(result.StatusCode, result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
         [HttpPut("{id}/view")]
         public async Task<IActionResult> IncreaseViewCount(Guid id)
             => StatusCode((await _service.IncreaseViewCount(id)).StatusCode, await _service.IncreaseViewCount(id));
