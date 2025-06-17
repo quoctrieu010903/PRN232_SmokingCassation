@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using SmokingCessation.Application.Helpers;
+using SmokingCessation.WebAPI.Attributes;
 using static SmokingCessation.Application.DTOs.Response.AuthenticationResponse;
 
 namespace SmokingCessation.WebAPI.Middlewares
@@ -19,6 +21,20 @@ namespace SmokingCessation.WebAPI.Middlewares
         {
             try
             {
+                var endpoint = context.GetEndpoint();
+
+                // Skip token validation if:
+                // 1. The endpoint has [AllowAnonymous] attribute
+                // 2. The endpoint doesn't have [Authorize] attribute
+                // 3. The endpoint has [BypassJwtMiddleware] attribute
+                if (endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null ||
+                    endpoint?.Metadata?.GetMetadata<IAuthorizeData>() == null ||
+                    endpoint?.Metadata?.GetMetadata<BypassJwtMiddlewareAttribute>() != null)
+                {
+                    await _next(context);
+                    return;
+                }
+
                 var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 _logger.LogInformation($"Processing request to: {context.Request.Path}");
 

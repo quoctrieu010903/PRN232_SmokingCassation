@@ -1,4 +1,4 @@
-﻿
+﻿using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using SmokingCessation.Application.DTOs.Fillter;
@@ -20,14 +20,14 @@ namespace SmokingCessation.Application.Service.Implementations
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IUserContext _userContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPhotoService _photoService;
 
-        public BlogService(IUnitOfWork unitOfWork, IMapper mapper, IUserContext userContext, IPhotoService photoService)
+        public BlogService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, IPhotoService photoService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _userContext = userContext;
+            _httpContextAccessor = httpContextAccessor;
             _photoService = photoService;
         }
 
@@ -41,7 +41,7 @@ namespace SmokingCessation.Application.Service.Implementations
             blog.Status = status;
          
            
-            blog.LastUpdatedBy = _userContext.GetUserId();
+            blog.LastUpdatedBy = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             blog.LastUpdatedTime = CoreHelper.SystemTimeNow;
             await repo.UpdateAsync(blog);
             await _unitOfWork.SaveChangesAsync();
@@ -57,7 +57,7 @@ namespace SmokingCessation.Application.Service.Implementations
             {
                 imageUrl = await _photoService.UploadPhotoAsync(request.FeaturedImage);
             }
-            var userId = _userContext.GetUserId();
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var blog = _mapper.Map<Blog>(request);
             blog.AuthorId = Guid.Parse(userId);
             blog.Status = BlogStatus.PendingApproval;
@@ -73,7 +73,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Delete(Guid id)
         {
-            var userId = _userContext.GetUserId();
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var repo = _unitOfWork.Repository<Blog, Guid>();
             var blog = await repo.GetByIdAsync(id);
             if (blog == null)
@@ -94,8 +94,8 @@ namespace SmokingCessation.Application.Service.Implementations
         {
             var blogs = await _unitOfWork.Repository<Blog, Blog>().GetAllWithIncludeAsync(true, p=>p.Ratings , p => p.Feedbacks);
 
-            var currentUser = _userContext.GetCurrentUser();
-            bool isAdmin = currentUser != null && currentUser.isInRole(UserRoles.Admin);
+            var currentUser = _httpContextAccessor.HttpContext?.User;
+            bool isAdmin = currentUser != null && currentUser.IsInRole(UserRoles.Admin);
 
             if (!isAdmin)
             {
@@ -183,6 +183,6 @@ namespace SmokingCessation.Application.Service.Implementations
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.BLOG_UPDATE_SUCCESS);
 
         }
-      
-    }
+
+      }
 }

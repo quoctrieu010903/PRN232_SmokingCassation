@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.Service.Interface;
+using SmokingCessation.Core.Constants;
+using SmokingCessation.Core.Response;
 using static SmokingCessation.Application.DTOs.Request.AuthenticationRequest;
 
 namespace SmokingCessation.WebAPI.Controllers
@@ -22,14 +24,20 @@ namespace SmokingCessation.WebAPI.Controllers
          public async Task<IActionResult> AsignUserRole(AssignUserRoles request)
         {
             await _service.AssignUserRole(request);
-            return Ok();
+            return Ok(new BaseResponseModel(
+                 statusCode: StatusCodes.Status200OK,
+                 code: ResponseCodeConstants.SUCCESS,
+                 data: "Gán Role cho user thành công"));
         }
         [HttpPost("register")]
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] UserRegisterRequest request)
         {
             var response = await _service.RegisterAsync(request);
-            return Ok(response);
+            return Ok(new BaseResponseModel(
+                 statusCode: StatusCodes.Status200OK,
+                 code: ResponseCodeConstants.SUCCESS,
+                 data: MessageConstants.CREATE_SUCCESS));
         }
 
         /// <summary>
@@ -42,7 +50,10 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
         {
             var response = await _service.LoginAsync(request);
-            return Ok(response);
+            return Ok(new BaseResponseModel(
+                 statusCode: StatusCodes.Status200OK,
+                 code: ResponseCodeConstants.SUCCESS,
+                 data: response));
         }
 
         /// <summary>
@@ -56,7 +67,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var response = await _service.GetByIdAsync(id);
-            return Ok(response);
+            return Ok(new BaseResponseModel(statusCode: StatusCodes.Status200OK, code: ResponseCodeConstants.SUCCESS, data: response));
         }
 
         /// <summary>
@@ -69,7 +80,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             var response = await _service.RefreshTokenAsync(request);
-            return Ok(response);
+            return Ok(new BaseResponseModel(statusCode: StatusCodes.Status200OK, code: ResponseCodeConstants.SUCCESS, data: response));
         }
 
         /// <summary>
@@ -84,9 +95,15 @@ namespace SmokingCessation.WebAPI.Controllers
             var response = await _service.RevokeRefreshToken(request);
             if (response != null && response.Message == "Refresh token revoked successfully")
             {
-                return Ok(response);
+                return Ok(new BaseResponseModel(
+                 statusCode: StatusCodes.Status200OK,
+                 code: ResponseCodeConstants.SUCCESS,
+                 data: MessageConstants.BLOG_CREATE_PENDING_APPROVAL));
             }
-            return BadRequest(response);
+            return BadRequest(new BaseResponseModel(
+                 statusCode: StatusCodes.Status200OK,
+                 code: ResponseCodeConstants.SUCCESS,
+                 data: MessageConstants.BLOG_CREATE_PENDING_APPROVAL));
         }
 
         /// <summary>
@@ -103,7 +120,7 @@ namespace SmokingCessation.WebAPI.Controllers
                 return Unauthorized("User is not authenticated.");
             }
             var response = await _service.GetCurrentUserAsync();
-            return Ok(response);
+            return Ok(new BaseResponseModel(statusCode: StatusCodes.Status200OK, code: ResponseCodeConstants.SUCCESS, data: response));
         }
 
         /// <summary>
@@ -116,7 +133,10 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             await _service.DeleteAsync(id);
-            return Ok();
+            return Ok(new BaseResponseModel(
+                 statusCode: StatusCodes.Status200OK,
+                 code: ResponseCodeConstants.SUCCESS,
+                 data: MessageConstants.DELETE_SUCCESS));
         }
 
     }
