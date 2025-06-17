@@ -9,16 +9,15 @@ namespace SmokingCessation.Application.Service.Interface
 {
     public interface IAuthenticationService
     {
-        Task AssignUserRole(AssignUserRoles request);
+        Task<BaseResponseModel> AssignUserRole(AssignUserRoles request);
+        Task<BaseResponseModel<UserResponse>> RegisterAsync(UserRegisterRequest request);
+        Task<BaseResponseModel<CurrentUserResponse>> GetCurrentUserAsync();
+        Task<BaseResponseModel<UserResponse>> GetByIdAsync(Guid id);
+        Task<BaseResponseModel<UserResponse>> UpdateAsync(Guid id, UpdateUserRequest request);
+        Task<BaseResponseModel> DeleteAsync(Guid id);
+        Task<BaseResponseModel<RevokeRefreshTokenResponse>> RevokeRefreshToken(RefreshTokenRequest refreshTokenRemoveRequest);
+        Task<BaseResponseModel<CurrentUserResponse>> RefreshTokenAsync(RefreshTokenRequest request);
+        Task<BaseResponseModel<UserResponse>> LoginAsync(UserLoginRequest request);
 
-        Task<UserResponse> RegisterAsync(UserRegisterRequest request);
-        Task<CurrentUserResponse> GetCurrentUserAsync();
-        Task<UserResponse> GetByIdAsync(Guid id);
-        Task<UserResponse> UpdateAsync(Guid id, UpdateUserRequest request);
-        Task DeleteAsync(Guid id);
-        Task<RevokeRefreshTokenResponse> RevokeRefreshToken(RefreshTokenRequest refreshTokenRemoveRequest);
-        Task<CurrentUserResponse> RefreshTokenAsync(RefreshTokenRequest request);
-
-        Task<UserResponse> LoginAsync(UserLoginRequest request);
     }
 }
