@@ -22,6 +22,18 @@ namespace SmokingCessation.Core.Constants
         public const string UNPROCESSABLE_ENTITY = "Unprocessable Entity";
         public static string JWT_TOKEN_EXPIRED = "JWT Token expired";
 
+        // Payment & Membership specific codes
+        public const string PAYMENT_REQUIRED = "Payment required!";
+        public const string PAYMENT_SUCCESS = "Payment success!";
+        public const string PAYMENT_FAILED = "Payment failed!";
+        public const string ACTIVE_PACKAGE_EXISTS = "Active package exists!";
+        public const string PACKAGE_NOT_FOUND = "Package not found!";
+        public const string REGISTER_PACKAGE_SUCCESS = "Register package success!";
+        public const string CANCEL_PACKAGE_SUCCESS = "Cancel package success!";
+        public const string NO_ACTIVE_MEMBERSHIP = "No active membership!";
+        public const string ALREADY_RATED = "Already rated!";
+        public const string INVALID_RATING_VALUE = "Invalid rating value!";
+
     }
 
     public static class ErrorMessages

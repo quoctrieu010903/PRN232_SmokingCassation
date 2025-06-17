@@ -20,19 +20,11 @@ namespace SmokingCessation.Infrastracture.Extentions
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-
+            
             var connectionString = configuration.GetConnectionString("SmokingCessationDB");
-
             services.AddDbContext<SmokingCassationDBContext>(options =>
-                options.UseSqlServer(connectionString, sqlServerOptions =>
-                {
-                    sqlServerOptions.EnableRetryOnFailure(
-                        maxRetryCount: 5, // số lần thử lại
-                        maxRetryDelay: TimeSpan.FromSeconds(10), // thời gian delay giữa các lần thử
-                        errorNumbersToAdd: null // mặc định
-                    );
-                })
-                .EnableSensitiveDataLogging());
+                options.UseSqlServer(connectionString).EnableSensitiveDataLogging());
+
 
             services.AddScoped<ISmokingSessationSeeder, SmokingCessationSeeder>();
             // Dependency Injection 
