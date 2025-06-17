@@ -64,6 +64,7 @@ namespace SmokingCessation.Application.Mapping
                 .ForMember(dest => dest.BlogTitle, opt => opt.MapFrom(src => src.Blog.Title))
                 .ForMember(dest => dest.UserName , opt => opt.MapFrom(src => src.User.UserName));
             #endregion
+
             #region Rating mapper
             CreateMap<RatingRequest, Rating>();
             CreateMap<Rating, RatingResponse>()
@@ -71,6 +72,22 @@ namespace SmokingCessation.Application.Mapping
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName))
                 .ForMember(dest => dest.Value , opt => opt.MapFrom(src => src.Start));
             #endregion
+
+            #region User Package 
+                CreateMap<UserPackage, UserPackageResponse>()
+               .ForMember(dest => dest.PackageId, opt => opt.MapFrom(src => src.PackageId))
+               .ForMember(dest => dest.PackageName, opt => opt.MapFrom(src => src.Package != null ? src.Package.Name : string.Empty))
+               .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Package != null ? src.Package.Price : 0))
+               .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Package != null ? src.Package.Type.ToString() : string.Empty))
+               .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Package != null ? src.Package.Description : string.Empty))
+               .ForMember(dest => dest.Features, opt => opt.MapFrom(src => src.Package != null ? src.Package.Features : null))
+               .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User != null ? src.User.FullName : string.Empty))
+             // Additional mapping
+                .ForMember(dest => dest.RemainingDays, opt => opt.MapFrom(src => (src.EndDate - DateTimeOffset.UtcNow).Days > 0 ? (src.EndDate - DateTimeOffset.UtcNow).Days : 0))
+                .ForMember(dest => dest.IsExpired, opt => opt.MapFrom(src => src.EndDate < DateTimeOffset.UtcNow));
+
+            #endregion
+
         }
     }
 }

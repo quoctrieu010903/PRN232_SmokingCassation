@@ -25,7 +25,7 @@ namespace SmokingCessation.Core.Constants
         // Validation messages
         public const string REQUIRED_FIELD = "This field is required.";
         public const string INVALID_FORMAT = "Invalid format.";
-        // Payment message
+        
         // Payment & Membership messages
         public const string PAYMENT_REQUIRED = "You must complete payment to use this feature.";
         public const string PAYMENT_SUCCESS = "Payment completed successfully!";
@@ -37,6 +37,23 @@ namespace SmokingCessation.Core.Constants
         public const string NO_ACTIVE_MEMBERSHIP = "No active membership found.";
         public const string ALREADY_RATED = "You have already rated this blog.";
         public const string INVALID_RATING_VALUE = "Rating value must be between 1 and 5.";
+        // Blog messages
+        public const string BLOG_APPROVE_SUCCESS = "Blog approved successfully!";
+        public const string BLOG_REJECT_SUCCESS = "Blog rejected successfully!";
+        public const string BLOG_CREATE_PENDING_APPROVAL = "Blog created successfully and is pending approval.";
+        public const string BLOG_ALREADY_APPROVED = "Blog has already been approved.";
+        public const string BLOG_ALREADY_REJECTED = "Blog has already been rejected.";
+        public const string BLOG_NOT_FOUND = "Blog not found.";
+        public const string BLOG_DELETE_SUCCESS = "Blog deleted successfully.";
+        public const string BLOG_UPDATE_SUCCESS = "Blog updated successfully.";
+        public const string BLOG_CREATE_SUCCESS = "Blog created successfully.";
+        public const string BLOG_STATUS_UPDATED = "Blog status updated successfully.";
+        public const string BLOG_UNAUTHORIZED = "You are not authorized to modify this blog.";
+        public const string BLOG_FORBIDDEN = "You do not have permission to perform this action on the blog.";
+        public const string BLOG_INVALID_STATUS = "Invalid blog status.";
+        public const string BLOG_ALREADY_EXISTS = "A blog with the same title already exists.";
+        public const string BLOG_VIEWCOUNT_INCREASED = "Blog view count increased.";
+
 
 
     }

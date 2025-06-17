@@ -1,6 +1,7 @@
 ﻿
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using SmokingCessation.Application.DTOs.Fillter;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
@@ -44,7 +45,7 @@ namespace SmokingCessation.Application.Service.Implementations
             blog.LastUpdatedTime = CoreHelper.SystemTimeNow;
             await repo.UpdateAsync(blog);
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, "Status updated");
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.BLOG_STATUS_UPDATED);
 
         }
 
@@ -59,13 +60,14 @@ namespace SmokingCessation.Application.Service.Implementations
             var userId = _userContext.GetUserId();
             var blog = _mapper.Map<Blog>(request);
             blog.AuthorId = Guid.Parse(userId);
+            blog.Status = BlogStatus.PendingApproval;
             blog.FeaturedImageUrl = imageUrl;
             blog.PublishedDate = CoreHelper.SystemTimeNow;
             blog.CreatedTime = CoreHelper.SystemTimeNow;
 
             await _unitOfWork.Repository<Blog, Guid>().AddAsync(blog);
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.CREATE_SUCCESS);
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.BLOG_CREATE_PENDING_APPROVAL);
 
         }
 
@@ -84,21 +86,53 @@ namespace SmokingCessation.Application.Service.Implementations
             await _unitOfWork.Repository<Blog, Guid>().UpdateAsync(blog);
 
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.CREATE_SUCCESS);
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.BLOG_DELETE_SUCCESS);
 
         }
 
-        public async Task<PaginatedList<BlogResponse>> GetAll(PagingRequestModel model)
+        public async Task<PaginatedList<BlogResponse>> GetAll(PagingRequestModel model , BlogListFilter filter)
         {
             var blogs = await _unitOfWork.Repository<Blog, Blog>().GetAllWithIncludeAsync(true, p=>p.Ratings , p => p.Feedbacks);
+
+            var currentUser = _userContext.GetCurrentUser();
+            bool isAdmin = currentUser != null && currentUser.isInRole(UserRoles.Admin);
+
+            if (!isAdmin)
+            {
+                // User thường chỉ xem blog đã duyệt
+                blogs = blogs.Where(b => b.Status == BlogStatus.Published).ToList();
+            }
+            else
+            {
+                // Admin có thể filter theo status nếu truyền lên
+                if (filter.Status.HasValue)
+                    blogs = blogs.Where(b => b.Status == filter.Status.Value).ToList();
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                var searchLower = filter.Search.Trim().ToLower();
+                blogs = blogs.Where(b =>
+                    (!string.IsNullOrEmpty(b.Title) && b.Title.ToLower().Contains(searchLower)) ||
+                    (!string.IsNullOrEmpty(b.Content) && b.Content.ToLower().Contains(searchLower)) ||
+                    (b.Author != null && !string.IsNullOrEmpty(b.Author.FullName) && b.Author.FullName.ToLower().Contains(searchLower))
+                ).ToList();
+            }
+            IEnumerable<Blog> sortedBlogs = filter.FilterType switch
+            {
+                BlogListFilterType.Popular => blogs.OrderByDescending(b => b.ViewCount),
+                BlogListFilterType.Newest => blogs.OrderByDescending(b => b.PublishedDate).Take(5),
+                BlogListFilterType.All or _ => blogs.OrderByDescending(b => b.PublishedDate)
+            };
             // Tính average rating cho tất cả blog một lần
-            var avgDict = blogs
+            var avgDict = sortedBlogs
                 .Where(b => b.Ratings != null && b.Ratings.Any())
                 .ToDictionary(
                     b => b.Id,
                     b => b.Ratings.Average(r => r.Start)
                 );
-            var result = _mapper.Map<List<BlogResponse>>(blogs.ToList());
+
+            var result = _mapper.Map<List<BlogResponse>>(sortedBlogs.ToList());
        
             foreach (var blog in result)
             {
@@ -118,7 +152,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
 
             var result = _mapper.Map<BlogResponse>(blog);
-            return new BaseResponseModel<BlogResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS,result, MessageConstants.GET_SUCCESS);
+            return new BaseResponseModel<BlogResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS,result, MessageConstants.GETALL_SUCCESS);
 
         }
 
@@ -130,9 +164,10 @@ namespace SmokingCessation.Application.Service.Implementations
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             blog.ViewCount += 1;
+            
             await repo.UpdateAsync(blog);
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, "View count increased");
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.BLOG_VIEWCOUNT_INCREASED);
         }
 
         public async Task<BaseResponseModel> Update(Guid id, BlogRequest request)
@@ -145,7 +180,7 @@ namespace SmokingCessation.Application.Service.Implementations
             _mapper.Map(request, blog);
             await repo.UpdateAsync(blog);
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.CREATE_SUCCESS);
+            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.BLOG_UPDATE_SUCCESS);
 
         }
       

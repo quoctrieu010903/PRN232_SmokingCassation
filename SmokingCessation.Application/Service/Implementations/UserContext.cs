@@ -12,7 +12,7 @@ namespace SmokingCessation.Application.Service.Implementations
 {
     public class UserContext(IHttpContextAccessor _context)  : IUserContext
     {
-        
+
 
 
         /// <summary>
@@ -24,38 +24,34 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public CurrentUser? GetCurrentUser()
         {
-         
-            var user = _context.HttpContext?.User; // Use null-conditional for HttpContext
+            var user = _context.HttpContext?.User;
             if (user == null)
-            {
-                // This might indicate an issue with HttpContextAccessor setup or request context
                 throw new InvalidOperationException("User context is not present in HttpContext.");
-            }
 
-            // CORRECTED LOGIC: If the user's identity is null OR they are NOT authenticated, return null.
-            // Otherwise, proceed to extract claims.
             if (user.Identity == null || !user.Identity.IsAuthenticated)
-            {
-                throw new UnauthorizedException("Need Authorization"); // User is not authenticated, so no current user to return
-            }
+                throw new UnauthorizedException("Need Authorization");
 
-            // Ensure claims exist before attempting to access .Value
-            var userIdClaim = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
-            var emailClaim = user.FindFirst(c => c.Type == ClaimTypes.Email);
-            var rolesClaims = user.Claims.Where(c => c.Type == ClaimTypes.Role);
+            // Lấy userId từ nhiều khả năng
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)
+                              ?? user.FindFirst("UserId")
+                              ?? user.FindFirst("sub");
+            var emailClaim = user.FindFirst(ClaimTypes.Email)
+                            ?? user.FindFirst("Email")
+                            ?? user.FindFirst("email");
+            var rolesClaims = user.Claims.Where(c =>
+                c.Type == ClaimTypes.Role ||
+                c.Type == "role" ||
+                c.Type == "Role"
+            );
 
             if (userIdClaim == null || emailClaim == null)
-            {
-                // Log or handle cases where essential claims are missing
-                throw new InvalidOperationException("Essential user claims (NameIdentifier or Email) are missing.");
-            }
+                throw new InvalidOperationException("Essential user claims (UserId/NameIdentifier or Email) are missing.");
 
             var userId = userIdClaim.Value;
             var email = emailClaim.Value;
-            var roles = rolesClaims.Select(c => c.Value).ToList(); // Convert to List for safety
+            var roles = rolesClaims.Select(c => c.Value).ToList();
 
             return new CurrentUser(userId, email, roles);
-        
         }
 
         public string? GetUserId()

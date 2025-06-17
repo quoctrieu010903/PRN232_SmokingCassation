@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmokingCessation.Application.DTOs.Fillter
+namespace SmokingCessation.Domain.Enums
 {
-    internal class BlogFillter
+    public enum BlogListFilterType
     {
+        All = 0,
+        Newest = 1,
+        Popular = 2
     }
 }

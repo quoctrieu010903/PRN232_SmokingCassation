@@ -13,7 +13,7 @@ namespace SmokingCessation.Application.DTOs.Request
         public string Title { get; set; }
         public string Content { get; set; }
         public IFormFile? FeaturedImage { get; set; }
-        public BlogStatus Status { get; set; }
+        //public BlogStatus Status { get; set; }
 
 
     }

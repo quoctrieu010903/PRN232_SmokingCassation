@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using SmokingCessation.Application.DTOs.Request;
+using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
 using SmokingCessation.Core.CustomExceptionss;
@@ -32,7 +33,7 @@ namespace SmokingCessation.Application.Service.Implementations
             _context = Context;
         }
 
-        public async Task<BaseResponseModel> CancelCurrentPackage()
+        public async Task<BaseResponseModel<UserPackageResponse>> CancelCurrentPackage()
         {
             var userId = Guid.Parse(_context.GetUserId());
             var now = CoreHelper.SystemTimeNow;
@@ -43,19 +44,25 @@ namespace SmokingCessation.Application.Service.Implementations
                 .FirstOrDefault();
 
             if (current == null)
-                return new BaseResponseModel(StatusCodes.Status404NotFound, ResponseCodeConstants.NO_ACTIVE_MEMBERSHIP, MessageConstants.NO_ACTIVE_MEMBERSHIP);
+                return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status404NotFound, ResponseCodeConstants.NO_ACTIVE_MEMBERSHIP, MessageConstants.NO_ACTIVE_MEMBERSHIP);
 
             current.IsActive = false;
             current.EndDate = now;
             current.CancelledDate = now;
             await userpackageRepo.UpdateAsync(current);
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.CANCEL_PACKAGE_SUCCESS, MessageConstants.CANCEL_PACKAGE_SUCCESS);
 
-
+            // Load navigation properties if needed
+            var packageRepo = _unitOfWork.Repository<MembershipPackage, Guid>();
+            current.Package = await packageRepo.GetByIdAsync(current.PackageId);
+            var response = _mapper.Map<UserPackageResponse>(current);
+            return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status200OK, ResponseCodeConstants.CANCEL_PACKAGE_SUCCESS, response, null, MessageConstants.CANCEL_PACKAGE_SUCCESS);
         }
 
-        public async Task<BaseResponseModel> GetCurrentPackage()
+
+
+
+        public async Task<BaseResponseModel<UserPackageResponse>> GetCurrentPackage()
         {
             var userId = Guid.Parse(_context.GetUserId());
             var now = CoreHelper.SystemTimeNow;
@@ -66,35 +73,54 @@ namespace SmokingCessation.Application.Service.Implementations
                 .FirstOrDefault();
 
             if (current == null)
-                return new BaseResponseModel(StatusCodes.Status404NotFound, ResponseCodeConstants.NO_ACTIVE_MEMBERSHIP, MessageConstants.NO_ACTIVE_MEMBERSHIP);
+                return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status404NotFound, ResponseCodeConstants.NO_ACTIVE_MEMBERSHIP, MessageConstants.NO_ACTIVE_MEMBERSHIP);
 
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, current);
+            // Load navigation properties if needed
+            var packageRepo = _unitOfWork.Repository<MembershipPackage, Guid>();
+            current.Package = await packageRepo.GetByIdAsync(current.PackageId);
+            var response = _mapper.Map<UserPackageResponse>(current);
+            return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, response);
 
         }
 
-        public async Task<BaseResponseModel> GetPackageById(Guid id)
+        public async Task<BaseResponseModel<UserPackageResponse>> GetPackageById(Guid id)
         {
             var userId = Guid.Parse(_context.GetUserId());
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
             var package = await userpackageRepo.GetByIdAsync(id);
             if (package == null || package.UserId != userId)
-                return new BaseResponseModel(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+                return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, package);
+            // Load navigation properties if needed
+            var packageRepo = _unitOfWork.Repository<MembershipPackage, Guid>();
+            package.Package = await packageRepo.GetByIdAsync(package.PackageId);
 
+            var response = _mapper.Map<UserPackageResponse>(package);
+            return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, response);
         }
 
-        public async Task<BaseResponseModel> GetPackageHistory()
+
+
+        public async Task<BaseResponseModel<List<UserPackageResponse>>> GetPackageHistory()
         {
             var userId = Guid.Parse(_context.GetUserId());
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
-            var history = await userpackageRepo.GetAllWithSpecAsync(
-                new BaseSpecification<UserPackage>(um => um.UserId == userId));
+            var history = (await userpackageRepo.GetAllWithSpecAsync(
+                new BaseSpecification<UserPackage>(um => um.UserId == userId)))
+                .OrderByDescending(x => x.StartDate)
+                .ToList();
 
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, history.OrderByDescending(x => x.StartDate).ToList());
+            // Load package info for each item if needed
+            var packageRepo = _unitOfWork.Repository<MembershipPackage, Guid>();
+            foreach (var item in history)
+            {
+                item.Package = await packageRepo.GetByIdAsync(item.PackageId);
+            }
 
+            var response = _mapper.Map<List<UserPackageResponse>>(history);
+            return new BaseResponseModel<List<UserPackageResponse>>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, response);
         }
 
         public async Task<BaseResponseModel> RegisterPackage(UserPackageRequest request)
