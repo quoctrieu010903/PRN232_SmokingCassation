@@ -51,10 +51,8 @@ namespace SmokingCessation.WebAPI.Extensions
                     {
                         options.RequireHttpsMetadata = false;
                         options.SaveToken = true;
-
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
-
                             ValidateIssuer = true,
                             ValidateAudience = true,
                             ValidateLifetime = true,
@@ -62,37 +60,22 @@ namespace SmokingCessation.WebAPI.Extensions
                             ValidIssuer = jwtSettings.Issuer,
                             ValidAudience = jwtSettings.Audience,
                             IssuerSigningKey = new SymmetricSecurityKey(
-                                    Encoding.UTF8.GetBytes(jwtSettings.Key))
+                                Encoding.UTF8.GetBytes(jwtSettings.Key)),
+                            ClockSkew = TimeSpan.Zero
                         };
 
-                        // Sửa lại phần xử lý sự kiện OnChallenge
                         options.Events = new JwtBearerEvents
                         {
-                            OnChallenge = async context =>
+                            OnAuthenticationFailed = context =>
                             {
-                                // Tắt xử lý mặc định
-                                context.HandleResponse();
-
-                                // Kiểm tra nếu là API request
-                                if (context.Request.Path.StartsWithSegments("/api"))
+                                if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
                                 {
-                                    context.Response.StatusCode = 401;
-                                    context.Response.ContentType = "application/json";
-                                    await context.Response.WriteAsync(JsonSerializer.Serialize(new
-                                    {
-                                        error = "Unauthorized",
-                                        message = "Authentication token is required"
-                                    }));
+                                    context.Response.Headers.Add("Token-Expired", "true");
                                 }
-                                // Chuyển hướng cho MVC request
-                                else
-                                {
-                                    context.Response.Redirect("/Account/Login");
-                                }
+                                return Task.CompletedTask;
                             }
                         };
                     });
-
 
                 return services;
             }
