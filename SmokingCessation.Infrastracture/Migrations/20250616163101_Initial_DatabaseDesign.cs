@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SmokingCessation.Infrastracture.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial_Database : Migration
+    public partial class Initial_DatabaseDesign : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

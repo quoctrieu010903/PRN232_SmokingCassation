@@ -25,5 +25,19 @@ namespace SmokingCessation.Core.Constants
         // Validation messages
         public const string REQUIRED_FIELD = "This field is required.";
         public const string INVALID_FORMAT = "Invalid format.";
+        // Payment message
+        // Payment & Membership messages
+        public const string PAYMENT_REQUIRED = "You must complete payment to use this feature.";
+        public const string PAYMENT_SUCCESS = "Payment completed successfully!";
+        public const string PAYMENT_FAILED = "Payment failed.";
+        public const string ACTIVE_PACKAGE_EXISTS = "You already have an active package.";
+        public const string PACKAGE_NOT_FOUND = "Membership package not found.";
+        public const string REGISTER_PACKAGE_SUCCESS = "Package registration successful.";
+        public const string CANCEL_PACKAGE_SUCCESS = "Membership cancelled successfully.";
+        public const string NO_ACTIVE_MEMBERSHIP = "No active membership found.";
+        public const string ALREADY_RATED = "You have already rated this blog.";
+        public const string INVALID_RATING_VALUE = "Rating value must be between 1 and 5.";
+
+
     }
 }

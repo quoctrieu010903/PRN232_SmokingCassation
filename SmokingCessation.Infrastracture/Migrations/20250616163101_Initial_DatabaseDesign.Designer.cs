@@ -12,8 +12,8 @@ using SmokingCessation.Infrastracture.Data.Persistence;
 namespace SmokingCessation.Infrastracture.Migrations
 {
     [DbContext(typeof(SmokingCassationDBContext))]
-    [Migration("20250616155939_Initial_Database")]
-    partial class Initial_Database
+    [Migration("20250616163101_Initial_DatabaseDesign")]
+    partial class Initial_DatabaseDesign
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
