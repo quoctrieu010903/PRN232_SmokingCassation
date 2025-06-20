@@ -17,5 +17,6 @@ namespace SmokingCessation.Application.DTOs.Response
         public QuitPlanStatus Status { get; set; }
         public Guid UserId { get; set; }
         public Guid PackageId { get; set; }
+        public string PackageName { get; set; }
     }
 }

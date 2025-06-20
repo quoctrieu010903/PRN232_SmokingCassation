@@ -39,7 +39,9 @@ namespace SmokingCessation.Application.Mapping
 
             CreateMap<QuitPlan, QuitPlanResponse>()
                 //.ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.PackageName, opt => opt.MapFrom(src => src.MembershipPackage.Name.ToString()));
+                
             //.ForMember(dest => dest.PackageName, opt => opt.MapFrom(src => src.MembershipPackage.Name)).ReverseMap();
 
 

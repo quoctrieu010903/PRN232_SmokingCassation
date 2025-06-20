@@ -35,7 +35,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var userID = _userContext.GetUserId();
             var currentUser = await _unitOfWork.Repository<ApplicationUser, Guid>().GetByIdAsync(Guid.Parse(userID));
 
-// check existQUITPlan           
+
             var existingQuitPlanSpec = new BaseSpecification<QuitPlan>(
              x => x.UserId == Guid.Parse(userID) &&
             x.Status == QuitPlanStatus.Active &&

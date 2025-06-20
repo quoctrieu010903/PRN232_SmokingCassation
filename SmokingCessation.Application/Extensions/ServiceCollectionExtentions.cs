@@ -1,5 +1,4 @@
-﻿
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +7,7 @@ using SmokingCessation.Application.Helpers;
 using SmokingCessation.Application.Mapping;
 using SmokingCessation.Application.Service.Implementations;
 using SmokingCessation.Application.Service.Interface;
+using SmokingCessation.Application.Service.Interfaces;
 using SmokingCessation.Core.Base;
 using SmokingCessation.Domain.Entities;
 using SmokingCessation.Infrastracture.Photos;
@@ -45,6 +45,7 @@ namespace SmokingCessation.Application.Extensions
             services.AddScoped<IRatingService, RatingService>();
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<IUserPackageService, UserPackageService>();
+            services.AddScoped<IDeepSeekService, DeepSeekService>();
 
 
 

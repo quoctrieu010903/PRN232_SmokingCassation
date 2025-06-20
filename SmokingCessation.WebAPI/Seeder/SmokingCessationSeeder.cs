@@ -30,10 +30,10 @@ namespace SmokingCessation.Infrastracture.Seeder
                     _dbContext.UserAchievements.AddRange(GetUserAchievements());
                 }
 
-                //if (!_dbContext.Blogs.Any())
-                //{
-                //    _dbContext.Blogs.AddRange(GetBlogs());
-                //}
+                if (!_dbContext.Blogs.Any())
+                {
+                    _dbContext.Blogs.AddRange(GetBlogs());
+                }
                 if (!_dbContext.Roles.Any())
                 {
                     var roles = GetRoles(); 
@@ -181,28 +181,97 @@ namespace SmokingCessation.Infrastracture.Seeder
             };
         }
         #region Seeding Blog data
-        //public static List<Blog> GetBlogs()
-        //{
-        //    return new List<Blog>
-        //    {
-        //        new Blog
-        //        {
-        //            Id = Guid.NewGuid(),
-        //            Title = "My Journey to Quit Smoking",
-        //            Content = "I started my quit journey this week...",
-        //            AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
-        //            CreatedTime = CoreHelper.SystemTimeNow
-        //        },
-        //        new Blog
-        //        {
-        //            Id = Guid.NewGuid(),
-        //            Title = "5 Tips to Beat Cravings",
-        //            Content = "Drink water, exercise, and avoid triggers...",
-        //            AuthorId = Guid.Parse("f77b8d8a-345e-4a63-8928-2ddbdcf7b93b"),
-        //            CreatedTime = CoreHelper.SystemTimeNow
-        //        }
-        //    };
-        //}
+        public static List<Blog> GetBlogs()
+        {
+            return new List<Blog>
+            {
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "My Journey to Quit Smoking",
+                    Content = "I started my quit journey this week...",
+                    Status = Domain.Enums.BlogStatus.Published,
+                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                     FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+                    CreatedTime = CoreHelper.SystemTimeNow
+                },
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "5 Tips to Beat Cravings",
+                    Content = "Drink water, exercise, and avoid triggers...",
+                    Status = Domain.Enums.BlogStatus.Published,
+                    AuthorId = Guid.Parse("f77b8d8a-345e-4a63-8928-2ddbdcf7b93b"),
+                     FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+                    CreatedTime = CoreHelper.SystemTimeNow
+                },
+              
+
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "My Journey to Quit Smoking",
+                    Content = "I started my quit journey this week. It’s been challenging but I’m motivated to make a real change for my health and family.",
+                    Status = Domain.Enums.BlogStatus.Published,
+                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                     FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+                    CreatedTime = CoreHelper.SystemTimeNow
+                },
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Day 3 Without a Cigarette",
+                    Content = "The cravings are intense, especially after meals. I’m trying to replace the habit with drinking water and chewing gum.",
+                    Status = Domain.Enums.BlogStatus.Published,
+                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                     FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+                    CreatedTime = CoreHelper.SystemTimeNow
+                },
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "How I Handle Stress Without Smoking",
+                    Content = "I used to smoke every time I felt stressed. Now I go for walks or journal my thoughts. It’s not easy, but it works better over time.",
+                    Status = Domain.Enums.BlogStatus.Published,
+                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                     FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+                    CreatedTime = CoreHelper.SystemTimeNow
+                },
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "One Week Smoke-Free!",
+                    Content = "I’ve made it through the first week. It’s a small win, but a very meaningful one. I'm breathing easier already.",
+                    Status = Domain.Enums.BlogStatus.Published,
+                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                     FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+                    CreatedTime = CoreHelper.SystemTimeNow
+                },
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Relapsed After 10 Days – What I Learned",
+                    Content = "I had a cigarette after 10 days. I felt guilty but I learned that I need a better plan when I’m around other smokers. I'm not giving up.",
+                    Status = Domain.Enums.BlogStatus.Published,
+                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                     FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+
+                    CreatedTime = CoreHelper.SystemTimeNow
+                },
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "The Role of Support in Quitting Smoking",
+                    Content = "Having a support system has helped me tremendously. My partner checks in with me every day and I joined an online support group.",
+                    Status = Domain.Enums.BlogStatus.Pending_Approval,
+                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                     FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+                    CreatedTime = CoreHelper.SystemTimeNow
+                }
+            };
+
+      
+        }
         #endregion
     }
 

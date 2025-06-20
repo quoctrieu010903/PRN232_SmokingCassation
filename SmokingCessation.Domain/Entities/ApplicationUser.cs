@@ -10,6 +10,7 @@ namespace SmokingCessation.Domain.Entities
     {
         // Personal Info
         public string FullName { get; set; } = null!;
+        public string ImageUrl { get; set; }
 
         // Audit Info
         public string? CreatedBy { get; set; }

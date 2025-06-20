@@ -13,7 +13,7 @@ namespace SmokingCessation.Application.Service.Interface
         Task<BaseResponseModel<UserResponse>> RegisterAsync(UserRegisterRequest request);
         Task<BaseResponseModel<CurrentUserResponse>> GetCurrentUserAsync();
         Task<BaseResponseModel<UserResponse>> GetByIdAsync(Guid id);
-        Task<BaseResponseModel<UserResponse>> UpdateAsync(Guid id, UpdateUserRequest request);
+        Task<BaseResponseModel<UserCurrenResponse>> UpdateAsync(Guid id, UpdateUserRequest request);
         Task<BaseResponseModel> DeleteAsync(Guid id);
         Task<BaseResponseModel<RevokeRefreshTokenResponse>> RevokeRefreshToken(RefreshTokenRequest refreshTokenRemoveRequest);
         Task<BaseResponseModel<CurrentUserResponse>> RefreshTokenAsync(RefreshTokenRequest request);
