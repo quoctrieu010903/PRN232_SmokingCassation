@@ -60,7 +60,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var blog = _mapper.Map<Blog>(request);
             blog.AuthorId = Guid.Parse(userId);
-            blog.Status = BlogStatus.PendingApproval;
+            blog.Status = BlogStatus.Pending_Approval;
             blog.FeaturedImageUrl = imageUrl;
             blog.PublishedDate = CoreHelper.SystemTimeNow;
             blog.CreatedTime = CoreHelper.SystemTimeNow;
@@ -172,12 +172,15 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Update(Guid id, BlogRequest request)
         {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var repo = _unitOfWork.Repository<Blog, Guid>();
             var blog = await repo.GetByIdAsync(id);
             if (blog == null)
                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             _mapper.Map(request, blog);
+            blog.LastUpdatedBy = userId;
+            blog.LastUpdatedTime = CoreHelper.SystemTimeNow;
             await repo.UpdateAsync(blog);
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.BLOG_UPDATE_SUCCESS);

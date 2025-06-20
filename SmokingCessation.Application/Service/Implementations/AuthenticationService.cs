@@ -14,6 +14,7 @@ using SmokingCessation.Core.CustomExceptionss;
 using SmokingCessation.Core.Response;
 using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
+using static System.Net.WebRequestMethods;
 using static SmokingCessation.Application.DTOs.Response.AuthenticationResponse;
 
 namespace SmokingCessation.Application.Service.Implementations
@@ -24,10 +25,11 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly ILogger<AuthenticationService> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly IPhotoService _photoService;
         private readonly IUserContext _userContext;
         private readonly IMapper _mapper;
 
-        public AuthenticationService(ITokenService tokenService, ILogger<AuthenticationService> logger, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<Guid>> roleManager, IMapper mapper, IUserContext userContext)
+        public AuthenticationService(ITokenService tokenService, ILogger<AuthenticationService> logger, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<Guid>> roleManager, IMapper mapper, IUserContext userContext, IPhotoService photoService)
         {
             _tokenService = tokenService;
             _logger = logger;
@@ -35,6 +37,7 @@ namespace SmokingCessation.Application.Service.Implementations
             _roleManager = roleManager;
             _mapper = mapper;
             _userContext = userContext;
+            _photoService = photoService;
         }
 
         public async Task<BaseResponseModel> AssignUserRole(AssignUserRoles request)
@@ -72,8 +75,8 @@ namespace SmokingCessation.Application.Service.Implementations
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "User not found.");
-
-            var result = await _userManager.DeleteAsync(user);
+            user.DeletedTime = CoreHelper.SystemTimeNow;
+            var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.FAILED, "Failed to delete user.");
 
@@ -150,6 +153,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var newUser = _mapper.Map<ApplicationUser>(request);
             newUser.UserName = username;
             newUser.FullName = fullName;
+            newUser.ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg";
             newUser.CreatedTime = CoreHelper.SystemTimeNow;
             newUser.LastUpdatedTime = CoreHelper.SystemTimeNow;
             newUser.CreatedBy = userId;
@@ -212,22 +216,28 @@ namespace SmokingCessation.Application.Service.Implementations
             }
         }
 
-        public async Task<BaseResponseModel<UserResponse>> UpdateAsync(Guid id, AuthenticationRequest.UpdateUserRequest request)
+        public async Task<BaseResponseModel<UserCurrenResponse>> UpdateAsync(Guid id, AuthenticationRequest.UpdateUserRequest request)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "User not found");
+            string? imageUrl = null;
 
+            if (request.imageUrl != null)
+            {
+                imageUrl = await _photoService.UploadPhotoAsync(request.imageUrl);
+            }
             user.LastUpdatedTime = CoreHelper.SystemTimeNow;
             user.FullName = request.FullName;
             user.Email = request.Email;
+            user.ImageUrl = imageUrl; 
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.FAILED, "Failed to update user");
 
-            var userResponse = _mapper.Map<UserResponse>(user);
-            return new BaseResponseModel<UserResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, userResponse, null, "Cập nhật user thành công");
+            var userResponse = _mapper.Map<UserCurrenResponse>(user);
+            return new BaseResponseModel<UserCurrenResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, userResponse, null, "Cập nhật user thành công");
         }
 
         public async Task<BaseResponseModel<CurrentUserResponse>> GetCurrentUserAsync()

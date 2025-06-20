@@ -25,10 +25,10 @@ namespace SmokingCessation.Infrastracture.Seeder
                 {
                     _dbContext.Achievements.AddRange(GetAchievements());
                 }
-                //if (!_dbContext.Blogs.Any())
-                //{
-                //    _dbContext.Blogs.AddRange(GetBlogs());
-                //}
+                if (!_dbContext.Blogs.Any())
+                {
+                    _dbContext.Blogs.AddRange(GetBlogs());
+                }
                 if (!_dbContext.Roles.Any())
                 {
                     var roles = GetRoles();
@@ -74,6 +74,8 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Id = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
                     UserName = "john.doe",
                     FullName = "John Doe",
+                    ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     Email = "john.doe@example.com",
                     EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
@@ -83,6 +85,8 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Id = Guid.Parse("f77b8d8a-345e-4a63-8928-2ddbdcf7b93b"),
                     UserName = "jane.smith",
                     FullName = "Jane Smith",
+                    ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     Email = "jane.smith@example.com",
                     EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
@@ -93,6 +97,8 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "quoctrieu15",
                     FullName = "Quoc Trieu",
                     Email = "luongquoctrieu165@gmail.com", // Sửa lỗi định dạng email
+                    ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
                 },
@@ -102,6 +108,8 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "ThanhVu22",
                     FullName = "Lê Thanh Vũ",
                     Email = "vult2911@gmail.com",
+                    ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
                 },
@@ -111,6 +119,8 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "VietQuoc01",
                     FullName = "Nguyễn Trần Việt Quốc",
                     Email = "ntvq88@gmail.com",
+                    ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
                 },
@@ -120,6 +130,8 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "NhatTruong02",
                     FullName = "Lê Nhật Trường",
                     Email = "ltn04098@gmail.com",
+                    ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
                 }
@@ -136,7 +148,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Id = Guid.Parse("365B7E24-1CB1-4128-8D63-7C60604CD977"),
                     Title = "1 Week Smoke-Free",
                     Description = "Reached 7 days without smoking",
-                    IconUrl = "https://cdn-icons-png.flaticon.com/512/2921/2921222.png"
+                    IconUrl = "https://cdn-icons-png.flaticon.com/512/2921/2921222.png",
                 },
                 new Achievement
                 {
@@ -218,6 +230,8 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Title = "My Journey to Quit Smoking",
                     Content = "I started my quit journey this week...",
                     AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                    Status = BlogStatus.Published,
+                    FeaturedImageUrl= "https://res.cloudinary.com/dae7xasfc/image/upload/v1750146369/enhcnhezb9eqimew7k4p.jpg",
                     CreatedTime = DateTime.UtcNow
                 },
                 new Blog
@@ -226,7 +240,57 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Title = "5 Tips to Beat Cravings",
                     Content = "Drink water, exercise, and avoid triggers...",
                     AuthorId = Guid.Parse("f77b8d8a-345e-4a63-8928-2ddbdcf7b93b"),
+                    FeaturedImageUrl= "https://res.cloudinary.com/dae7xasfc/image/upload/v1750146369/enhcnhezb9eqimew7k4p.jpg",
                     CreatedTime = DateTime.UtcNow
+                },
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "5 Tips to Beat Cravings",
+                    Content = "Drink water, exercise, and avoid triggers...",
+                    Status = Domain.Enums.BlogStatus.Published,
+                    AuthorId = Guid.Parse("f77b8d8a-345e-4a63-8928-2ddbdcf7b93b"),
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                            FeaturedImageUrl= "https://res.cloudinary.com/dae7xasfc/image/upload/v1750146369/enhcnhezb9eqimew7k4p.jpg",
+                },
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Day 3 Without a Cigarette",
+                    Content = "The cravings are intense...",
+                    Status = Domain.Enums.BlogStatus.Published,
+                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                    FeaturedImageUrl= "https://res.cloudinary.com/dae7xasfc/image/upload/v1750146369/enhcnhezb9eqimew7k4p.jpg",
+                },
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "One Week Smoke-Free!",
+                    Content = "I’ve made it through the first week...",
+                    Status = Domain.Enums.BlogStatus.Published,
+                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                    FeaturedImageUrl= "https://res.cloudinary.com/dae7xasfc/image/upload/v1750146369/enhcnhezb9eqimew7k4p.jpg",
+                },
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Relapsed After 10 Days – What I Learned",
+                    Content = "I had a cigarette after 10 days...",
+                    Status = Domain.Enums.BlogStatus.Published,
+                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                    CreatedTime = CoreHelper.SystemTimeNow,
+                    FeaturedImageUrl= "https://res.cloudinary.com/dae7xasfc/image/upload/v1750146369/enhcnhezb9eqimew7k4p.jpg",
+                },
+                new Blog
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "The Role of Support in Quitting Smoking",
+                    Content = "Having a support system has helped me tremendously...",
+                    Status = Domain.Enums.BlogStatus.Pending_Approval,
+                    AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
+                    CreatedTime = CoreHelper.SystemTimeNow,FeaturedImageUrl= "https://res.cloudinary.com/dae7xasfc/image/upload/v1750146369/enhcnhezb9eqimew7k4p.jpg",
                 }
             };
         }

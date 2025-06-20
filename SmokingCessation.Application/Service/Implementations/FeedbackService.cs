@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -56,7 +57,9 @@ namespace SmokingCessation.Application.Service.Implementations
                 Comment = request.Comment,
           
                 CreatedBy = userId,
-                CreatedTime = DateTimeOffset.UtcNow
+                CreatedTime = CoreHelper.SystemTimeNow,
+                LastUpdatedBy = userId,
+                LastUpdatedTime = CoreHelper.SystemTimeNow,
             };
             await _unitOfWork.Repository<Feedback, Guid>().AddAsync(feedback);
             await _unitOfWork.SaveChangesAsync();
@@ -115,10 +118,15 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Update(Guid id, FeedbackRequest request)
         {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var repo = _unitOfWork.Repository<Feedback, Guid>();
             var feedback = await repo.GetByIdAsync(id);
             if (feedback == null)
                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+            feedback.DeletedBy = userId;
+            feedback.DeletedTime = CoreHelper.SystemTimeNow;
+            feedback.LastUpdatedBy = userId;
+            feedback.LastUpdatedTime = CoreHelper.SystemTimeNow;
 
             feedback.Comment = request.Comment;
             await repo.UpdateAsync(feedback);

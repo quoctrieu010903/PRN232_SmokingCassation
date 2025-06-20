@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SmokingCessation.Infrastracture.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial_DatabaseDesign : Migration
+    public partial class InitialDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,6 +51,7 @@ namespace SmokingCessation.Infrastracture.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastUpdatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),

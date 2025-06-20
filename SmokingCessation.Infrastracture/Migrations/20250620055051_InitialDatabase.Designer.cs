@@ -12,8 +12,8 @@ using SmokingCessation.Infrastracture.Data.Persistence;
 namespace SmokingCessation.Infrastracture.Migrations
 {
     [DbContext(typeof(SmokingCassationDBContext))]
-    [Migration("20250616163101_Initial_DatabaseDesign")]
-    partial class Initial_DatabaseDesign
+    [Migration("20250620055051_InitialDatabase")]
+    partial class InitialDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -238,6 +238,10 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("nvarchar(max)");

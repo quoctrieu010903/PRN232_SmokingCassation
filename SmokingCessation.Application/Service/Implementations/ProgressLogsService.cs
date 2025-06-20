@@ -1,4 +1,5 @@
 ﻿
+using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using SmokingCessation.Application.DTOs.Fillter;
@@ -8,6 +9,7 @@ using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
 using SmokingCessation.Core.CustomExceptionss;
 using SmokingCessation.Core.Response;
+using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Domain.Specifications;
@@ -19,12 +21,13 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IUserContext _userContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ProgressLogsService(IUnitOfWork unitOfWork, IMapper mapper, IUserContext userContext)
+        public ProgressLogsService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _userContext = userContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<BaseResponseModel> Create(ProgressLogsRequest request)
@@ -35,7 +38,9 @@ namespace SmokingCessation.Application.Service.Implementations
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
             }
             var entity = _mapper.Map<ProgressLog>(request);
-            entity.LogDate = DateTimeOffset.UtcNow;
+            entity.LogDate = CoreHelper.SystemTimeNow;
+            entity.CreatedTime = CoreHelper.SystemTimeNow;
+            entity.LastUpdatedTime = CoreHelper.SystemTimeNow;  
 
             await _unitOfWork.Repository<ProgressLog, Guid>().AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
@@ -44,6 +49,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Update(ProgressLogsRequest request, Guid id)
         {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var repo = _unitOfWork.Repository<ProgressLog, Guid>();
             var entity = await repo.GetByIdAsync(id);
             if (entity == null)
@@ -51,7 +57,8 @@ namespace SmokingCessation.Application.Service.Implementations
 
             _mapper.Map(request, entity);
             // Optionally update LogDate if you want to allow editing the date
-
+            entity.LastUpdatedBy = userId;
+            entity.LastUpdatedTime = CoreHelper.SystemTimeNow;
             await repo.UpdateAsync(entity);
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.CREATE_SUCCESS);
@@ -59,12 +66,18 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Delete(Guid id)
         {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var repo = _unitOfWork.Repository<ProgressLog, Guid>();
             var entity = await repo.GetByIdAsync(id);
             if (entity == null)
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
-            await repo.DeleteAsync(id);
+            entity.LastUpdatedBy = userId;
+            entity.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            entity.DeletedBy = userId;
+            entity.DeletedTime = CoreHelper.SystemTimeNow;
+
+            await repo.UpdateAsync(entity);
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.DELETE_SUCCESS);
         }
