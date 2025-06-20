@@ -23,13 +23,13 @@ namespace SmokingCessation.Application.Service.Implementations
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IUserContext _userContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FeedbackService(IUnitOfWork unitOfWork, IMapper mapper, IUserContext userContext)
+        public FeedbackService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _userContext = userContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         //public async Task<BaseResponseModel> Approve(Guid id, bool isApproved)
@@ -49,7 +49,7 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<BaseResponseModel> Create(FeedbackRequest request)
         {
 
-            var userId = _userContext.GetUserId();
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var feedback = new Feedback
             {
                 BlogId = request.BlogId,
@@ -70,7 +70,7 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<BaseResponseModel> Delete(Guid id)
         {
 
-            var userId = _userContext.GetUserId();
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var repo = _unitOfWork.Repository<Feedback, Guid>();
             var feedback = await repo.GetByIdAsync(id);
             if (feedback == null)
