@@ -54,7 +54,7 @@ namespace SmokingCessation.Application.Service.Implementations
                          $"Start date: {quitPlan.StartDate:yyyy-MM-dd}, Target date: {quitPlan.TargetDate:yyyy-MM-dd}. " +
                          $"Please provide a motivational advice to help the user stay on track.";
 
-            var adviceText = await _deepSeekService.GenerateAdviceAsync(prompt);
+            var adviceText = await _deepSeekService.GenerateAdviceByOpenRouterAsync(prompt);
 
             var adviceLog = new CoachAdviceLog
             {
@@ -116,7 +116,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 Hôm nay là {CoreHelper.SystemTimeNow:yyyy-MM-dd}. Hãy đưa ra một lời khuyên động viên, thực tế, KHÔNG QUÁ 225 từ, bằng tiếng Việt, giúp người dùng kiên trì với kế hoạch bỏ thuốc. Không lặp lại lời khuyên trước đó.
                 ";
 
-            var adviceText = await _deepSeekService.GenerateAdviceAsync(prompt);
+            var adviceText = await _deepSeekService.GenerateAdviceByOpenRouterAsync(prompt);
 
             var adviceLog = new CoachAdviceLog
             {
@@ -128,7 +128,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 LastUpdatedBy = userid,
                 LastUpdatedTime = CoreHelper.SystemTimeNow
             };
-            await _unitOfWork.Repository<CoachAdviceLog, Guid>().AddAsync(adviceLog);
+            await _unitOfWork.Repository<CoachAdviceLog, CoachAdviceLog>().AddAsync(adviceLog);
             await _unitOfWork.SaveChangesAsync();
 
             // Use AutoMapper

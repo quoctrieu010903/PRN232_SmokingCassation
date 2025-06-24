@@ -75,7 +75,7 @@ namespace SmokingCessation.WebAPI.Controllers
         [HttpPatch("{id}")]
         [Authorize]
 
-        public async Task<ActionResult<BaseResponseModel>> Update(Guid id, [FromBody] BlogRequest request)
+        public async Task<ActionResult<BaseResponseModel>> Update(Guid id, [FromForm] BlogRequest request)
         {
             var result = await _service.Update(id,request);
             return Ok(new BaseResponseModel<string>(
@@ -101,7 +101,7 @@ namespace SmokingCessation.WebAPI.Controllers
         /// <returns></returns>
         
         [HttpPatch("{id}/approve")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> ApproveBlog(Guid id)
         {
             try
@@ -116,7 +116,7 @@ namespace SmokingCessation.WebAPI.Controllers
         }
 
         [HttpPatch("{id}/reject")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> RejectBlog(Guid id)
         {
             try

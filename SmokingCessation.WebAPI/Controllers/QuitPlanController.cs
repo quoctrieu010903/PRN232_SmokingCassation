@@ -42,7 +42,7 @@ namespace SmokingCessation.WebAPI.Controllers
                      ResponseCodeConstants.SUCCESS,
                      result));
         }
-        [HttpPatch("{id}")]
+        [HttpDelete("{id}")]
         [Authorize]
 
         public async Task<ActionResult<BaseResponseModel>> Delete(Guid id)
@@ -53,7 +53,7 @@ namespace SmokingCessation.WebAPI.Controllers
                  ResponseCodeConstants.SUCCESS,
                 MessageConstants.DELETE_SUCCESS)); ;
         }
-        [HttpPatch("{id}/dctivate")]
+        [HttpPatch("{id}/Activate")]
         [Authorize]
         public async Task<ActionResult<BaseResponseModel>> SetActive(Guid id)
         {

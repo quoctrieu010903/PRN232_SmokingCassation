@@ -91,6 +91,9 @@ namespace SmokingCessation.Application.Mapping
                 .ForMember(dest => dest.IsExpired, opt => opt.MapFrom(src => src.EndDate < DateTimeOffset.UtcNow));
 
             #endregion
+            CreateMap<CoachAdviceLog, CoachAdviceLogResponse>().ReverseMap();
+           
+
 
         }
     }
