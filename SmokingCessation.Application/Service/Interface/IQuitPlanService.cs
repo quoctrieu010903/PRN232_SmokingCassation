@@ -17,7 +17,7 @@ namespace SmokingCessation.Application.Service.Interface
         Task<PaginatedList<QuitPlanResponse>> getAllQuitPlan(PagingRequestModel model, QuitPlanFillter fillter, bool isCurrentUser);
         Task<BaseResponseModel<QuitPlanResponse>> getQuitPlanById(Guid id);
         Task<BaseResponseModel> Create(QuitPlansRequest request);
-        Task<BaseResponseModel> Update(UpdateStatusQuitPlan request, Guid id );
+        Task<BaseResponseModel> UpdateStatus( Guid id, QuitPlanStatus request );
         Task<BaseResponseModel> Delete(Guid id);
     }
 }

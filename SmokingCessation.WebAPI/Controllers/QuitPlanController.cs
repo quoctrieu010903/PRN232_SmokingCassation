@@ -42,7 +42,7 @@ namespace SmokingCessation.WebAPI.Controllers
                      ResponseCodeConstants.SUCCESS,
                      result));
         }
-        [HttpDelete("{id}")]
+        [HttpPatch("{id}")]
         [Authorize]
 
         public async Task<ActionResult<BaseResponseModel>> Delete(Guid id)
@@ -53,16 +53,28 @@ namespace SmokingCessation.WebAPI.Controllers
                  ResponseCodeConstants.SUCCESS,
                 MessageConstants.DELETE_SUCCESS)); ;
         }
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}/dctivate")]
         [Authorize]
-
-        public async Task<ActionResult<BaseResponseModel>> Update(Guid id, [FromBody] UpdateStatusQuitPlan request)
+        public async Task<ActionResult<BaseResponseModel>> SetActive(Guid id)
         {
-            var result = await _service.Update(request, id);
-            return Ok(new BaseResponseModel<string>(
-                 StatusCodes.Status200OK,
-                 ResponseCodeConstants.SUCCESS,
-                 MessageConstants.UPDATE_SUCCESS)); ;
+            var result = await _service.UpdateStatus(id, QuitPlanStatus.Active);
+            return Ok(result);
+        }
+
+        [HttpPatch("{id}/deactivate")]
+        [Authorize]
+        public async Task<ActionResult<BaseResponseModel>> SetInactive(Guid id)
+        {
+            var result = await _service.UpdateStatus(id,QuitPlanStatus.Inactive );
+            return Ok(result);
+        }
+
+        [HttpPatch("{id}/complete")]
+        [Authorize]
+        public async Task<ActionResult<BaseResponseModel>> SetCompleted(Guid id)
+        {
+            var result = await _service.UpdateStatus(id, QuitPlanStatus.Completed);
+            return Ok(result);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<MemberShipPackageResponse>> GetById(Guid id)

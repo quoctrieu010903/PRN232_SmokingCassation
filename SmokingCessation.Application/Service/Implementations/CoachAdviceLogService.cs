@@ -10,6 +10,7 @@ using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Application.Service.Interfaces;
 using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
+using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Interfaces;
 
 namespace SmokingCessation.Application.Service.Implementations
@@ -20,21 +21,34 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly IUnitOfWork _unitOfWork;
         private readonly IDeepSeekService _deepSeekService;
         private readonly IMapper _mapper;
+        private readonly IUserContext _userContext;
 
-        public CoachAdviceLogService(IUnitOfWork unitOfWork, IDeepSeekService deepSeekService, IMapper mapper)
+        public CoachAdviceLogService(IUnitOfWork unitOfWork, IDeepSeekService deepSeekService, IMapper mapper, IUserContext userContext)
         {
             _unitOfWork = unitOfWork;
             _deepSeekService = deepSeekService;
             _mapper = mapper;
+            _userContext = userContext;
         }
 
         /// <summary>
         /// Tạo một log lời khuyên mới cho kế hoạch bỏ thuốc, sinh nội dung bằng AI DeepSeek.
         /// </summary>
-        public async Task CreateAdviceLogAsync(Guid quitPlanId)
-        {
-            var quitPlan = await _unitOfWork.Repository<QuitPlan, Guid>().GetByIdAsync(quitPlanId);
-            if (quitPlan == null) throw new Exception("Quit plan not found");
+        public async Task CreateAdviceLogAsync()
+        { // 1. Lấy userId từ context
+            var userId = _userContext.GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                throw new Exception("Không xác định được người dùng.");
+
+            // 2. Lấy QuitPlan phù hợp của user hiện tại (ưu tiên đang hoạt động, nếu không có thì lấy mới nhất)
+            var quitPlans = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllAsync();
+            var userQuitPlans = quitPlans.Where(q => q.UserId == Guid.Parse(userId));
+            var quitPlan = userQuitPlans
+                .FirstOrDefault(q => q.Status == QuitPlanStatus.Active)
+                ?? userQuitPlans.OrderByDescending(q => q.CreatedTime).FirstOrDefault();
+
+            if (quitPlan == null)
+                throw new Exception("Không tìm thấy kế hoạch bỏ thuốc cho người dùng này.");
 
             var prompt = $"User wants to quit smoking for the following reason: {quitPlan.Reason}. " +
                          $"Start date: {quitPlan.StartDate:yyyy-MM-dd}, Target date: {quitPlan.TargetDate:yyyy-MM-dd}. " +
@@ -44,7 +58,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
             var adviceLog = new CoachAdviceLog
             {
-                QuitPlanId = quitPlanId,
+                QuitPlanId = quitPlan.Id,
                 AdviceDate = CoreHelper.SystemTimeNow,
                 AdviceText = adviceText,
                 CreatedTime = CoreHelper.SystemTimeNow,
@@ -57,14 +71,26 @@ namespace SmokingCessation.Application.Service.Implementations
         /// <summary>
         /// Sinh và lưu lời khuyên hàng ngày cho kế hoạch bỏ thuốc, sử dụng AI DeepSeek dựa trên tiến trình gần nhất.
         /// </summary>
-        public async Task<CoachAdviceLogResponse> GenerateAndSaveDailyAdviceAsync(CoachAdviceLogRequest request)
+        public async Task<CoachAdviceLogResponse> GenerateAndSaveDailyAdviceAsync()
         {
-            var quitPlan = await _unitOfWork.Repository<QuitPlan, Guid>().GetByIdAsync(request.QuitPlanId);
-            if (quitPlan == null) throw new Exception("Không tìm thấy kế hoạch bỏ thuốc.");
+            var userid = _userContext.GetUserId();
+            if (string.IsNullOrEmpty(userid))
+                throw new Exception("Không xác định được người dùng.");
+
+            // 2. Lấy QuitPlan phù hợp của user hiện tại (ưu tiên đang hoạt động, nếu không có thì lấy mới nhất)
+            var quitPlans = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllAsync();
+            var userQuitPlans = quitPlans.Where(q => q.UserId == Guid.Parse(userid));
+            var quitPlan = userQuitPlans
+                .FirstOrDefault(q => q.Status == QuitPlanStatus.Active)
+                ?? userQuitPlans.OrderByDescending(q => q.CreatedTime).FirstOrDefault();
+
+            if (quitPlan == null)
+                throw new Exception("Không tìm thấy kế hoạch bỏ thuốc cho người dùng này.");
+
 
             var progressLogs = (await _unitOfWork.Repository<ProgressLog, ProgressLog>()
                 .GetAllWithIncludeAsync(true, p => p.QuitPlan))
-                .Where(p => p.QuitPlanId == request.QuitPlanId)
+                .Where(p => p.QuitPlanId == quitPlan.Id)
                 .OrderByDescending(p => p.LogDate)
                 .Take(3)
                 .ToList();
@@ -74,30 +100,32 @@ namespace SmokingCessation.Application.Service.Implementations
 
             var lastAdvice = (await _unitOfWork.Repository<CoachAdviceLog, CoachAdviceLog>()
                 .GetAllAsync())
-                .Where(a => a.QuitPlanId == request.QuitPlanId)
+                .Where(a => a.QuitPlanId == quitPlan.Id)
                 .OrderByDescending(a => a.AdviceDate)
                 .FirstOrDefault();
 
             var prompt = $@"
-            User is trying to quit smoking.
-            - Reason: {quitPlan.Reason}
-            - Start date: {quitPlan.StartDate:yyyy-MM-dd}
-            - Target quit date: {quitPlan.TargetDate:yyyy-MM-dd}
-            - Days smoke-free streak: {streak}
-            - Yesterday: {(lastProgress != null ? lastProgress.SmokedToday : 0)} cigarettes.
-            - User note: ""{lastProgress?.Note ?? "No note."}""
-            - Previous advice: ""{lastAdvice?.AdviceText ?? "None yet."}""
-            Today is {CoreHelper.SystemTimeNow:yyyy-MM-dd}. Please give a new, motivational, and practical piece of advice to help the user stay on track with their quit plan. Avoid repeating previous advice.
-        ";
+                Người dùng đang cố gắng bỏ thuốc lá.
+                - Lý do: {quitPlan.Reason}
+                - Ngày bắt đầu: {quitPlan.StartDate:yyyy-MM-dd}
+                - Ngày mục tiêu: {quitPlan.TargetDate:yyyy-MM-dd}
+                - Số ngày liên tiếp không hút thuốc: {streak}
+                - Hôm qua: {(lastProgress != null ? lastProgress.SmokedToday : 0)} điếu.
+                - Ghi chú của người dùng: ""{lastProgress?.Note ?? "Không có ghi chú."}""
+                - Lời khuyên trước đó: ""{lastAdvice?.AdviceText ?? "Chưa có."}""
+                Hôm nay là {CoreHelper.SystemTimeNow:yyyy-MM-dd}. Hãy đưa ra một lời khuyên động viên, thực tế, KHÔNG QUÁ 225 từ, bằng tiếng Việt, giúp người dùng kiên trì với kế hoạch bỏ thuốc. Không lặp lại lời khuyên trước đó.
+                ";
 
             var adviceText = await _deepSeekService.GenerateAdviceAsync(prompt);
 
             var adviceLog = new CoachAdviceLog
             {
-                QuitPlanId = request.QuitPlanId,
+                QuitPlanId =    quitPlan.Id,
                 AdviceDate = CoreHelper.SystemTimeNow,
                 AdviceText = adviceText,
+                CreatedBy = userid,
                 CreatedTime = CoreHelper.SystemTimeNow,
+                LastUpdatedBy = userid,
                 LastUpdatedTime = CoreHelper.SystemTimeNow
             };
             await _unitOfWork.Repository<CoachAdviceLog, Guid>().AddAsync(adviceLog);
@@ -198,9 +226,10 @@ namespace SmokingCessation.Application.Service.Implementations
         /// <summary>
         /// Lấy lịch sử tất cả lời khuyên của một user (theo tất cả kế hoạch bỏ thuốc).
         /// </summary>
-        public async Task<List<CoachAdviceLogResponse>> GetAdviceHistoryByUserAsync(Guid userId)
+        public async Task<List<CoachAdviceLogResponse>> GetAdviceHistoryByUserAsync()
         {
-            var quitPlans = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllAsync();
+            var userId = Guid.Parse(_userContext.GetUserId());
+              var quitPlans = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllAsync();
             var userQuitPlanIds = quitPlans.Where(q => q.UserId == userId).Select(q => q.Id).ToList();
 
             var logs = await _unitOfWork.Repository<CoachAdviceLog, CoachAdviceLog>().GetAllAsync();

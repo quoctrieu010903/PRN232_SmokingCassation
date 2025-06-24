@@ -72,5 +72,14 @@ namespace SmokingCessation.WebAPI.Controllers
                      ResponseCodeConstants.SUCCESS,
                      result));
         }
+        /// <summary>
+        /// Tạo ProgressLog dựa trên lời khuyên mới nhất của user hiện tại tu coachadvices.
+        /// </summary>
+        [HttpPost("from-advice")]
+        public async Task<IActionResult> CreateFromAdvice()
+        {
+            var response = await _service.CreateProgressLogFromAdviceAsync();
+            return StatusCode(response.StatusCode, response);
+        }
     }
 }

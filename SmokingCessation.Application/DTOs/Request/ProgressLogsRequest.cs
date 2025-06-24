@@ -8,7 +8,6 @@ namespace SmokingCessation.Application.DTOs.Request
 {
     public class ProgressLogsRequest
     {
-        public Guid QuitPlanId { get; set; }
         public int SmokedToday { get; set; }
         public string Note { get; set; }
     }

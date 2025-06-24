@@ -30,19 +30,94 @@ namespace SmokingCessation.Application.Service.Implementations
             _userContext = userContext;
         }
 
+        #region check lại LUỒNG
+        /// <summary>
+        /// Chekc luồng 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="ErrorException"></exception>
+        /// 
+        /*
+         public async Task<BaseResponseModel> Create(QuitPlansRequest request)
+         {
+             var userID = _userContext.GetUserId();
+             var currentUser = await _unitOfWork.Repository<ApplicationUser, Guid>().GetByIdAsync(Guid.Parse(userID));
+
+
+             var existingQuitPlanSpec = new BaseSpecification<QuitPlan>(
+              x => x.UserId == Guid.Parse(userID) &&
+             x.Status == QuitPlanStatus.Active &&
+             !x.DeletedTime.HasValue
+    );
+
+             var existingQuitPlans = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllWithSpecAsync(existingQuitPlanSpec);
+
+             if (existingQuitPlans.Any())
+             {
+                 throw new ErrorException(
+                     StatusCodes.Status400BadRequest,
+                     ResponseCodeConstants.BADREQUEST,
+                     "Người dùng đã có kế hoạch bỏ thuốc đang hoạt động."
+                 );
+             }
+
+
+             var baseSpeci = new BaseSpecification<Payment>(f => f.UserId == Guid.Parse(userID) && f.Status== PaymentStatus.Completed);
+             var startDay = CoreHelper.SystemTimeNow;
+             int targetDay = 0;
+             var payments = await _unitOfWork.Repository<Payment, Payment>().GetAllWithSpecAsync(baseSpeci);
+             var latestPaidPackage = payments
+                 .OrderByDescending(x => x.CreatedTime)
+                 .Select(x => new { x.PackageId, x.CreatedTime })
+                 .FirstOrDefault();
+             if (latestPaidPackage == null)
+             {
+                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Người dùng chưa thanh toán gói nào.");
+             }
+             // Lấy ra gói package đã thanh toán
+             var package = await _unitOfWork.Repository<MembershipPackage, Guid>().GetByIdAsync(latestPaidPackage.PackageId);
+             if (package == null)
+             {
+                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Không tìm thấy gói membership.");
+             }
+
+             targetDay = package.DurationMonths > 0 ? package.DurationMonths * 30 : 30;
+             var targetDate = startDay.AddDays(targetDay);
+
+             var quitPlan = new QuitPlan
+             {
+                 Reason = request.Reason,
+                 StartDate = startDay,
+                 TargetDate = targetDate,
+                 Status = QuitPlanStatus.Active,
+                 UserId = Guid.Parse(userID),
+
+                 CreatedBy = userID,
+                 LastUpdatedBy = userID,
+                 LastUpdatedTime = startDay,
+                 CreatedTime = startDay,
+             };
+             await _unitOfWork.Repository<QuitPlan, Guid>().AddAsync(quitPlan);
+             await _unitOfWork.SaveChangesAsync();
+             return new BaseResponseModel(StatusCodes.Status200OK, "SUCCESS","Tạo data thành công");
+         }
+         */
+        #endregion
+
         public async Task<BaseResponseModel> Create(QuitPlansRequest request)
         {
             var userID = _userContext.GetUserId();
-            var currentUser = await _unitOfWork.Repository<ApplicationUser, Guid>().GetByIdAsync(Guid.Parse(userID));
+            var userGuid = Guid.Parse(userID);
 
-
+            // 1. Kiểm tra xem đã có QuitPlan đang hoạt động chưa
             var existingQuitPlanSpec = new BaseSpecification<QuitPlan>(
-             x => x.UserId == Guid.Parse(userID) &&
-            x.Status == QuitPlanStatus.Active &&
-            !x.DeletedTime.HasValue
-   );
+                x => x.UserId == userGuid &&
+                     x.Status == QuitPlanStatus.Active &&
+                     !x.DeletedTime.HasValue);
 
-            var existingQuitPlans = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllWithSpecAsync(existingQuitPlanSpec);
+            var existingQuitPlans = await _unitOfWork.Repository<QuitPlan, QuitPlan>()
+                .GetAllWithSpecAsync(existingQuitPlanSpec);
 
             if (existingQuitPlans.Any())
             {
@@ -53,45 +128,86 @@ namespace SmokingCessation.Application.Service.Implementations
                 );
             }
 
+            // 2. Kiểm tra xem người dùng có gói user package còn hiệu lực không
+            var today = CoreHelper.SystemTimeNow.Date;
+            var userPackageSpec = new BaseSpecification<UserPackage>(
+                x => x.UserId == userGuid &&
+                     x.StartDate <= today &&
+                     x.EndDate >= today &&
+                     x.IsActive);
 
-            var baseSpeci = new BaseSpecification<Payment>(f => f.UserId == Guid.Parse(userID) && f.Status== PaymentStatus.Completed);
-            var startDay = CoreHelper.SystemTimeNow;
-            int targetDay = 0;
-            var payments = await _unitOfWork.Repository<Payment, Payment>().GetAllWithSpecAsync(baseSpeci);
+            var validUserPackages = await _unitOfWork.Repository<UserPackage, UserPackage>()
+                .GetAllWithSpecAsync(userPackageSpec);
+
+            if (!validUserPackages.Any())
+            {
+                throw new ErrorException(
+                    StatusCodes.Status400BadRequest,
+                    ResponseCodeConstants.BADREQUEST,
+                    "Người dùng chưa đăng ký gói thành viên hợp lệ để tạo kế hoạch bỏ thuốc."
+                );
+            }
+
+            // 3. Kiểm tra gói đã thanh toán (Payment)
+            var baseSpeci = new BaseSpecification<Payment>(
+                f => f.UserId == userGuid && f.Status == PaymentStatus.Completed);
+
+            var payments = await _unitOfWork.Repository<Payment, Payment>()
+                .GetAllWithSpecAsync(baseSpeci);
+
             var latestPaidPackage = payments
                 .OrderByDescending(x => x.CreatedTime)
                 .Select(x => new { x.PackageId, x.CreatedTime })
                 .FirstOrDefault();
+
             if (latestPaidPackage == null)
             {
-                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Người dùng chưa thanh toán gói nào.");
+                throw new ErrorException(
+                    StatusCodes.Status404NotFound,
+                    ResponseCodeConstants.NOT_FOUND,
+                    "Người dùng chưa thanh toán gói nào."
+                );
             }
-            // Lấy ra gói package đã thanh toán
-            var package = await _unitOfWork.Repository<MembershipPackage, Guid>().GetByIdAsync(latestPaidPackage.PackageId);
+
+            var package = await _unitOfWork.Repository<MembershipPackage, Guid>()
+                .GetByIdAsync(latestPaidPackage.PackageId);
+
             if (package == null)
             {
-                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "Không tìm thấy gói membership.");
+                throw new ErrorException(
+                    StatusCodes.Status404NotFound,
+                    ResponseCodeConstants.NOT_FOUND,
+                    "Không tìm thấy gói membership."
+                );
             }
 
-            targetDay = package.DurationMonths > 0 ? package.DurationMonths * 30 : 30;
+            // 4. Tính toán ngày target dựa trên gói
+            int targetDay = package.DurationMonths > 0 ? package.DurationMonths * 30 : 30;
+            var startDay = CoreHelper.SystemTimeNow;
             var targetDate = startDay.AddDays(targetDay);
 
+            // 5. Tạo QuitPlan
             var quitPlan = new QuitPlan
             {
                 Reason = request.Reason,
                 StartDate = startDay,
                 TargetDate = targetDate,
                 Status = QuitPlanStatus.Active,
-                UserId = Guid.Parse(userID),
-                   
+                UserId = userGuid,
                 CreatedBy = userID,
                 LastUpdatedBy = userID,
                 LastUpdatedTime = startDay,
                 CreatedTime = startDay,
             };
+
             await _unitOfWork.Repository<QuitPlan, Guid>().AddAsync(quitPlan);
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, "SUCCESS","Tạo data thành công");
+
+            return new BaseResponseModel(
+                StatusCodes.Status200OK,
+                "SUCCESS",
+                "Tạo kế hoạch bỏ thuốc thành công."
+            );
         }
 
         public async Task<BaseResponseModel> Delete(Guid id)
@@ -102,19 +218,19 @@ namespace SmokingCessation.Application.Service.Implementations
 
             if (entity == null)
                 return new BaseResponseModel(StatusCodes.Status404NotFound, "NOT_FOUND", "QuitPlan not found");
-
+          
             entity.LastUpdatedBy = currentUser;
             entity.LastUpdatedTime = CoreHelper.SystemTimeNow;
-            entity.DeletedBy = currentUser;
-            entity.DeletedTime = CoreHelper.SystemTimeNow;
+     
 
 
             await repo.UpdateAsync(entity);
 
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, "SUCCESS", "Deleted successfully");
+            return new BaseResponseModel(StatusCodes.Status200OK, "SUCCESS", "Change Status  successfully");
 
         }
+        
 
         public async Task<PaginatedList<QuitPlanResponse>> getAllQuitPlan(PagingRequestModel model, QuitPlanFillter fillter, bool isCurrentUser)
         {
@@ -159,7 +275,7 @@ namespace SmokingCessation.Application.Service.Implementations
            
         }
 
-        public async Task<BaseResponseModel> Update(UpdateStatusQuitPlan request, Guid id)
+        public async Task<BaseResponseModel> UpdateStatus( Guid id, QuitPlanStatus request)
         {
             var currentUser = _userContext.GetUserId();
             var existedEntity = await _unitOfWork.Repository<QuitPlan,Guid>().GetByIdAsync(id);
@@ -167,10 +283,15 @@ namespace SmokingCessation.Application.Service.Implementations
             {
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
             }
-         
+            // Optional: Không cho chuyển Completed về trạng thái khác
+            if (existedEntity.Status == QuitPlanStatus.Completed)
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Kế hoạch đã hoàn thành không thể cập nhật.");
+            }
+
             existedEntity.LastUpdatedBy = currentUser;
             existedEntity.LastUpdatedTime = CoreHelper.SystemTimeNow;
-            existedEntity.Status = request.Status;
+            existedEntity.Status = request;
             
 
             _mapper.Map(request, existedEntity);

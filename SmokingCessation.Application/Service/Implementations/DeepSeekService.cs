@@ -30,7 +30,9 @@ namespace SmokingCessation.Application.Service.Implementations
                     new { role = "system", content = "You are a helpful coach for quitting smoking." },
                     new { role = "user", content = prompt }
                 },
+                temperature = 0.7,
                 max_tokens = 512
+
             };
 
             var requestJson = JsonSerializer.Serialize(requestBody);
@@ -55,11 +57,11 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<string> GenerateDailyAdviceAsync(string reason, DateTimeOffset startDate, DateTimeOffset targetDate, DateTimeOffset today)
         {
             var prompt = $@"A user is trying to quit smoking.
-- Reason: {reason}
-- Start date: {startDate:yyyy-MM-dd}
-- Target quit date: {targetDate:yyyy-MM-dd}
-Today is {today:yyyy-MM-dd}.
-Please provide a motivational, practical, and supportive daily advice to help the user stay on track with their quit plan. The advice should be relevant for today and encourage the user to keep going.";
+                        - Reason: {reason}
+                        - Start date: {startDate:yyyy-MM-dd}
+                        - Target quit date: {targetDate:yyyy-MM-dd}
+                        Today is {today:yyyy-MM-dd}.
+                        Please provide a motivational, practical, and supportive daily advice to help the user stay on track with their quit plan. The advice should be relevant for today and encourage the user to keep going.";
 
             return await GenerateAdviceAsync(prompt);
         }

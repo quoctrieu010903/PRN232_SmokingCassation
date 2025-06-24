@@ -10,14 +10,14 @@ namespace SmokingCessation.Application.Service.Interface
 {
     public interface ICoachAdviceLogService
     {
-        Task CreateAdviceLogAsync(Guid quitPlanId);
-        Task<CoachAdviceLogResponse> GenerateAndSaveDailyAdviceAsync(CoachAdviceLogRequest request);
+        Task CreateAdviceLogAsync();
+        Task<CoachAdviceLogResponse> GenerateAndSaveDailyAdviceAsync();
         Task<CoachAdviceLogResponse> GetLatestAdviceAsync(Guid quitPlanId);
         Task<List<CoachAdviceLogResponse>> GetAllAdvicesByQuitPlanAsync(Guid quitPlanId);
         Task<CoachAdviceLogResponse> GetAdviceByIdAsync(Guid adviceLogId);
         Task<bool> DeleteAdviceAsync(Guid adviceLogId);
         Task<CoachAdviceLogResponse> UpdateAdviceAsync(Guid adviceLogId, string newAdviceText);
-        Task<List<CoachAdviceLogResponse>> GetAdviceHistoryByUserAsync(Guid userId);
+        Task<List<CoachAdviceLogResponse>> GetAdviceHistoryByUserAsync();
         Task<List<CoachAdviceLogResponse>> GetAllAdvicesAsync(/* filter/paging params for admin */);
 
     }

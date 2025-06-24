@@ -131,7 +131,14 @@ namespace SmokingCessation.WebAPI.Controllers
         }
         [HttpPut("{id}/view")]
         public async Task<IActionResult> IncreaseViewCount(Guid id)
-            => StatusCode((await _service.IncreaseViewCount(id)).StatusCode, await _service.IncreaseViewCount(id));
+        {
+            var result = await _service.IncreaseViewCount(id);
+            return Ok(new BaseResponseModel(
+                    StatusCodes.Status200OK,
+                    ResponseCodeConstants.SUCCESS,
+                    result));
+        }
+          
 
     }
 }
