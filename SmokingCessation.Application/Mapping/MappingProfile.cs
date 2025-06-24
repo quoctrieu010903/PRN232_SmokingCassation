@@ -57,7 +57,9 @@ namespace SmokingCessation.Application.Mapping
             CreateMap<BlogRequest, Blog>();
             CreateMap<Blog, BlogResponse>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
-                .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.Author.FullName));
+                .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.Author.FullName))
+                .ForMember(dest => dest.Views , opt => opt.MapFrom(src => src.ViewCount));
+
             #endregion
 
             #region Feedback
@@ -89,6 +91,9 @@ namespace SmokingCessation.Application.Mapping
                 .ForMember(dest => dest.IsExpired, opt => opt.MapFrom(src => src.EndDate < DateTimeOffset.UtcNow));
 
             #endregion
+            CreateMap<CoachAdviceLog, CoachAdviceLogResponse>().ReverseMap();
+           
+
 
         }
     }

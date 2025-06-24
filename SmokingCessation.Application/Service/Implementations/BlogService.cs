@@ -163,7 +163,7 @@ namespace SmokingCessation.Application.Service.Implementations
             if (blog == null)
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
-            blog.ViewCount += 1;
+            blog.ViewCount +=  1;
             
             await repo.UpdateAsync(blog);
             await _unitOfWork.SaveChangesAsync();

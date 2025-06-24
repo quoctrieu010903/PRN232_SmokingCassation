@@ -12,6 +12,7 @@ namespace SmokingCessation.Application.DTOs.Response
         public string Title { get; set; }
         public string Content { get; set; }
         public string? FeaturedImageUrl { get; set; }
+        public int Views {  get; set; }
         public string Status { get; set; }
         public DateTimeOffset PublishedDate { get; set; }
         public string AuthorName { get; set; }

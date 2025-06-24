@@ -18,5 +18,7 @@ namespace SmokingCessation.Application.Service.Interface
         Task<BaseResponseModel> Create(ProgressLogsRequest request);
         Task<BaseResponseModel> Update(ProgressLogsRequest request, Guid id);
         Task<BaseResponseModel> Delete(Guid id);
+        Task<BaseResponseModel> CreateProgressLogFromAdviceAsync();
+
     }
 }
