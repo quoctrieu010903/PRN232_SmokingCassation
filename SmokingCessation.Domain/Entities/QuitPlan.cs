@@ -11,9 +11,12 @@ namespace SmokingCessation.Domain.Entities
     public class QuitPlan : BaseEntity
     {
         public string Reason { get; set; }                      // Lý do bỏ thuốc
-        public DateTimeOffset StartDate { get; set; }           // Ngày bắt đầu
-        public DateTimeOffset TargetDate { get; set; }          // Ngày mục tiêu
+        public DateTime StartDate { get; set; }           // Ngày bắt đầu
+        public DateTime TargetDate { get; set; }          // Ngày mục tiêu
         public QuitPlanStatus Status { get; set; }              // Trạng thái (Đang tiến hành, Hoàn thành, Huỷ)
+
+        public int CigarettesPerDayBeforeQuit { get; set; }   // ✅ Bao nhiêu điếu mỗi ngày
+        public int YearsSmokingBeforeQuit { get; set; }       // ✅ Bao nhiêu năm đã hút
 
         public Guid UserId { get; set; }
         public ApplicationUser User { get; set; }

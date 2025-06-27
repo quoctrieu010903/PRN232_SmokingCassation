@@ -36,7 +36,7 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<BaseResponseModel<UserPackageResponse>> CancelCurrentPackage()
         {
             var userId = Guid.Parse(_context.GetUserId());
-            var now = CoreHelper.SystemTimeNow;
+            var now = DateTime.UtcNow;
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
             var current = (await userpackageRepo.GetAllWithSpecAsync(
@@ -126,7 +126,7 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<BaseResponseModel> RegisterPackage(UserPackageRequest request)
         {
             var userId = Guid.Parse(_context.GetUserId());
-            var now = CoreHelper.SystemTimeNow;
+            var now = DateTime.UtcNow;
 
             // Check for completed payment for this user  
             var paymentRepo = _unitOfWork.Repository<Payment, Guid>();

@@ -80,7 +80,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Email = "john.doe@example.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
-                    CreatedTime = CoreHelper.SystemTimeNow,
+                    CreatedTime =  DateTime.UtcNow,
                      SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new ApplicationUser
@@ -91,7 +91,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Email = "jane.smith@example.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
-                    CreatedTime = CoreHelper.SystemTimeNow,
+                    CreatedTime =  DateTime.UtcNow,
                      SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new ApplicationUser
@@ -102,7 +102,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Email = "luongquoctrieu165@gmail.com", // Sửa lỗi định dạng email
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
-                    CreatedTime = CoreHelper.SystemTimeNow,
+                    CreatedTime =  DateTime.UtcNow,
                      SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new ApplicationUser
@@ -113,7 +113,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Email = "vult2911@gmail.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
-                    CreatedTime = CoreHelper.SystemTimeNow,
+                    CreatedTime =  DateTime.UtcNow,
                      SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new ApplicationUser
@@ -124,7 +124,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Email = "ntvq88@gmail.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
-                    CreatedTime = CoreHelper.SystemTimeNow,
+                    CreatedTime =  DateTime.UtcNow,
                     SecurityStamp = Guid.NewGuid().ToString()
                 },
                 new ApplicationUser
@@ -135,7 +135,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     Email = "ltn04098@gmail.com",
                     EmailConfirmed = true,
-                    CreatedTime = CoreHelper.SystemTimeNow,
+                    CreatedTime =  DateTime.UtcNow,
                     SecurityStamp = Guid.NewGuid().ToString()
                 }
             };
@@ -193,7 +193,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Status = Domain.Enums.BlogStatus.Published,
                     AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
                      FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-                    CreatedTime = CoreHelper.SystemTimeNow
+                    CreatedTime =  DateTime.UtcNow
                 },
                 new Blog
                 {
@@ -203,7 +203,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Status = Domain.Enums.BlogStatus.Published,
                     AuthorId = Guid.Parse("f77b8d8a-345e-4a63-8928-2ddbdcf7b93b"),
                      FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-                    CreatedTime = CoreHelper.SystemTimeNow
+                    CreatedTime =  DateTime.UtcNow
                 },
               
 
@@ -215,7 +215,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Status = Domain.Enums.BlogStatus.Published,
                     AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
                      FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-                    CreatedTime = CoreHelper.SystemTimeNow
+                    CreatedTime =  DateTime.UtcNow
                 },
                 new Blog
                 {
@@ -225,7 +225,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Status = Domain.Enums.BlogStatus.Published,
                     AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
                      FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-                    CreatedTime = CoreHelper.SystemTimeNow
+                    CreatedTime =  DateTime.UtcNow
                 },
                 new Blog
                 {
@@ -235,7 +235,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Status = Domain.Enums.BlogStatus.Published,
                     AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
                      FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-                    CreatedTime = CoreHelper.SystemTimeNow
+                    CreatedTime =  DateTime.UtcNow
                 },
                 new Blog
                 {
@@ -245,7 +245,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Status = Domain.Enums.BlogStatus.Published,
                     AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
                      FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-                    CreatedTime = CoreHelper.SystemTimeNow
+                    CreatedTime =  DateTime.UtcNow
                 },
                 new Blog
                 {
@@ -256,7 +256,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
                      FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
 
-                    CreatedTime = CoreHelper.SystemTimeNow
+                    CreatedTime =  DateTime.UtcNow
                 },
                 new Blog
                 {
@@ -266,7 +266,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     Status = Domain.Enums.BlogStatus.Pending_Approval,
                     AuthorId = Guid.Parse("c1c780f9-8dce-41b3-9735-b6bc0e935712"),
                      FeaturedImageUrl = "https://images.unsplash.com/photo-1603398938378-329cb7a2391b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-                    CreatedTime = CoreHelper.SystemTimeNow
+                    CreatedTime =  DateTime.UtcNow
                 }
             };
 

@@ -1,7 +1,6 @@
 ﻿
 
 using AutoMapper;
-using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using SmokingCessation.Application.DTOs.Fillter;
@@ -39,9 +38,9 @@ namespace SmokingCessation.Application.Service.Implementations
             var entity = _mapper.Map<MembershipPackage>(request);
 
             entity.CreatedBy = currentUser;
-            entity.CreatedTime = CoreHelper.SystemTimeNow;
+            entity.CreatedTime =  DateTime.UtcNow;
             entity.LastUpdatedBy = currentUser;
-            entity.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            entity.LastUpdatedTime =  DateTime.UtcNow;
 
             await _unitOfWork.Repository<MembershipPackage, bool>().AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
@@ -60,9 +59,9 @@ namespace SmokingCessation.Application.Service.Implementations
                 return new BaseResponseModel(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND,MessageConstants.NOT_FOUND);
 
             entity.LastUpdatedBy = currentUser;
-            entity.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            entity.LastUpdatedTime =  DateTime.UtcNow;
             entity.DeletedBy = currentUser;
-            entity.DeletedTime = CoreHelper.SystemTimeNow;
+            entity.DeletedTime =  DateTime.UtcNow;
             
 
             await repo.UpdateAsync(entity);
@@ -113,7 +112,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 return new BaseResponseModel(404, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             entity.LastUpdatedBy = currentUser;
-            entity.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            entity.LastUpdatedTime =  DateTime.UtcNow;
             _mapper.Map(request, entity);
 
             await repo.UpdateAsync(entity);

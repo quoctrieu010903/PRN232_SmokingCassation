@@ -59,10 +59,10 @@ namespace SmokingCessation.Application.Service.Implementations
             var adviceLog = new CoachAdviceLog
             {
                 QuitPlanId = quitPlan.Id,
-                AdviceDate = CoreHelper.SystemTimeNow,
+                AdviceDate =  DateTime.UtcNow,
                 AdviceText = adviceText,
-                CreatedTime = CoreHelper.SystemTimeNow,
-                LastUpdatedTime = CoreHelper.SystemTimeNow
+                CreatedTime =  DateTime.UtcNow,
+                LastUpdatedTime =  DateTime.UtcNow
             };
             await _unitOfWork.Repository<CoachAdviceLog, Guid>().AddAsync(adviceLog);
             await _unitOfWork.SaveChangesAsync();
@@ -113,7 +113,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 - Hôm qua: {(lastProgress != null ? lastProgress.SmokedToday : 0)} điếu.
                 - Ghi chú của người dùng: ""{lastProgress?.Note ?? "Không có ghi chú."}""
                 - Lời khuyên trước đó: ""{lastAdvice?.AdviceText ?? "Chưa có."}""
-                Hôm nay là {CoreHelper.SystemTimeNow:yyyy-MM-dd}. Hãy đưa ra một lời khuyên động viên, thực tế, KHÔNG QUÁ 225 từ, bằng tiếng Việt, giúp người dùng kiên trì với kế hoạch bỏ thuốc. Không lặp lại lời khuyên trước đó.
+                Hôm nay là { DateTime.UtcNow:yyyy-MM-dd}. Hãy đưa ra một lời khuyên động viên, thực tế, KHÔNG QUÁ 225 từ, bằng tiếng Việt, giúp người dùng kiên trì với kế hoạch bỏ thuốc. Không lặp lại lời khuyên trước đó.
                 ";
 
             var adviceText = await _deepSeekService.GenerateAdviceByOpenRouterAsync(prompt);
@@ -121,12 +121,12 @@ namespace SmokingCessation.Application.Service.Implementations
             var adviceLog = new CoachAdviceLog
             {
                 QuitPlanId =    quitPlan.Id,
-                AdviceDate = CoreHelper.SystemTimeNow,
+                AdviceDate =  DateTime.UtcNow,
                 AdviceText = adviceText,
                 CreatedBy = userid,
-                CreatedTime = CoreHelper.SystemTimeNow,
+                CreatedTime =  DateTime.UtcNow,
                 LastUpdatedBy = userid,
-                LastUpdatedTime = CoreHelper.SystemTimeNow
+                LastUpdatedTime =  DateTime.UtcNow
             };
             await _unitOfWork.Repository<CoachAdviceLog, CoachAdviceLog>().AddAsync(adviceLog);
             await _unitOfWork.SaveChangesAsync();
@@ -212,7 +212,7 @@ namespace SmokingCessation.Application.Service.Implementations
             if (log == null) return null;
 
             log.AdviceText = newAdviceText;
-            log.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            log.LastUpdatedTime =  DateTime.UtcNow;
             await _unitOfWork.Repository<CoachAdviceLog, Guid>().UpdateAsync(log);
             await _unitOfWork.SaveChangesAsync();
 

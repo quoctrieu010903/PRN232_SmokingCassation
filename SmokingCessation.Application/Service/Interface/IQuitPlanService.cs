@@ -19,5 +19,6 @@ namespace SmokingCessation.Application.Service.Interface
         Task<BaseResponseModel> Create(QuitPlansRequest request);
         Task<BaseResponseModel> UpdateStatus( Guid id, QuitPlanStatus request );
         Task<BaseResponseModel> Delete(Guid id);
+        Task<BaseResponseModel<QuitPlanResponse?>> GetQuitPlanAsync(Guid? userId = null);
     }
 }

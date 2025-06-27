@@ -12,6 +12,11 @@ namespace SmokingCessation.Domain.Entities
         public string Title { get; set; }
         public String Description { get; set; }
         public string IconUrl { get; set; }
+
+        // Điều kiện để gán tự động
+        public string ConditionType { get; set; }   // e.g., "DaysSmokeFree"
+        public int ConditionValue { get; set; }
+
         public List<UserAchievement> UserAchievements { get; set; }
     }
 }

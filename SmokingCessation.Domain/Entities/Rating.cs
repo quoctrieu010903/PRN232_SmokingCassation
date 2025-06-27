@@ -14,7 +14,7 @@ namespace SmokingCessation.Domain.Entities
         public Guid BlogId { get; set; }
         public Guid UserId { get; set; }
         public int Start { get; set; }
-        public DateTimeOffset RatedAt { get; set; } = CoreHelper.SystemTimeNow;
+        public DateTime RatedAt { get; set; } =DateTime.UtcNow;
 
        
         public Blog Blog { get; set; }
