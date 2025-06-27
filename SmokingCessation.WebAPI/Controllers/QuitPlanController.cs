@@ -28,19 +28,13 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<ActionResult<BaseResponseModel>> Create([FromBody] QuitPlansRequest request)
         {
             var result = await _service.Create(request);
-            return Ok(new BaseResponseModel(
-                 statusCode: StatusCodes.Status200OK,
-                 code: ResponseCodeConstants.SUCCESS,
-                 data: MessageConstants.CREATE_SUCCESS));
+            return Ok(result);
         }
         [HttpGet]
         public async Task<ActionResult<PaginatedList<QuitPlansRequest>>> GetAll([FromQuery] PagingRequestModel paging, [FromQuery] QuitPlanFillter filter, bool isCurrentUser)
         {
             var result = await _service.getAllQuitPlan(paging, filter, isCurrentUser);
-            return Ok(new BaseResponseModel(
-                     StatusCodes.Status200OK,
-                     ResponseCodeConstants.SUCCESS,
-                     result));
+            return Ok(result);
         }
         [HttpDelete("{id}")]
         [Authorize]
@@ -48,10 +42,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<ActionResult<BaseResponseModel>> Delete(Guid id)
         {
             var result = await _service.Delete(id);
-            return Ok(new BaseResponseModel<string>(
-                 StatusCodes.Status200OK,
-                 ResponseCodeConstants.SUCCESS,
-                MessageConstants.DELETE_SUCCESS)); ;
+            return Ok(result); 
         }
         [HttpPatch("{id}/Activate")]
         [Authorize]
@@ -80,10 +71,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<ActionResult<MemberShipPackageResponse>> GetById(Guid id)
         {
             var result = await _service.getQuitPlanById(id);
-            return Ok(new BaseResponseModel(
-                     StatusCodes.Status200OK,
-                     ResponseCodeConstants.SUCCESS,
-                     result));
+            return Ok(result);
         }
 
     }

@@ -26,10 +26,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> GenerateAdvice()
         {
             var response = await _service.GenerateAndSaveDailyAdviceAsync();
-            return Ok(new BaseResponseModel(
-                  StatusCodes.Status200OK,
-                  ResponseCodeConstants.SUCCESS,
-                  response));
+            return Ok(response);
         }
 
         /// <summary>
@@ -41,10 +38,7 @@ namespace SmokingCessation.WebAPI.Controllers
           
 
             var result = await _service.GetAdviceHistoryByUserAsync();
-            return Ok(new BaseResponseModel(
-                     StatusCodes.Status200OK,
-                     ResponseCodeConstants.SUCCESS,
-                     result));
+            return Ok(result);
         }
 
         /// <summary>
@@ -54,10 +48,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> GetByQuitPlan(Guid quitPlanId)
         {
             var result = await _service.GetAllAdvicesByQuitPlanAsync(quitPlanId);
-            return Ok(new BaseResponseModel(
-                StatusCodes.Status200OK,
-                ResponseCodeConstants.SUCCESS,
-                result));
+            return Ok(result);
         }
 
         /// <summary>
@@ -67,10 +58,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _service.GetAdviceByIdAsync(id);
-                    return Ok(new BaseResponseModel(
-                 StatusCodes.Status200OK,
-                 ResponseCodeConstants.SUCCESS,
-                 result));
+            return Ok(result);
         }
 
         /// <summary>
@@ -81,10 +69,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _service.GetAllAdvicesAsync();
-            return Ok(new BaseResponseModel(
-                StatusCodes.Status200OK,
-                ResponseCodeConstants.SUCCESS,
-                result));
+            return Ok(result);
         }
 
         /// <summary>
@@ -94,10 +79,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _service.DeleteAdviceAsync(id);
-            return Ok(new BaseResponseModel(
-                StatusCodes.Status200OK,
-                ResponseCodeConstants.SUCCESS,
-                result));
+            return Ok(result);
         }
 
         /// <summary>
@@ -107,10 +89,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> Update(Guid id, [FromBody] string newAdviceText)
         {
             var result = await _service.UpdateAdviceAsync(id, newAdviceText);
-            return Ok(new BaseResponseModel(
-                     StatusCodes.Status200OK,
-                     ResponseCodeConstants.SUCCESS,
-                     result));
+            return Ok(result);
         }
     }
 }

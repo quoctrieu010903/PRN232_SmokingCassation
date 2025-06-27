@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using SmokingCessation.Application.DTOs.Fillter;
 using SmokingCessation.Application.DTOs.Request;
@@ -27,19 +28,13 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<ActionResult<BaseResponseModel>> Create([FromBody] ProgressLogsRequest request)
         {
             var result = await _service.Create(request);
-            return Ok(new BaseResponseModel(
-                 statusCode: StatusCodes.Status200OK,
-                 code: ResponseCodeConstants.SUCCESS,
-                 data: MessageConstants.CREATE_SUCCESS));
+            return Ok(result);
         }
         [HttpGet]
         public async Task<ActionResult<PaginatedList<QuitPlansRequest>>> GetAll([FromQuery] PagingRequestModel paging, [FromQuery] ProgressLogsFillter filter)
         {
             var result = await _service.getAllProgressLogs(paging, filter);
-            return Ok(new BaseResponseModel(
-                     StatusCodes.Status200OK,
-                     ResponseCodeConstants.SUCCESS,
-                     result));
+            return Ok(result);
         }
         [HttpDelete("{id}")]
         [Authorize]
@@ -47,10 +42,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<ActionResult<BaseResponseModel>> Delete(Guid id)
         {
             var result = await _service.Delete(id);
-            return Ok(new BaseResponseModel<string>(
-                 StatusCodes.Status200OK,
-                 ResponseCodeConstants.SUCCESS,
-                MessageConstants.DELETE_SUCCESS)); ;
+            return Ok(result);
         }
         [HttpPatch("{id}")]
         [Authorize]
@@ -58,19 +50,13 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<ActionResult<BaseResponseModel>> Update(Guid id, [FromBody] ProgressLogsRequest request)
         {
             var result = await _service.Update(request, id);
-            return Ok(new BaseResponseModel<string>(
-                 StatusCodes.Status200OK,
-                 ResponseCodeConstants.SUCCESS,
-                 MessageConstants.UPDATE_SUCCESS)); ;
+            return Ok(result);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<MemberShipPackageResponse>> GetById(Guid id)
         {
             var result = await _service.getProgressLogsyId(id);
-            return Ok(new BaseResponseModel(
-                     StatusCodes.Status200OK,
-                     ResponseCodeConstants.SUCCESS,
-                     result));
+            return Ok(result);
         }
         /// <summary>
         /// Tạo ProgressLog dựa trên lời khuyên mới nhất của user hiện tại tu coachadvices.
@@ -79,7 +65,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> CreateFromAdvice()
         {
             var response = await _service.CreateProgressLogFromAdviceAsync();
-            return StatusCode(response.StatusCode, response);
+            return Ok(response);
         }
     }
 }

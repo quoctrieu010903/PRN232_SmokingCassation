@@ -25,10 +25,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> Register([FromBody] UserPackageRequest request)
         {
             var result = await _service.RegisterPackage(request);
-            return Ok(new BaseResponseModel(
-                  statusCode: StatusCodes.Status200OK,
-                  code: ResponseCodeConstants.SUCCESS,
-                  data: MessageConstants.REGISTER_PACKAGE_SUCCESS));
+            return Ok(result);
         }
         /// <summary>
         /// Lấy gói thành viên hiện tại còn hạn
@@ -37,10 +34,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> GetCurrent()
         {
             var result = await _service.GetCurrentPackage();
-            return Ok(new BaseResponseModel(
-                 statusCode: StatusCodes.Status200OK,
-                 code: ResponseCodeConstants.SUCCESS,
-                 data: result));
+            return Ok(result);
         }
         /// <summary>
         /// Hủy gói thành viên hiện tại
@@ -49,10 +43,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> Cancel()
         {
             var result = await _service.CancelCurrentPackage();
-            return Ok(new BaseResponseModel(
-                   statusCode: StatusCodes.Status200OK,
-                   code: ResponseCodeConstants.SUCCESS,
-                   data: MessageConstants.CANCEL_PACKAGE_SUCCESS));
+            return Ok(result);
         }
 
         /// <summary>
@@ -62,10 +53,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> GetHistory()
         {
             var result = await _service.GetPackageHistory();
-            return Ok(new BaseResponseModel(
-                  statusCode: StatusCodes.Status200OK,
-                  code: ResponseCodeConstants.SUCCESS,
-                  data: result));
+            return Ok(result);
         }
             /// <summary>
             /// Lấy chi tiết một gói đã đăng ký theo Id
@@ -74,10 +62,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _service.GetPackageById(id);
-            return Ok(new BaseResponseModel(
-                   statusCode: StatusCodes.Status200OK,
-                   code: ResponseCodeConstants.SUCCESS,
-                   data: result));
+            return Ok(result);
         }
 
     }

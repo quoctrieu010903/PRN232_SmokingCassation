@@ -28,10 +28,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<ActionResult<BaseResponseModel>> Create([FromForm] BlogRequest request)
         {
             var result = await _service.Create(request);
-            return Ok(new BaseResponseModel(
-                 statusCode: StatusCodes.Status200OK,
-                 code: ResponseCodeConstants.SUCCESS,
-                 data: MessageConstants.BLOG_CREATE_PENDING_APPROVAL));
+            return Ok(result);
         }
         /// <summary>
         /// /// Lấy danh sách blog theo phân quyền và filter:
@@ -54,10 +51,7 @@ namespace SmokingCessation.WebAPI.Controllers
             var filter = new BlogListFilter { FilterType = filterType, Search = search ,Status = status };
             var result = await _service.GetAll(paging, filter);
 
-            return Ok(new BaseResponseModel(
-                     StatusCodes.Status200OK,
-                     ResponseCodeConstants.SUCCESS,
-                     result));
+            return Ok(result);
         }
         [HttpDelete("{id}")]
         [Authorize]
@@ -65,10 +59,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<ActionResult<BaseResponseModel>> Delete(Guid id)
         {
             var result = await _service.Delete(id);
-            return Ok(new BaseResponseModel<string>(
-                 StatusCodes.Status200OK,
-                 ResponseCodeConstants.SUCCESS,
-                MessageConstants.DELETE_SUCCESS)); ;
+            return Ok(result);
         }
        
         
@@ -78,19 +69,13 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<ActionResult<BaseResponseModel>> Update(Guid id, [FromForm] BlogRequest request)
         {
             var result = await _service.Update(id,request);
-            return Ok(new BaseResponseModel<string>(
-                 StatusCodes.Status200OK,
-                 ResponseCodeConstants.SUCCESS,
-                 MessageConstants.UPDATE_SUCCESS)); ;
+            return Ok(result);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<BlogResponse>> GetById(Guid id)
         {
             var result = await _service.GetBlogsDetails(id);
-            return Ok(new BaseResponseModel(
-                     StatusCodes.Status200OK,
-                     ResponseCodeConstants.SUCCESS,
-                     result));
+            return Ok(result);
         }
 
         /// <summary>
@@ -133,10 +118,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> IncreaseViewCount(Guid id)
         {
             var result = await _service.IncreaseViewCount(id);
-            return Ok(new BaseResponseModel(
-                    StatusCodes.Status200OK,
-                    ResponseCodeConstants.SUCCESS,
-                    result));
+            return Ok(result);
         }
           
 
