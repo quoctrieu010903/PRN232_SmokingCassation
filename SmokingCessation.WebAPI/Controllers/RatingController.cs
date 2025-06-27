@@ -26,11 +26,8 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> Create([FromBody] RatingRequest request)
         {
             var result = await _service.Create(request);
-          
-            return Ok(new BaseResponseModel(
-                     StatusCodes.Status200OK,
-                     ResponseCodeConstants.SUCCESS,
-                     result));
+
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
@@ -38,10 +35,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> Update(Guid id, [FromBody] RatingRequest request)
         {
             var result = await _service.Update(id, request);
-            return Ok(new BaseResponseModel(
-                     StatusCodes.Status200OK,
-                     ResponseCodeConstants.SUCCESS,
-                     result));
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
@@ -49,20 +43,14 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _service.Delete(id);
-            return Ok(new BaseResponseModel(
-                      StatusCodes.Status200OK,
-                      ResponseCodeConstants.SUCCESS,
-                      result));
+            return Ok(result);
         }
 
         [HttpGet("by-blog/{blogId}")]
         public async Task<ActionResult<PaginatedList<RatingResponse>>> GetByBlogId(Guid blogId, [FromQuery] PagingRequestModel paging)
         {
             var result = await _service.GetByBlogId(blogId, paging);
-            return Ok(new BaseResponseModel(
-                    StatusCodes.Status200OK,
-                    ResponseCodeConstants.SUCCESS,
-                    result));
+            return Ok(result);
         }
 
         [HttpGet("by-user/{userId}")]
@@ -70,20 +58,14 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<ActionResult<PaginatedList<RatingResponse>>> GetByUserId(Guid userId, [FromQuery] PagingRequestModel paging)
         {
             var result = await _service.GetByUserId(userId, paging);
-            return Ok(new BaseResponseModel(
-                      StatusCodes.Status200OK,
-                      ResponseCodeConstants.SUCCESS,
-                      result));
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _service.GetById(id);
-            return Ok(new BaseResponseModel(
-                       StatusCodes.Status200OK,
-                       ResponseCodeConstants.SUCCESS,
-                       result));
+            return Ok(result);
         }
     }
 }

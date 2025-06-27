@@ -23,40 +23,28 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<ActionResult<BaseResponseModel<AchievementResponse>>> Create([FromForm] AchievementCreateRequest request)
         {
             var result = await _service.CreateAsync(request);
-            return Ok(new BaseResponseModel(
-              statusCode: StatusCodes.Status200OK,
-              code: ResponseCodeConstants.SUCCESS,
-              data: MessageConstants.CREATE_SUCCESS));
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<BaseResponseModel<AchievementResponse?>>> GetById(Guid id)
         {
             var result = await _service.GetByIdAsync(id);
-            return Ok(new BaseResponseModel(
-               statusCode: StatusCodes.Status200OK,
-               code: ResponseCodeConstants.SUCCESS,
-               data: result));
+            return Ok( result);
         }
 
         [HttpGet]
         public async Task<ActionResult<BaseResponseModel<IEnumerable<AchievementResponse>>>> GetAll([FromQuery] PagingRequestModel paging)
         {
             var result = await _service.GetAllAsync(paging);
-            return Ok(new BaseResponseModel(
-            statusCode: StatusCodes.Status200OK,
-            code: ResponseCodeConstants.SUCCESS,
-            data: result));
+            return Ok(result);
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<BaseResponseModel<AchievementResponse?>>> Update([FromForm] AchievementUpdateRequest request, Guid id)
         {
             var result = await _service.UpdateAsync(request, id);
-            return Ok(new BaseResponseModel(
-             statusCode: StatusCodes.Status200OK,
-             code: ResponseCodeConstants.SUCCESS,
-             data: result));
+            return Ok(result);
         }
     }
 }

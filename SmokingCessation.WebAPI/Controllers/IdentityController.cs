@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
@@ -50,10 +51,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
         {
             var response = await _service.LoginAsync(request);
-            return Ok(new BaseResponseModel(
-                 statusCode: StatusCodes.Status200OK,
-                 code: ResponseCodeConstants.SUCCESS,
-                 data: response));
+            return Ok(response);
         }
 
         /// <summary>
@@ -67,7 +65,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var response = await _service.GetByIdAsync(id);
-            return Ok(new BaseResponseModel(statusCode: StatusCodes.Status200OK, code: ResponseCodeConstants.SUCCESS, data: response));
+            return Ok(response);
         }
 
         /// <summary>
@@ -80,7 +78,7 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
             var response = await _service.RefreshTokenAsync(request);
-            return Ok(new BaseResponseModel(statusCode: StatusCodes.Status200OK, code: ResponseCodeConstants.SUCCESS, data: response));
+            return Ok(response);
         }
 
         /// <summary>
@@ -98,12 +96,12 @@ namespace SmokingCessation.WebAPI.Controllers
                 return Ok(new BaseResponseModel(
                  statusCode: StatusCodes.Status200OK,
                  code: ResponseCodeConstants.SUCCESS,
-                 data: MessageConstants.BLOG_CREATE_PENDING_APPROVAL));
+                 data: "Refresh token revoked successfully"));
             }
             return BadRequest(new BaseResponseModel(
                  statusCode: StatusCodes.Status200OK,
                  code: ResponseCodeConstants.SUCCESS,
-                 data: MessageConstants.BLOG_CREATE_PENDING_APPROVAL));
+                 data: "refresh token revoked successfully"));
         }
 
         /// <summary>
@@ -120,7 +118,7 @@ namespace SmokingCessation.WebAPI.Controllers
                 return Unauthorized("User is not authenticated.");
             }
             var response = await _service.GetCurrentUserAsync();
-            return Ok(new BaseResponseModel(statusCode: StatusCodes.Status200OK, code: ResponseCodeConstants.SUCCESS, data: response));
+            return Ok(response  );
         }
 
         /// <summary>
