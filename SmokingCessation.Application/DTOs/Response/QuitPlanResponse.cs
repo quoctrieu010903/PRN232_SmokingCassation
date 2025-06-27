@@ -13,10 +13,13 @@ namespace SmokingCessation.Application.DTOs.Response
         public string Reason { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset TargetDate { get; set; }
-        public int CreateNum { get; set; } // số lần user tạo một plan mới 
+        public int CigarettesPerDayBeforeQuit { get; set; }   // ✅ Bao nhiêu điếu mỗi ngày
+        public int YearsSmokingBeforeQuit { get; set; }       // 
         public QuitPlanStatus Status { get; set; }
         public Guid UserId { get; set; }
         public Guid PackageId { get; set; }
         public string PackageName { get; set; }
+        public int SmokeFreeDays { get; set; }
+        public HealthImpactProgress HealthImpact { get; set; }
     }
 }

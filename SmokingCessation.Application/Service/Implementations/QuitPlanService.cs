@@ -1,4 +1,4 @@
-﻿
+﻿using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using SmokingCessation.Application.DTOs.Fillter;
@@ -21,13 +21,13 @@ namespace SmokingCessation.Application.Service.Implementations
     {
         private IUnitOfWork _unitOfWork;
         private IMapper _mapper;
-        private IUserContext _userContext;
+        private IHttpContextAccessor _httpContextAccessor;
 
-        public QuitPlanService(IUnitOfWork unitOfWork, IUserContext userContext, IMapper mapper)
+        public QuitPlanService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
-            _userContext = userContext;
+           _httpContextAccessor = httpContextAccessor;
         }
 
         #region check lại LUỒNG
@@ -64,7 +64,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
 
              var baseSpeci = new BaseSpecification<Payment>(f => f.UserId == Guid.Parse(userID) && f.Status== PaymentStatus.Completed);
-             var startDay = CoreHelper.SystemTimeNow;
+             var startDay =  DateTime.UtcNow;
              int targetDay = 0;
              var payments = await _unitOfWork.Repository<Payment, Payment>().GetAllWithSpecAsync(baseSpeci);
              var latestPaidPackage = payments
@@ -107,7 +107,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Create(QuitPlansRequest request)
         {
-            var userID = _userContext.GetUserId();
+            var userID = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userGuid = Guid.Parse(userID);
 
             // 1. Kiểm tra xem đã có QuitPlan đang hoạt động chưa
@@ -129,7 +129,7 @@ namespace SmokingCessation.Application.Service.Implementations
             }
 
             // 2. Kiểm tra xem người dùng có gói user package còn hiệu lực không
-            var today = CoreHelper.SystemTimeNow.Date;
+            var today =  DateTime.UtcNow.Date;
             var userPackageSpec = new BaseSpecification<UserPackage>(
                 x => x.UserId == userGuid &&
                      x.StartDate <= today &&
@@ -183,7 +183,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
             // 4. Tính toán ngày target dựa trên gói
             int targetDay = package.DurationMonths > 0 ? package.DurationMonths * 30 : 30;
-            var startDay = CoreHelper.SystemTimeNow;
+            var startDay =  DateTime.UtcNow;
             var targetDate = startDay.AddDays(targetDay);
 
             // 5. Tạo QuitPlan
@@ -193,6 +193,8 @@ namespace SmokingCessation.Application.Service.Implementations
                 StartDate = startDay,
                 TargetDate = targetDate,
                 Status = QuitPlanStatus.Active,
+                CigarettesPerDayBeforeQuit = request.CigarettesPerDayBeforeQuit,
+                YearsSmokingBeforeQuit = request.YearsSmokingBeforeQuit,
                 UserId = userGuid,
                 CreatedBy = userID,
                 LastUpdatedBy = userID,
@@ -212,7 +214,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Delete(Guid id)
         {
-            var currentUser = _userContext.GetUserId();
+            var currentUser = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var repo = _unitOfWork.Repository<QuitPlan, Guid>();
             var entity = await repo.GetByIdAsync(id);
 
@@ -220,7 +222,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 return new BaseResponseModel(StatusCodes.Status404NotFound, "NOT_FOUND", "QuitPlan not found");
           
             entity.LastUpdatedBy = currentUser;
-            entity.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            entity.LastUpdatedTime =  DateTime.UtcNow;
      
 
 
@@ -238,7 +240,7 @@ namespace SmokingCessation.Application.Service.Implementations
            
             if (isCurrentUser)
             {
-                var userIdStr = _userContext.GetUserId();
+                var userIdStr = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (!Guid.TryParse(userIdStr, out var userId))
                     throw new ErrorException(StatusCodes.Status400BadRequest,ResponseCodeConstants.NOT_FOUND,"Invalid or missing user id.");
                 currentUserId = userId;
@@ -261,6 +263,71 @@ namespace SmokingCessation.Application.Service.Implementations
 
         }
 
+        public async Task<BaseResponseModel<QuitPlanResponse?>> GetQuitPlanAsync(Guid? userId = null)
+        {
+            var currentUserId = Guid.Parse(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+           
+           
+                
+            var currentUser = _httpContextAccessor.HttpContext?.User;
+            bool isAdmin = currentUser != null && currentUser.IsInRole(UserRoles.Admin);
+
+            if (!isAdmin)
+            {
+                 throw new ErrorException(
+                StatusCodes.Status403Forbidden,
+                ResponseCodeConstants.FORBIDDEN,
+                "Bạn không có quyền truy cập kế hoạch của người khác.");
+            }
+
+            // Truy xuất kế hoạch active của user, bao gồm thông tin Package
+            var quitPlanList = await _unitOfWork.Repository<QuitPlan, Guid>()
+                    .GetAllWithIncludeAsync(
+                         true,
+                         p => p.MembershipPackage
+                    );
+
+            // 2. Tìm kế hoạch đang active của user hiện tại
+            var plan = quitPlanList
+                .FirstOrDefault(q => q.UserId == currentUserId && q.Status == QuitPlanStatus.Active);
+
+            if (plan == null)
+            {
+                throw new ErrorException(
+                    StatusCodes.Status404NotFound,
+                    ResponseCodeConstants.NOT_FOUND,
+                    MessageConstants.NOT_FOUND);
+            }
+
+            var baseSpeci = new BaseSpecification<ProgressLog>(p => Guid.Parse(p.CreatedBy) == currentUserId && p.LogDate >= plan.StartDate.Date);
+            // Lấy progress log để tính ngày không hút
+            var logs = await _unitOfWork.Repository<ProgressLog, Guid>()
+                .GetAllWithSpecAsync(baseSpeci);
+
+            var smokeFreeDays = logs.Count(l => l.SmokedToday == 0);
+            var health = CalculateHealthImpact(smokeFreeDays);
+
+            var response = new QuitPlanResponse
+            {
+                Id = plan.Id,
+                Reason = plan.Reason,
+                StartDate = plan.StartDate,
+                TargetDate = plan.TargetDate,
+                CigarettesPerDayBeforeQuit = plan.CigarettesPerDayBeforeQuit,
+                YearsSmokingBeforeQuit = plan.YearsSmokingBeforeQuit,
+                Status = plan.Status,
+                UserId = plan.UserId,
+                PackageId = plan.MembershipPackage.Id,
+                PackageName = plan.MembershipPackage?.Name ?? "Không rõ",
+                SmokeFreeDays = smokeFreeDays,
+                HealthImpact = health
+            };
+
+            return new BaseResponseModel<QuitPlanResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, response);
+        }
+
+
+
         public async Task<BaseResponseModel<QuitPlanResponse>> getQuitPlanById(Guid id)
         {
             var entity = await _unitOfWork.Repository<QuitPlan, Guid>().GetByIdAsync(id);
@@ -277,7 +344,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> UpdateStatus( Guid id, QuitPlanStatus request)
         {
-            var currentUser = _userContext.GetUserId();
+            var currentUser = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var existedEntity = await _unitOfWork.Repository<QuitPlan,Guid>().GetByIdAsync(id);
             if(existedEntity == null)
             {
@@ -288,9 +355,15 @@ namespace SmokingCessation.Application.Service.Implementations
             {
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Kế hoạch đã hoàn thành không thể cập nhật.");
             }
+            // Không cho phép cập nhật thủ công sang Completed
+            if (request == QuitPlanStatus.Completed)
+            {
+                throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.BADREQUEST, "Không thể tự cập nhật sang trạng thái hoàn thành.");
+            }
+
 
             existedEntity.LastUpdatedBy = currentUser;
-            existedEntity.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            existedEntity.LastUpdatedTime =  DateTime.UtcNow;
             existedEntity.Status = request;
             
 
@@ -299,6 +372,19 @@ namespace SmokingCessation.Application.Service.Implementations
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(StatusCodes.Status200OK , ResponseCodeConstants.SUCCESS, "Update QuitPlan Successfully");
 
+        }
+
+        private HealthImpactProgress CalculateHealthImpact(int smokeFreeDays)
+        {
+            var cancer = Math.Min(100.0 * smokeFreeDays / 7300.0, 50.0);  // 20 năm = max 50%
+            var heart = Math.Min(100.0 * smokeFreeDays / 3650.0, 95.0);   // 10 năm = max 95%
+
+            return new HealthImpactProgress
+            {
+                CancerRiskReductionPercent = Math.Round(cancer, 1),
+                HeartRiskReductionPercent = Math.Round(heart, 1),
+                Summary = $"Bạn đã giảm {Math.Round(cancer, 1)}% nguy cơ ung thư và {Math.Round(heart, 1)}% nguy cơ bệnh tim."
+            };
         }
     }
 }

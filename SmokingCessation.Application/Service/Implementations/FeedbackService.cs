@@ -57,9 +57,9 @@ namespace SmokingCessation.Application.Service.Implementations
                 Comment = request.Comment,
           
                 CreatedBy = userId,
-                CreatedTime = CoreHelper.SystemTimeNow,
+                CreatedTime =  DateTime.UtcNow,
                 LastUpdatedBy = userId,
-                LastUpdatedTime = CoreHelper.SystemTimeNow,
+                LastUpdatedTime =  DateTime.UtcNow,
             };
             await _unitOfWork.Repository<Feedback, Guid>().AddAsync(feedback);
             await _unitOfWork.SaveChangesAsync();
@@ -77,9 +77,9 @@ namespace SmokingCessation.Application.Service.Implementations
                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             feedback.DeletedBy = userId;
-            feedback.DeletedTime = CoreHelper.SystemTimeNow;
+            feedback.DeletedTime =  DateTime.UtcNow;
             feedback.LastUpdatedBy = userId;
-            feedback.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            feedback.LastUpdatedTime =  DateTime.UtcNow;
             
             await repo.UpdateAsync(feedback);
             await _unitOfWork.SaveChangesAsync();
@@ -124,9 +124,9 @@ namespace SmokingCessation.Application.Service.Implementations
             if (feedback == null)
                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
             feedback.DeletedBy = userId;
-            feedback.DeletedTime = CoreHelper.SystemTimeNow;
+            feedback.DeletedTime = DateTime.UtcNow;    
             feedback.LastUpdatedBy = userId;
-            feedback.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            feedback.LastUpdatedTime = DateTime.UtcNow;
 
             feedback.Comment = request.Comment;
             await repo.UpdateAsync(feedback);

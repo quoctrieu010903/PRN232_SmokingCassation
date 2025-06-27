@@ -75,7 +75,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "User not found.");
-            user.DeletedTime = CoreHelper.SystemTimeNow;
+            user.DeletedTime =  DateTime.UtcNow;
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.FAILED, "Failed to delete user.");
@@ -108,7 +108,7 @@ namespace SmokingCessation.Application.Service.Implementations
             using var sha256 = SHA256.Create();
             var refreshTokenHash = sha256.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
             user.ResetToken = Convert.ToBase64String(refreshTokenHash);
-            user.ResetTokenExpires = CoreHelper.SystemTimeNow;
+            user.ResetTokenExpires =  DateTime.UtcNow;
 
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
@@ -129,7 +129,7 @@ namespace SmokingCessation.Application.Service.Implementations
             if (user == null)
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.FAILED, "Invalid refresh token");
 
-            if (user.ResetTokenExpires < CoreHelper.SystemTimeNow)
+            if (user.ResetTokenExpires <  DateTime.UtcNow)
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.FAILED, "Refresh token expired");
 
             var newAccessToken = await _tokenService.GenerateToken(user);
@@ -154,8 +154,8 @@ namespace SmokingCessation.Application.Service.Implementations
             newUser.UserName = username;
             newUser.FullName = fullName;
             newUser.ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg";
-            newUser.CreatedTime = CoreHelper.SystemTimeNow;
-            newUser.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            newUser.CreatedTime =  DateTime.UtcNow;
+            newUser.LastUpdatedTime =  DateTime.UtcNow;
             newUser.CreatedBy = userId;
             newUser.LastUpdatedBy = userId;
 
@@ -197,7 +197,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 if (user == null)
                     throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.FAILED,  "Invalid refresh token" );
 
-                if (user.ResetTokenExpires < CoreHelper.SystemTimeNow)
+                if (user.ResetTokenExpires <  DateTime.UtcNow)
                     throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.FAILED,  "Refresh token expired" );
 
                 user.ResetToken = null;
@@ -227,7 +227,7 @@ namespace SmokingCessation.Application.Service.Implementations
             {
                 imageUrl = await _photoService.UploadPhotoAsync(request.imageUrl);
             }
-            user.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            user.LastUpdatedTime =  DateTime.UtcNow;
             user.FullName = request.FullName;
             user.Email = request.Email;
             user.ImageUrl = imageUrl; 

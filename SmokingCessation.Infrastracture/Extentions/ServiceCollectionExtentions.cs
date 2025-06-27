@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,8 +24,7 @@ namespace SmokingCessation.Infrastracture.Extentions
             
             var connectionString = configuration.GetConnectionString("SmokingCessationDB");
             services.AddDbContext<SmokingCassationDBContext>(options =>
-                options.UseSqlServer(connectionString).EnableSensitiveDataLogging());
-
+                     options.UseNpgsql(configuration.GetConnectionString("SmokingCessationDB")));
 
             services.AddScoped<ISmokingSessationSeeder, SmokingCessationSeeder>();
             // Dependency Injection 

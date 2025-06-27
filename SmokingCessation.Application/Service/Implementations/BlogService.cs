@@ -42,7 +42,7 @@ namespace SmokingCessation.Application.Service.Implementations
          
            
             blog.LastUpdatedBy = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            blog.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            blog.LastUpdatedTime = DateTime.UtcNow;
             await repo.UpdateAsync(blog);
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.BLOG_STATUS_UPDATED);
@@ -62,8 +62,8 @@ namespace SmokingCessation.Application.Service.Implementations
             blog.AuthorId = Guid.Parse(userId);
             blog.Status = BlogStatus.Pending_Approval;
             blog.FeaturedImageUrl = imageUrl;
-            blog.PublishedDate = CoreHelper.SystemTimeNow;
-            blog.CreatedTime = CoreHelper.SystemTimeNow;
+            blog.PublishedDate = DateTime.UtcNow;
+            blog.CreatedTime = DateTime.UtcNow;
 
             await _unitOfWork.Repository<Blog, Guid>().AddAsync(blog);
             await _unitOfWork.SaveChangesAsync();
@@ -80,9 +80,9 @@ namespace SmokingCessation.Application.Service.Implementations
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             blog.DeletedBy = userId;
-            blog.DeletedTime = CoreHelper.SystemTimeNow;
+            blog.DeletedTime = DateTime.UtcNow;
             blog.LastUpdatedBy = userId;
-            blog.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            blog.LastUpdatedTime = DateTime.UtcNow;
             await _unitOfWork.Repository<Blog, Guid>().UpdateAsync(blog);
 
             await _unitOfWork.SaveChangesAsync();
@@ -180,7 +180,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
             _mapper.Map(request, blog);
             blog.LastUpdatedBy = userId;
-            blog.LastUpdatedTime = CoreHelper.SystemTimeNow;
+            blog.LastUpdatedTime = DateTime.UtcNow;
             await repo.UpdateAsync(blog);
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.BLOG_UPDATE_SUCCESS);

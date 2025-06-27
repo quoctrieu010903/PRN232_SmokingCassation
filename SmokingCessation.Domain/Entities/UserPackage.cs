@@ -12,11 +12,11 @@ namespace SmokingCessation.Domain.Entities
         public Guid UserId { get; set; }
         public Guid PackageId { get; set; }
 
-        public DateTimeOffset StartDate { get; set; }
-        public DateTimeOffset EndDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
 
-        public DateTimeOffset? CancelledDate { get; set; }
+        public  DateTime? CancelledDate { get; set; }
 
         public virtual ApplicationUser User { get; set; }
         public virtual MembershipPackage Package { get; set; }
