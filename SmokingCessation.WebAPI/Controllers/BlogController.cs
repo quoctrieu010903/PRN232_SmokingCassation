@@ -31,14 +31,16 @@ namespace SmokingCessation.WebAPI.Controllers
             return Ok(result);
         }
         /// <summary>
-        /// /// Lấy danh sách blog theo phân quyền và filter:
+        /// Lấy danh sách blog theo phân quyền và filter:
         /// - User thường: chỉ thấy blog đã duyệt (Published).
         /// - Admin: xem được tất cả, có thể lọc theo trạng thái (Status).
         /// - Có thể lọc/sắp xếp theo FilterType (All, Newest, Popular) và tìm kiếm theo tiêu đề, nội dung, tác giả. 
         /// </summary>
         /// <param name="paging"></param>
-        /// <param name="filterType"> có 3 loại all , new</param>
+        /// <param name="filterType"> có 3 loại all : 0 ,  new : 1 ,  Popular : 2 </param>
         /// <param name="search"></param>
+        /// <param name="status">  Pending_Approval : 0,   Rejected: 1,  Published : 2  -  Role Admin</param>
+
         /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult<PaginatedList<QuitPlansRequest>>> GetAll([FromQuery] PagingRequestModel paging,

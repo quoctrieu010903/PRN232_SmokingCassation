@@ -99,8 +99,18 @@ namespace SmokingCessation.Application.Service.Implementations
 
             if (!isAdmin)
             {
-                // User thường chỉ xem blog đã duyệt
-                blogs = blogs.Where(b => b.Status == BlogStatus.Published).ToList();
+                var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (Guid.TryParse(userId, out var currentUserId))
+                {
+                    blogs = blogs.Where(b =>
+                        b.Status == BlogStatus.Published || b.AuthorId == currentUserId
+                    ).ToList();
+                }
+                else
+                {
+                    throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.BLOG_NOT_FOUND);
+                }
             }
             else
             {

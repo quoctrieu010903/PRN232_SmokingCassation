@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using System.Reflection;
+using Microsoft.OpenApi.Models;
 
 namespace SmokingCessation.WebAPI.Extensions
 {
@@ -38,9 +39,13 @@ namespace SmokingCessation.WebAPI.Extensions
                     }
 
                 });
+                // 🟢 Add this to include XML comments
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+                c.IncludeXmlComments(xmlPath);
 
             });
-
+          
             return services;
         }
 
