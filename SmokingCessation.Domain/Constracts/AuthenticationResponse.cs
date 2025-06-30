@@ -14,6 +14,7 @@ namespace SmokingCessation.Application.DTOs.Response
             public string FullName { get; set; }
             public string Email { get; set; }
             public string AccessToken { get; set; }
+            public string UserImage { get; set; }
 
 
         }

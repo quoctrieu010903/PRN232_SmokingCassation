@@ -14,10 +14,11 @@ namespace SmokingCessation.Application.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<ApplicationUser, UserResponse>();
+            CreateMap<ApplicationUser, UserResponse>()
+                .ForMember(dest => dest.UserImage ,opt => opt.MapFrom(src => src.ImageUrl));
             CreateMap<ApplicationUser, CurrentUserResponse>();
             CreateMap<UserRegisterRequest, ApplicationUser>();
-
+            
             #region MemberShipPackage 
 
             CreateMap<MembershipPackage, MemberShipPackageRequest>();
@@ -58,7 +59,9 @@ namespace SmokingCessation.Application.Mapping
             CreateMap<Blog, BlogResponse>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.Author.FullName))
+                .ForMember(dest => dest.CommentsCount, opt => opt.MapFrom(src => src.Feedbacks.Count))
                 .ForMember(dest => dest.Views , opt => opt.MapFrom(src => src.ViewCount));
+
 
             #endregion
 
@@ -66,6 +69,7 @@ namespace SmokingCessation.Application.Mapping
             CreateMap<Feedback, FeedbackRequest>();
             CreateMap<Feedback, FeedbackResponse>()
                 .ForMember(dest => dest.BlogTitle, opt => opt.MapFrom(src => src.Blog.Title))
+                .ForMember(dest => dest.UserImage, opt => opt.MapFrom(src => src.User.ImageUrl))
                 .ForMember(dest => dest.UserName , opt => opt.MapFrom(src => src.User.UserName));
             #endregion
 

@@ -8,7 +8,7 @@ namespace SmokingCessation.Core.Base
     public abstract class BaseEntity
     {
         protected BaseEntity()
-        {
+        {   
             CreatedTime = LastUpdatedTime = DateTime.UtcNow;
         }
 

@@ -134,7 +134,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 new BaseSpecification<Payment>(p =>
                     p.UserId == userId &&
                     p.PackageId == request.MembershipPackageId &&
-                    p.Status == PaymentStatus.Completed)))
+                    p.Status == PaymentStatus.Success)))
                 .Any();
 
             if (!hasPaid)

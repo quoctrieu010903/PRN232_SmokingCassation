@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using SmokingCessation.Application.DTOs.Request;
+using SmokingCessation.Application.DTOs.Response;
+using SmokingCessation.Application.Exceptions;
 using SmokingCessation.Application.Service.Interface;
+using SmokingCessation.Core.Constants;
+using SmokingCessation.Core.CustomExceptionss;
 using SmokingCessation.Domain.Entities;
 using VNPAY_CS_ASPX;
 
 namespace SmokingCessation.Application.Service.Implementations
 {
-    public class VNPaymentService : IVNPayService
+    public class VNPaymentService 
     {
 
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -24,14 +29,65 @@ namespace SmokingCessation.Application.Service.Implementations
             _configuration = configuration;
         }
 
+        //public async Task<TransactionResponseDTO> CallVNPayIPN(IQueryCollection vnpayData)
+        //{
+        //    VNPayHelper vNPayHelper = new VNPayHelper();
+        //    //get all vnpay response data
+        //    VNPayResponseDTO vnpayResponseDTO = GetAllVNPayResponseData(vnpayData, vNPayHelper);
+
+        //    var bookingId = Guid.Parse(vnpayResponseDTO.vnp_TxnRef.Substring(13));
+        //    var transactionName = $"Transaction for booking: {bookingId}";
+        //    var transaction = new Transaction();
+        //    try
+        //    {
+        //        await _unitOfWork.BeginTransactionAsync();
+        //        var existedBooking = await _bookingRepository
+        //        .Find(b => b.Id == bookingId)
+        //        .Include(b => b.Transaction)
+        //        .FirstOrDefaultAsync();
+        //        if (existedBooking == null)
+        //        {
+        //            throw new APIException((int)HttpStatusCode.BadRequest, Exceptions.BOOKING_NOT_FOUND);
+        //        }
+        //        existedBooking.PaymentStatus = EnumPaymentStatus.Done;
+        //        transaction = _mapper.Map<Transaction>(vnpayResponseDTO);
+        //        transaction.Name = transactionName;
+        //        transaction.MoneyUnit = existedBooking.MoneyUnit;
+        //        transaction.PaymentMethod = EnumPaymentMethod.Transfer;
+        //        transaction.Booking = existedBooking;
+
+        //        await _transactionRepository.AddAsync(transaction);
+        //        await _unitOfWork.SaveChangesAsync();
+        //        await _unitOfWork.CommitAsync();
+        //    }
+        //    catch (System.Exception)
+        //    {
+        //        await _unitOfWork.RollbackAsync();
+        //        throw;
+        //    }
+        //    return _mapper.Map<TransactionResponseDTO>(transaction);
+        //}
+
+
+        public async Task<VNPayResponseDTO> CallVNPayReturnUrl(IQueryCollection vnpayData)
+        {
+            var vNPayHelper = new VnPayLibrary();
+
+            //get all vnpay response data
+            VNPayResponseDTO vnpayResponseDTO = GetAllVNPayResponseData(vnpayData, vNPayHelper);
+            return vnpayResponseDTO;
+        }
+
+       
+
         public async Task<string> GenerateUrlPayment(PaymentCreateRequest request)
         {
             var payCommand = _configuration["VNPay:PayCommand"]!;
             var vnp_tmnCode = _configuration["VNPay:TmnCode"]!;
             string vnp_locale = _configuration["VNPay:Locale"]!;
             var vnp_booking_orderType = _configuration["VNPay:BookingPackageType"]!;
-            // var vnp_returnURL = URLPrefix.HTTPS + _httpContextAccessor.HttpContext!.Request.Host + _configuration["VNPay:ReturnUrl"]!;
-            var vnp_returnURL = "https://skincare-booking-system.vercel.app/account-history";
+             var vnp_returnURL = URLPrefix.HTTPS + _httpContextAccessor.HttpContext!.Request.Host + _configuration["VNPay:ReturnUrl"]!;
+            
             var vnp_url = _configuration["VNPay:Url"]!;
             var vnp_hashSet = _configuration["VNPay:HashSecret"]!;
 
@@ -60,5 +116,54 @@ namespace SmokingCessation.Application.Service.Implementations
             string paymentUrl = vnpay.CreateRequestUrl(vnp_url, vnp_hashSet);
             return paymentUrl;
         }
+        private VNPayResponseDTO GetAllVNPayResponseData(IQueryCollection vnpayData, VnPayLibrary vNPayHelper)
+        {
+            foreach (var s in vnpayData)
+            {
+                //get all querystring data
+                if (!string.IsNullOrEmpty(s.Value) && s.Key.StartsWith("vnp_"))
+                {
+                    vNPayHelper.AddResponseData(s.Key, s.Value);
+                }
+            }
+            var vnp_ResponseCode = vNPayHelper.GetResponseData("vnp_ResponseCode");
+            var vnp_TransactionStatus = vNPayHelper.GetResponseData("vnp_TransactionStatus");
+            var vnp_TmnCode = vNPayHelper.GetResponseData("vnp_TmnCode");
+            var vnp_TxnRef = vNPayHelper.GetResponseData("vnp_TxnRef");
+            float vnp_Amount = float.Parse(vNPayHelper.GetResponseData("vnp_Amount")) / 100;
+            var vnp_OrderInfo = vNPayHelper.GetResponseData("vnp_OrderInfo");
+            var vnp_BankCode = vNPayHelper.GetResponseData("vnp_BankCode");
+            var vnp_BankTranNo = vNPayHelper.GetResponseData("vnp_BankTranNo");
+            var vnp_CardType = vNPayHelper.GetResponseData("vnp_CardType");
+            var vnp_PayDate = vNPayHelper.GetResponseData("vnp_PayDate");
+            var vnp_TransactionNo = vNPayHelper.GetResponseData("vnp_TransactionNo");
+            var vnp_SecureHash = vNPayHelper.GetResponseData("vnp_SecureHash");
+            var vnpay_hash_secret = _configuration["VNPay:HashSecret"];
+            bool checkSignature = vNPayHelper.ValidateSignature(vnp_SecureHash, vnpay_hash_secret);
+            if (!checkSignature)
+            {
+
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+            }
+            bool isSuccess = true;
+            if (vnp_ResponseCode != "00" || vnp_TransactionStatus != "00")
+            {
+                isSuccess = false;
+            }
+            return new VNPayResponseDTO
+            {
+                vnp_TmnCode = vnp_TmnCode,
+                vnp_TxnRef = vnp_TxnRef,
+                vnp_Amount = vnp_Amount,
+                vnp_OrderInfo = vnp_OrderInfo,
+                vnp_BankCode = vnp_BankCode,
+                vnp_BankTranNo = vnp_BankTranNo,
+                vnp_CardType = vnp_CardType,
+                vnp_PayDate = vnp_PayDate,
+                vnp_TransactionNo = vnp_TransactionNo,
+                isSuccess = isSuccess
+            };
+        }
+
     }
 }
