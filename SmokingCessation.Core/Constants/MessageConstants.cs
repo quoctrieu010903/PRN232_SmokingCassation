@@ -25,7 +25,9 @@ namespace SmokingCessation.Core.Constants
         // Validation messages
         public const string REQUIRED_FIELD = "This field is required.";
         public const string INVALID_FORMAT = "Invalid format.";
-        
+        public const string INVALID_SIGNATURE = "Invalid signature";
+
+
         // Payment & Membership messages
         public const string PAYMENT_REQUIRED = "You must complete payment to use this feature.";
         public const string PAYMENT_SUCCESS = "Payment completed successfully!";

@@ -158,9 +158,8 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ConditionType")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("ConditionType")
+                        .HasColumnType("integer");
 
                     b.Property<int>("ConditionValue")
                         .HasColumnType("integer");
@@ -168,13 +167,13 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
@@ -189,7 +188,7 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")
@@ -221,13 +220,13 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
@@ -249,7 +248,7 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("LockoutEnabled")
@@ -281,7 +280,7 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("ResetToken")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("ResetTokenExpires")
+                    b.Property<DateTime?>("ResetTokenExpires")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SecurityStamp")
@@ -297,7 +296,7 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("VerificationToken")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("VerificationTokenExpires")
+                    b.Property<DateTime?>("VerificationTokenExpires")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -331,13 +330,13 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FeaturedImageUrl")
@@ -347,10 +346,10 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset>("PublishedDate")
+                    b.Property<DateTime>("PublishedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
@@ -376,7 +375,7 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("AdviceDate")
+                    b.Property<DateTime>("AdviceDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("AdviceText")
@@ -387,19 +386,19 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("QuitPlanId")
@@ -429,19 +428,19 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
@@ -465,13 +464,13 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
@@ -488,7 +487,7 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
@@ -518,19 +517,19 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("PackageId")
@@ -563,22 +562,22 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset>("LogDate")
+                    b.Property<DateTime>("LogDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Note")
@@ -613,19 +612,19 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("MembershipPackageId")
@@ -636,13 +635,13 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<DateTimeOffset>("StartDate")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<DateTimeOffset>("TargetDate")
+                    b.Property<DateTime>("TargetDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
@@ -672,19 +671,19 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TotalSmokeFreeDays")
@@ -713,22 +712,22 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset>("RatedAt")
+                    b.Property<DateTime>("RatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Start")
@@ -758,13 +757,13 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("GrantedAt")
@@ -773,7 +772,7 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
@@ -794,22 +793,22 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset?>("CancelledDate")
+                    b.Property<DateTime?>("CancelledDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("CreatedTime")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DeletedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset?>("DeletedTime")
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset>("EndDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsActive")
@@ -818,13 +817,13 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<string>("LastUpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                    b.Property<DateTime>("LastUpdatedTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("PackageId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTimeOffset>("StartDate")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")

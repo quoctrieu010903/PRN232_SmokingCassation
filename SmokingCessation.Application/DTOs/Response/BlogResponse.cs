@@ -17,7 +17,7 @@ namespace SmokingCessation.Application.DTOs.Response
         public DateTimeOffset PublishedDate { get; set; }
         public string AuthorName { get; set; }
         public double AverageRating { get; set; } // Chỉ là property, không lưu DB
-        public List<FeedbackResponse> Comments { get; set; } = new();
+        public int CommentsCount { get; set; } = new();
 
 
     }

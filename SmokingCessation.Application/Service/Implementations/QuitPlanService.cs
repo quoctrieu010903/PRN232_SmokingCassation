@@ -150,7 +150,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
             // 3. Kiểm tra gói đã thanh toán (Payment)
             var baseSpeci = new BaseSpecification<Payment>(
-                f => f.UserId == userGuid && f.Status == PaymentStatus.Completed);
+                f => f.UserId == userGuid && f.Status == PaymentStatus.Success);
 
             var payments = await _unitOfWork.Repository<Payment, Payment>()
                 .GetAllWithSpecAsync(baseSpeci);

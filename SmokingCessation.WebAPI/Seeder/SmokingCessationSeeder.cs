@@ -78,6 +78,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "john.doe",
                     FullName = "John Doe",
                     Email = "john.doe@example.com",
+                    NormalizedEmail = "john.doe@example.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedTime =  DateTime.UtcNow,
@@ -89,6 +90,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "jane.smith",
                     FullName = "Jane Smith",
                     Email = "jane.smith@example.com",
+                    NormalizedEmail = "jane.smith@example.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedTime =  DateTime.UtcNow,
@@ -100,6 +102,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "quoctrieu15",
                     FullName = "Quoc Trieu",
                     Email = "luongquoctrieu165@gmail.com", // Sửa lỗi định dạng email
+                    NormalizedEmail = "luongquoctrieu165@gmail.com", // Sửa lỗi định dạng email
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedTime =  DateTime.UtcNow,
@@ -111,6 +114,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "ThanhVu22",
                     FullName = "Lê Thanh Vũ",
                     Email = "vult2911@gmail.com",
+                    NormalizedEmail = "vult2911@gmail.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedTime =  DateTime.UtcNow,
@@ -122,6 +126,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "VietQuoc01",
                     FullName = "Nguyễn Trần Việt Quốc",
                     Email = "ntvq88@gmail.com",
+                    NormalizedEmail = "ntvq88@gmail.com",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedTime =  DateTime.UtcNow,
@@ -134,6 +139,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     FullName = "Lê Nhật Trường",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     Email = "ltn04098@gmail.com",
+                    NormalizedEmail = "ltn04098@gmail.com",
                     EmailConfirmed = true,
                     CreatedTime =  DateTime.UtcNow,
                     SecurityStamp = Guid.NewGuid().ToString()

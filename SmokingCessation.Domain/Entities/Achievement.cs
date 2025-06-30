@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SmokingCessation.Core.Base;
+using SmokingCessation.Domain.Enums;
 
 namespace SmokingCessation.Domain.Entities
 {
@@ -14,7 +15,7 @@ namespace SmokingCessation.Domain.Entities
         public string IconUrl { get; set; }
 
         // Điều kiện để gán tự động
-        public string ConditionType { get; set; }   // e.g., "DaysSmokeFree"
+        public ConditionType ConditionType { get; set; }   // e.g., "DaysSmokeFree"
         public int ConditionValue { get; set; }
 
         public List<UserAchievement> UserAchievements { get; set; }
