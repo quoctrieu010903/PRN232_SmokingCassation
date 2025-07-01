@@ -195,7 +195,7 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<BaseResponseModel<BlogResponse>> GetBlogsDetails(Guid id)
         {
             var repo = _unitOfWork.Repository<Blog, Guid>();
-            var blog = await repo.GetByIdAsync(id);
+            var blog = await repo.GetByIdWithIncludeAsync(b => b.Id == id , true, p=> p.Author , p=> p.Feedbacks );
             if (blog == null)
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
