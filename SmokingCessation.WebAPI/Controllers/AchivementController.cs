@@ -19,6 +19,14 @@ namespace SmokingCessation.WebAPI.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"> condition Type : SetQuitDate : 0 ,
+        ///     DaysSmokeFree : 1 , CommentsPosted : 2 ,  FeaturesUsed : 3 , MissionsCompleted : 4, DiaryEntries: 5, MoneySaved:6 ,  CravingsResisted : 7  </param>
+        /// <returns></returns>
+       
+
         [HttpPost]
         public async Task<ActionResult<BaseResponseModel<AchievementResponse>>> Create([FromForm] AchievementCreateRequest request)
         {

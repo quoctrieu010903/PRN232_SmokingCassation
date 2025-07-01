@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using SmokingCessation.Domain.Enums;
 
 namespace SmokingCessation.Application.DTOs.Request
 {
@@ -12,7 +13,7 @@ namespace SmokingCessation.Application.DTOs.Request
         public string Title { get; set; } = default!;
         public string? Description { get; set; }
         public IFormFile iconUrl { get; set; }
-        public string ConditionType { get; set; }   // e.g., "DaysSmokeFree"
+        public ConditionType ConditionType { get; set; }   // e.g., "DaysSmokeFree"
         public int ConditionValue { get; set; }
 
     }

@@ -107,10 +107,7 @@ namespace SmokingCessation.Application.Service.Implementations
                         b.Status == BlogStatus.Published || b.AuthorId == currentUserId
                     ).ToList();
                 }
-                else
-                {
-                    throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.BLOG_NOT_FOUND);
-                }
+               
             }
             else
             {
