@@ -107,7 +107,7 @@ namespace SmokingCessation.Application.Service.Implementations
                         b.Status == BlogStatus.Published || b.AuthorId == currentUserId
                     ).ToList();
                 }
-               
+               blogs = blogs.Where(b => b.Status == BlogStatus.Published).ToList();
             }
             else
             {

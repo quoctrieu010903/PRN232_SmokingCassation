@@ -16,7 +16,11 @@ namespace SmokingCessation.Application.Mapping
         {
             CreateMap<ApplicationUser, UserResponse>()
                 .ForMember(dest => dest.UserImage ,opt => opt.MapFrom(src => src.ImageUrl));
-            CreateMap<ApplicationUser, CurrentUserResponse>();
+            CreateMap<ApplicationUser, CurrentUserResponse>()
+                .ForMember(dest => dest.UserImage ,opt => opt.MapFrom(src => src.ImageUrl)); 
+            CreateMap<ApplicationUser, UserCurrenResponse>()
+                .ForMember(dest => dest.ImageUrl ,opt => opt.MapFrom(src => src.ImageUrl)).ReverseMap();
+            
             CreateMap<UserRegisterRequest, ApplicationUser>();
             
             #region MemberShipPackage 

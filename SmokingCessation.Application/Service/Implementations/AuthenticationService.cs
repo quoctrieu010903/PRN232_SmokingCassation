@@ -240,7 +240,7 @@ namespace SmokingCessation.Application.Service.Implementations
             return new BaseResponseModel<UserCurrenResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, userResponse, null, "Cập nhật user thành công");
         }
 
-        public async Task<BaseResponseModel<CurrentUserResponse>> GetCurrentUserAsync()
+        public async Task<BaseResponseModel<UserCurrenResponse>> GetCurrentUserAsync()
         {
             var userId = _userContext.GetUserId();
             if (string.IsNullOrEmpty(userId))
@@ -250,8 +250,8 @@ namespace SmokingCessation.Application.Service.Implementations
             if (user == null)
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "User not found");
 
-            var response = _mapper.Map<CurrentUserResponse>(user);
-            return new BaseResponseModel<CurrentUserResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, response, null, "Lấy thông tin user thành công");
+            var response = _mapper.Map<UserCurrenResponse>(user);
+            return new BaseResponseModel<UserCurrenResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, response, null, "Lấy thông tin user thành công");
         }
     }
 }

@@ -11,7 +11,7 @@ namespace SmokingCessation.Application.Service.Interface
     {
         Task<BaseResponseModel> AssignUserRole(AssignUserRoles request);
         Task<BaseResponseModel<UserResponse>> RegisterAsync(UserRegisterRequest request);
-        Task<BaseResponseModel<CurrentUserResponse>> GetCurrentUserAsync();
+        Task<BaseResponseModel<UserCurrenResponse>> GetCurrentUserAsync();
         Task<BaseResponseModel<UserResponse>> GetByIdAsync(Guid id);
         Task<BaseResponseModel<UserCurrenResponse>> UpdateAsync(Guid id, UpdateUserRequest request);
         Task<BaseResponseModel> DeleteAsync(Guid id);
