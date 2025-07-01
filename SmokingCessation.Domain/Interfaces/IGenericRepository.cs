@@ -25,6 +25,7 @@ namespace SmokingCessation.Domain.Interfaces
         Task<TResult?> GetWithSpecAndSelectorAsync<TResult>(ISpecification<TEntity> specification,
             Expression<Func<TEntity, TResult>> selector, bool tracked = true);
         Task<IEnumerable<TEntity>> GetAllWithSpecAsync(ISpecification<TEntity> specification, bool tracked = true);
+        Task<IEnumerable<TEntity>> GetAllWithSpecWithInclueAsync(ISpecification<TEntity> specification, bool tracked = true, params Expression<Func<TEntity, object>>[] includes);
         Task<IEnumerable<TResult>> GetAllWithSpecAndSelectorAsync<TResult>(ISpecification<TEntity> specification,
             Expression<Func<TEntity, TResult>> selector, bool tracked = true);
         Task<int> CountAsync();

@@ -94,7 +94,7 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<PaginatedList<RatingResponse>> GetByBlogId(Guid blogId, PagingRequestModel paging)
         {
             var baseSpeci = new BaseSpecification<Rating>(r => r.BlogId == blogId);
-            var ratings = await _unitOfWork.Repository<Rating, Rating>().GetAllWithSpecAsync(baseSpeci);
+            var ratings = await _unitOfWork.Repository<Rating, Rating>().GetAllWithSpecWithInclueAsync(baseSpeci, true, b=> b.User , b=> b.Blog);
             var result = _mapper.Map<List<RatingResponse>>(ratings);
             return PaginatedList<RatingResponse>.Create(result, paging.PageNumber, paging.PageSize);
         }

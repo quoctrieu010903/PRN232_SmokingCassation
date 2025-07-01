@@ -80,7 +80,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 (!fillter.Type.HasValue || mp.Type == fillter.Type.Value)
     );
 
-            var response = await _unitOfWork.Repository<MembershipPackage, MembershipPackage>().GetAllWithSpecAsync(baseSpeci);
+            var response = await _unitOfWork.Repository<MembershipPackage, MembershipPackage>().GetAllWithSpecWithInclueAsync(baseSpeci, true );
             var result = _mapper.Map<List<MemberShipPackageResponse>>(response);
             
             return PaginatedList<MemberShipPackageResponse>.Create(result, model.PageNumber,

@@ -68,8 +68,8 @@ namespace SmokingCessation.Application.Service.Implementations
             var now = CoreHelper.SystemTimeNow;
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
-            var current = (await userpackageRepo.GetAllWithSpecAsync(
-                new BaseSpecification<UserPackage>(um => um.UserId == userId && um.IsActive && um.EndDate > now)))
+            var current = (await userpackageRepo.GetAllWithSpecWithInclueAsync(
+                new BaseSpecification<UserPackage>(um => um.UserId == userId && um.IsActive && um.EndDate > now),true,f=>f.User, f => f.Package))
                 .FirstOrDefault();
 
             if (current == null)

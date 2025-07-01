@@ -286,5 +286,24 @@ namespace SmokingCessation.Infrastracture.Repository
         {
             return SpecificationEvaluator<TEntity>.GetQuery(query, specification);
         }
+
+        public async Task<IEnumerable<TEntity>> GetAllWithSpecWithInclueAsync(ISpecification<TEntity> specification, bool tracked = true, params Expression<Func<TEntity, object>>[] includes)
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            if (!tracked)
+            {
+                query = query.AsNoTracking();
+            }
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return await ApplySpecification(query, specification).ToListAsync();
+        }
     }
 }

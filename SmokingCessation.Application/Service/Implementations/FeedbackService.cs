@@ -90,7 +90,8 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<PaginatedList<FeedbackResponse>> GetByBlogId(Guid blogId, PagingRequestModel paging)
         {
             var baseSpeci = new Domain.Specifications.BaseSpecification<Feedback>(f => f.BlogId == blogId);
-            var feedbacks = await _unitOfWork.Repository<Feedback, Feedback>().GetAllWithSpecAsync(baseSpeci);
+            var feedbacks = await _unitOfWork.Repository<Feedback, Feedback>().GetAllWithSpecWithInclueAsync(baseSpeci, true,  f => f.User,
+                                                                                                                                f => f.Blog);
             var result = _mapper.Map<List<FeedbackResponse>>(feedbacks);
             return PaginatedList<FeedbackResponse>.Create(result, paging.PageNumber, paging.PageSize);
 
@@ -111,7 +112,7 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<PaginatedList<FeedbackResponse>> GetByUserId(Guid userId, PagingRequestModel paging)
         {
             var baseSpeci = new BaseSpecification<Feedback>(f => f.UserId == userId);
-            var feedbacks = await _unitOfWork.Repository<Feedback, Feedback>().GetAllWithSpecAsync(baseSpeci);
+            var feedbacks = await _unitOfWork.Repository<Feedback, Feedback>().GetAllWithSpecWithInclueAsync(baseSpeci , true , f=>f.User , f => f.Blog);
             var result = _mapper.Map<List<FeedbackResponse>>(feedbacks);
             return PaginatedList<FeedbackResponse>.Create(result, paging.PageNumber, paging.PageSize);
         }
