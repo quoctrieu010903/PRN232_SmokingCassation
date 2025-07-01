@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -24,18 +25,18 @@ namespace SmokingCessation.Application.Service.Implementations
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IUserContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserPackageService(IUnitOfWork unitOfWork, IMapper mapper, IUserContext Context)
+        public UserPackageService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _context = Context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<BaseResponseModel<UserPackageResponse>> CancelCurrentPackage()
         {
-            var userId = Guid.Parse(_context.GetUserId());
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var now = DateTime.UtcNow;
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
@@ -64,7 +65,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel<UserPackageResponse>> GetCurrentPackage()
         {
-            var userId = Guid.Parse(_context.GetUserId());
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var now = CoreHelper.SystemTimeNow;
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
@@ -85,7 +86,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel<UserPackageResponse>> GetPackageById(Guid id)
         {
-            var userId = Guid.Parse(_context.GetUserId());
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
             var package = await userpackageRepo.GetByIdAsync(id);
@@ -104,7 +105,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel<List<UserPackageResponse>>> GetPackageHistory()
         {
-            var userId = Guid.Parse(_context.GetUserId());
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
             var history = (await userpackageRepo.GetAllWithSpecAsync(
@@ -125,7 +126,8 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> RegisterPackage(UserPackageRequest request)
         {
-            var userId = Guid.Parse(_context.GetUserId());
+            var userId =  Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            ;
             var now = DateTime.UtcNow;
 
             // Check for completed payment for this user  
@@ -176,6 +178,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 EndDate = now.AddMonths(package.DurationMonths),
                 IsActive = true
             };
+
 
             await userpackageRepo.AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();

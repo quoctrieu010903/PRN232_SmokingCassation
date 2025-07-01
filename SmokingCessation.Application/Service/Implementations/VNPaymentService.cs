@@ -13,20 +13,24 @@ using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
 using SmokingCessation.Core.CustomExceptionss;
 using SmokingCessation.Domain.Entities;
+using SmokingCessation.Domain.Enums;
+using SmokingCessation.Domain.Interfaces;
 using VNPAY_CS_ASPX;
 
 namespace SmokingCessation.Application.Service.Implementations
 {
-    public class VNPaymentService 
+    public class VNPaymentService : IVNPayService
     {
 
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public VNPaymentService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public VNPaymentService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IUnitOfWork unitOfWork)
         {
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
+            _unitOfWork = unitOfWork;
         }
 
         //public async Task<TransactionResponseDTO> CallVNPayIPN(IQueryCollection vnpayData)
@@ -80,7 +84,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
        
 
-        public async Task<string> GenerateUrlPayment(PaymentCreateRequest request)
+        public async Task<string> GeneratePaymentUrlAsync(PaymentCreateRequest request)
         {
             var payCommand = _configuration["VNPay:PayCommand"]!;
             var vnp_tmnCode = _configuration["VNPay:TmnCode"]!;
@@ -104,7 +108,7 @@ namespace SmokingCessation.Application.Service.Implementations
             vnpay.AddRequestData("vnp_TmnCode", vnp_tmnCode);
             vnpay.AddRequestData("vnp_Locale", vnp_locale);
             vnpay.AddRequestData("vnp_CurrCode", request.MoneyUnit);
-            vnpay.AddRequestData("vnp_TxnRef", "payment-code_" + request.PackageId);
+            vnpay.AddRequestData("vnp_TxnRef", "payment-code_" + request.BookingId);
             vnpay.AddRequestData("vnp_OrderInfo", request.PaymentContent);
             vnpay.AddRequestData("vnp_OrderType", vnp_booking_orderType);
             vnpay.AddRequestData("vnp_Amount", (request.TotalAmount * 100).ToString());
@@ -130,7 +134,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var vnp_TransactionStatus = vNPayHelper.GetResponseData("vnp_TransactionStatus");
             var vnp_TmnCode = vNPayHelper.GetResponseData("vnp_TmnCode");
             var vnp_TxnRef = vNPayHelper.GetResponseData("vnp_TxnRef");
-            float vnp_Amount = float.Parse(vNPayHelper.GetResponseData("vnp_Amount")) / 100;
+            decimal vnp_Amount = decimal.Parse(vNPayHelper.GetResponseData("vnp_Amount")) / 100;
             var vnp_OrderInfo = vNPayHelper.GetResponseData("vnp_OrderInfo");
             var vnp_BankCode = vNPayHelper.GetResponseData("vnp_BankCode");
             var vnp_BankTranNo = vNPayHelper.GetResponseData("vnp_BankTranNo");
@@ -164,6 +168,41 @@ namespace SmokingCessation.Application.Service.Implementations
                 isSuccess = isSuccess
             };
         }
+
+        public async Task<VnPaymentResponseModel> ProcessVnPayCallbackAsync(IQueryCollection vnpayData)
+        {
+            var vNPayHelper = new VnPayLibrary();
+            var response = GetAllVNPayResponseData(vnpayData, vNPayHelper);
+
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext!.User.FindFirst("id")!.Value);
+            var txnRef = response.vnp_TxnRef;
+            var packageIdStr = txnRef.Replace("payment-code_", "");
+            var packageId = Guid.Parse(packageIdStr);
+
+            var paymentRepo = _unitOfWork.Repository<Payment, Guid>();
+            var payment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                PackageId = packageId,
+                Amount = response.vnp_Amount,
+                Status = response.isSuccess ? PaymentStatus.Success : PaymentStatus.Failed,
+                CreatedTime = DateTime.UtcNow,
+               
+            };
+
+            await paymentRepo.AddAsync(payment);
+            await _unitOfWork.SaveChangesAsync();
+
+            return new VnPaymentResponseModel
+            {
+                isSuccess = response.isSuccess,
+                Message = response.isSuccess ? "Payment success." : "Payment failed.",
+                Amount = response.vnp_Amount,
+                PackageId = packageId
+            };
+        }
+
 
     }
 }

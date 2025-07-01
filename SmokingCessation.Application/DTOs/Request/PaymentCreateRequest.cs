@@ -10,7 +10,7 @@ namespace SmokingCessation.Application.DTOs.Request
     {
         public string MoneyUnit { get; set; }
         //TxnRef
-        public Guid PackageId { get; set; }
+        public Guid BookingId { get; set; } 
         public string PaymentContent { get; set; } = "";
         public float TotalAmount { get; set; } = 0;
     }

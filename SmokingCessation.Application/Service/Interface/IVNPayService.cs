@@ -11,8 +11,8 @@ namespace SmokingCessation.Application.Service.Interface
 {
     public interface IVNPayService
     {
-        //Task<string> GeneratePaymentUrlAsync(PaymentCreateRequest request);
-        //Task<VnPaymentResponseModel> ProcessVnPayCallbackAsync(IQueryCollection vnpayData);
+        Task<string> GeneratePaymentUrlAsync(PaymentCreateRequest request);
+        Task<VnPaymentResponseModel> ProcessVnPayCallbackAsync(IQueryCollection vnpayData);
 
 
     }
