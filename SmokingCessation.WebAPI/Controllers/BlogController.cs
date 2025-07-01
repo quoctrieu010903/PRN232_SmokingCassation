@@ -55,6 +55,20 @@ namespace SmokingCessation.WebAPI.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Get blogs by author. If no authorId is provided, get blogs by current user.
+        /// lấy tất cả blog bởi author , nếu không có authorID thì sẽ lấy các blog của user hiện tại ( phải logged in users 
+        /// </summary>
+        [HttpGet("author")]
+        [Authorize] // Optional: use this if you want to restrict to logged-in users
+        public async Task<IActionResult> GetBlogsByAuthor([FromQuery] Guid? authorId, [FromQuery] PagingRequestModel pagingModel)
+        {
+            var result = await _service.GetBlogByAuthor(authorId, pagingModel);
+            return Ok(result);
+        }
+
+
         [HttpDelete("{id}")]
         [Authorize]
 

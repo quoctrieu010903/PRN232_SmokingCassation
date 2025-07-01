@@ -153,6 +153,48 @@ namespace SmokingCessation.Application.Service.Implementations
 
         }
 
+        public async Task<PaginatedList<BlogResponse>> GetBlogByAuthor(Guid? authorId, PagingRequestModel model)
+        {
+            var blogs = await _unitOfWork.Repository<Blog, Blog>().GetAllWithIncludeAsync(true, p => p.Ratings, p => p.Feedbacks);
+
+            var currentUser = _httpContextAccessor.HttpContext?.User;
+            var userIdStr = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!authorId.HasValue || authorId == Guid.Empty)
+            {
+                // Get blogs by current logged-in user
+                if (!Guid.TryParse(userIdStr, out var currentUserId))
+                {
+                    throw new ErrorException(StatusCodes.Status401Unauthorized, ResponseCodeConstants.UNAUTHORIZED, "Unauthorized access.");
+                }
+
+                blogs = blogs.Where(x => x.AuthorId == currentUserId).ToList();
+            }
+            else
+            {
+                // Get blogs by specified authorId
+                blogs = blogs.Where(x => x.AuthorId == authorId.Value && x.Status == BlogStatus.Published).ToList();
+            }
+
+            // Tính average rating cho tất cả blog một lần
+            var avgDict = blogs
+                .Where(b => b.Ratings != null && b.Ratings.Any())
+                .ToDictionary(
+                    b => b.Id,
+                    b => b.Ratings.Average(r => r.Start)
+                );
+
+            var result = _mapper.Map<List<BlogResponse>>(blogs);
+
+            foreach (var blog in result)
+            {
+                blog.AverageRating = avgDict.TryGetValue(blog.Id, out var avg) ? avg : 0;
+            }
+
+            return PaginatedList<BlogResponse>.Create(result, model.PageNumber, model.PageSize);
+        }
+
+
         public async Task<BaseResponseModel<BlogResponse>> GetBlogsDetails(Guid id)
         {
             var repo = _unitOfWork.Repository<Blog, Guid>();

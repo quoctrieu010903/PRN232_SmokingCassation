@@ -94,7 +94,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
                     EmailConfirmed = true,
                     CreatedTime =  DateTime.UtcNow,
-                     SecurityStamp = Guid.NewGuid().ToString()
+                     SecurityStamp = Guid.NewGuid().ToString()  
                 },
                 new ApplicationUser
                 {

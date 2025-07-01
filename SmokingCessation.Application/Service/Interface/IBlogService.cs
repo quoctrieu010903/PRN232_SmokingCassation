@@ -19,6 +19,7 @@ namespace SmokingCessation.Application.Service.Interface
         Task<BaseResponseModel> Update(Guid id, BlogRequest request);
         Task<BaseResponseModel> Delete(Guid id);
         Task<PaginatedList<BlogResponse>> GetAll(PagingRequestModel model , BlogListFilter fillter);
+        Task<PaginatedList<BlogResponse>> GetBlogByAuthor(Guid? authorId , PagingRequestModel model);
         Task<BaseResponseModel<BlogResponse>> GetBlogsDetails(Guid id);
         
         Task<BaseResponseModel> ChangeStatus(Guid id, BlogStatus status);
