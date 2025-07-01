@@ -152,7 +152,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<PaginatedList<BlogResponse>> GetBlogByAuthor(Guid? authorId, PagingRequestModel model)
         {
-            var blogs = await _unitOfWork.Repository<Blog, Blog>().GetAllWithIncludeAsync(true, p => p.Ratings, p => p.Feedbacks);
+            var blogs = await _unitOfWork.Repository<Blog, Blog>().GetAllWithIncludeAsync(true, p => p.Ratings, p => p.Feedbacks, p=> p.Author);
 
             var currentUser = _httpContextAccessor.HttpContext?.User;
             var userIdStr = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;

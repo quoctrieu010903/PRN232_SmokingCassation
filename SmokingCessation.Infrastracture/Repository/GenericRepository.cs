@@ -29,6 +29,23 @@ namespace SmokingCessation.Infrastracture.Repository
         {
             return await _dbSet.FindAsync(id);
         }
+        public async Task<TEntity?> GetByIdWithIncludeAsync(Expression<Func<TEntity, bool>> predicate, bool tracked = true, params Expression<Func<TEntity, object>>[] includes)
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            if (!tracked)
+            {
+                query = query.AsNoTracking();
+            }
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.FirstOrDefaultAsync(predicate);
+        }
+      
 
         public async Task<IEnumerable<TEntity>> GetAllAsync(bool tracked = true)
         {
@@ -305,5 +322,7 @@ namespace SmokingCessation.Infrastracture.Repository
 
             return await ApplySpecification(query, specification).ToListAsync();
         }
+
+       
     }
 }

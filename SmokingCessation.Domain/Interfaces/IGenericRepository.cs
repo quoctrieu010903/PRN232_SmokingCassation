@@ -18,6 +18,11 @@ namespace SmokingCessation.Domain.Interfaces
         Task<IEnumerable<TEntity>> GetAllWithIncludeAsync( bool tracked = true, params Expression<Func<TEntity, object>>[] includes);
 
         Task<TEntity?> GetByIdAsync(TKey id);
+        Task<TEntity?> GetByIdWithIncludeAsync(
+      Expression<Func<TEntity, bool>> predicate,
+      bool tracked = true,
+      params Expression<Func<TEntity, object>>[] includes
+  );
 
 
         /// Retrieve with specifications
