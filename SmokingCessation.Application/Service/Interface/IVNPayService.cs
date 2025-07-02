@@ -15,7 +15,5 @@ namespace SmokingCessation.Application.Service.Interface
         Task<string> GeneratePaymentUrlAsync(PaymentCreateRequest request);
         Task<BaseResponseModel<VNPayResponseDTO>> CallVNPayReturnUrl(IQueryCollection vnpayData);
         Task<BaseResponseModel<TransactionResponseDTO>> CallVNPayIPN(IQueryCollection vnpayData);
-
-
     }
 }
