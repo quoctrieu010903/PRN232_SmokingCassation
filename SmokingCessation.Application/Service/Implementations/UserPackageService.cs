@@ -164,7 +164,7 @@ namespace SmokingCessation.Application.Service.Implementations
                     BookingId = package.Id,
                     MoneyUnit = "VND",
                     PaymentContent = $"Payment For {package.Name}",
-                    TotalAmount = package.Price,
+                    TotalAmount = Convert.ToSingle(package.Price),
                 };
                 paymentURL = await _vnpayService.GeneratePaymentUrlAsync(paymentCreateDTO);
                

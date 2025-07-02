@@ -10,7 +10,7 @@ namespace SmokingCessation.Application.DTOs.Response
     {
         public string vnp_TmnCode { get; set; }
         public string vnp_TxnRef { get; set; }
-        public decimal vnp_Amount { get; set; }
+        public float vnp_Amount { get; set; }
         public string vnp_OrderInfo { get; set; }
         public string vnp_BankCode { get; set; }
         public string? vnp_BankTranNo { get; set; }

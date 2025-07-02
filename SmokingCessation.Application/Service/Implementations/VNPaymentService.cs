@@ -129,7 +129,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 Id = Guid.NewGuid(),
                 UserId = request.UserId,
                 PackageId = request.BookingId, 
-                Amount = request.TotalAmount,
+                Amount = (decimal)request.TotalAmount,
                 Status = PaymentStatus.Pending,
                 VnPayTxnRef = $"PAYMENT_{request.UserId}_{request.BookingId}", 
                 CreatedTime = DateTime.UtcNow,
@@ -188,7 +188,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var vnp_TransactionStatus = vNPayHelper.GetResponseData("vnp_TransactionStatus");
             var vnp_TmnCode = vNPayHelper.GetResponseData("vnp_TmnCode");
             var vnp_TxnRef = vNPayHelper.GetResponseData("vnp_TxnRef");
-            decimal vnp_Amount = decimal.Parse(vNPayHelper.GetResponseData("vnp_Amount")) / 100;
+            float vnp_Amount = float.Parse(vNPayHelper.GetResponseData("vnp_Amount")) / 100;
             var vnp_OrderInfo = vNPayHelper.GetResponseData("vnp_OrderInfo");
             var vnp_BankCode = vNPayHelper.GetResponseData("vnp_BankCode");
             var vnp_BankTranNo = vNPayHelper.GetResponseData("vnp_BankTranNo");
@@ -212,7 +212,7 @@ namespace SmokingCessation.Application.Service.Implementations
             {
                 vnp_TmnCode = vnp_TmnCode,
                 vnp_TxnRef = vnp_TxnRef,
-                vnp_Amount = vnp_Amount,
+                vnp_Amount =Convert.ToSingle(vnp_Amount),
                 vnp_OrderInfo = vnp_OrderInfo,
                 vnp_BankCode = vnp_BankCode,
                 vnp_BankTranNo = vnp_BankTranNo,
@@ -239,7 +239,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 PackageId = packageId,
-                Amount = response.vnp_Amount,
+                Amount = (decimal) response.vnp_Amount,
                 Status = response.isSuccess ? PaymentStatus.Success : PaymentStatus.Failed,
                 CreatedTime = DateTime.UtcNow,
                
@@ -252,7 +252,7 @@ namespace SmokingCessation.Application.Service.Implementations
             {
                 isSuccess = response.isSuccess,
                 Message = response.isSuccess ? "Payment success." : "Payment failed.",
-                Amount = response.vnp_Amount,
+                Amount = (decimal) response.vnp_Amount,
                 PackageId = packageId
             };
         }

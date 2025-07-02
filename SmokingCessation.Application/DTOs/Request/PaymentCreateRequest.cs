@@ -12,6 +12,6 @@ namespace SmokingCessation.Application.DTOs.Request
         public Guid UserId { get; set; }
         public Guid BookingId { get; set; } 
         public string PaymentContent { get; set; } = "";
-        public decimal TotalAmount { get; set; } = 0;
+        public float TotalAmount { get; set; } = 0;
     }
 }
