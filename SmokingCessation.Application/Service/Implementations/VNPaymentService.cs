@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using SmokingCessation.Application.DTOs.Request;
@@ -12,9 +14,11 @@ using SmokingCessation.Application.Exceptions;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
 using SmokingCessation.Core.CustomExceptionss;
+using SmokingCessation.Core.Response;
 using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Interfaces;
+using SmokingCessation.Domain.Specifications;
 using VNPAY_CS_ASPX;
 
 namespace SmokingCessation.Application.Service.Implementations
@@ -25,72 +29,122 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public VNPaymentService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IUnitOfWork unitOfWork)
+        public VNPaymentService(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, IUnitOfWork unitOfWork , IMapper mapper)
         {
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        //public async Task<TransactionResponseDTO> CallVNPayIPN(IQueryCollection vnpayData)
-        //{
-        //    VNPayHelper vNPayHelper = new VNPayHelper();
-        //    //get all vnpay response data
-        //    VNPayResponseDTO vnpayResponseDTO = GetAllVNPayResponseData(vnpayData, vNPayHelper);
+        public async Task<BaseResponseModel<TransactionResponseDTO>> CallVNPayIPN(IQueryCollection vnpayData)
+        {
 
-        //    var bookingId = Guid.Parse(vnpayResponseDTO.vnp_TxnRef.Substring(13));
-        //    var transactionName = $"Transaction for booking: {bookingId}";
-        //    var transaction = new Transaction();
-        //    try
-        //    {
-        //        await _unitOfWork.BeginTransactionAsync();
-        //        var existedBooking = await _bookingRepository
-        //        .Find(b => b.Id == bookingId)
-        //        .Include(b => b.Transaction)
-        //        .FirstOrDefaultAsync();
-        //        if (existedBooking == null)
-        //        {
-        //            throw new APIException((int)HttpStatusCode.BadRequest, Exceptions.BOOKING_NOT_FOUND);
-        //        }
-        //        existedBooking.PaymentStatus = EnumPaymentStatus.Done;
-        //        transaction = _mapper.Map<Transaction>(vnpayResponseDTO);
-        //        transaction.Name = transactionName;
-        //        transaction.MoneyUnit = existedBooking.MoneyUnit;
-        //        transaction.PaymentMethod = EnumPaymentMethod.Transfer;
-        //        transaction.Booking = existedBooking;
+            var vnpHelper = new VnPayLibrary();
+            var vnpayResponseDTO = GetAllVNPayResponseData(vnpayData, vnpHelper);
+            var txnRef = vnpayResponseDTO.vnp_TxnRef;
 
-        //        await _transactionRepository.AddAsync(transaction);
-        //        await _unitOfWork.SaveChangesAsync();
-        //        await _unitOfWork.CommitAsync();
-        //    }
-        //    catch (System.Exception)
-        //    {
-        //        await _unitOfWork.RollbackAsync();
-        //        throw;
-        //    }
-        //    return _mapper.Map<TransactionResponseDTO>(transaction);
-        //}
+            // Tìm Payment theo VnPayTxnRef
+            var paymentRepo = _unitOfWork.Repository<Payment, Guid>();
+            var baseSpecific = new BaseSpecification<Payment>(p => p.VnPayTxnRef == txnRef);
+            var payment = await paymentRepo.GetWithSpecAsync(baseSpecific, true);
 
+            // Parse txnRef để lấy UserId và PaymentId
+            var parts = vnpayResponseDTO.vnp_TxnRef.Split('_');
+            if (parts.Length < 3) throw new APIException(400, "Sai định dạng mã giao dịch");
 
-        public async Task<VNPayResponseDTO> CallVNPayReturnUrl(IQueryCollection vnpayData)
+            var userId = Guid.Parse(parts[1]);
+            var paymentId = Guid.Parse(parts[2]);
+
+            // Kiểm tra phản hồi từ VNPay
+            if (!vnpayResponseDTO.isSuccess)
+            {
+                payment.Status = PaymentStatus.Failed;
+                throw new APIException((int)HttpStatusCode.BadRequest, "Thanh toán không thành công từ VNPay");
+            }
+
+            if (payment == null)
+                throw new APIException(404, "Không tìm thấy giao dịch");
+
+            if (payment.Status == PaymentStatus.Success)
+                throw new ErrorException(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, "Giao dịch đã được xử lý");
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+
+                // Cập nhật trạng thái
+                payment.Status = PaymentStatus.Success;
+                payment.CreatedTime = DateTime.UtcNow;
+
+                // Tạo gói
+                var package = await _unitOfWork.Repository<MembershipPackage, Guid>().GetByIdAsync(payment.PackageId);
+                if (package == null)
+                    throw new APIException(404, "Gói không tồn tại");
+
+                var userPackage = new UserPackage
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    PackageId = payment.PackageId,
+                    StartDate = DateTime.UtcNow,
+                    EndDate = DateTime.UtcNow.AddMonths(package.DurationMonths),
+                    IsActive = true,
+                    CreatedBy = userId.ToString(),
+                    CreatedTime = DateTime.UtcNow,
+                };
+
+                await _unitOfWork.Repository<UserPackage, Guid>().AddAsync(userPackage);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitAsync();
+
+                var result = _mapper.Map<TransactionResponseDTO>(payment);
+                return new BaseResponseModel<TransactionResponseDTO>(200, "SUCCESS", result);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
+
+        }
+
+        public async Task<BaseResponseModel<VNPayResponseDTO>> CallVNPayReturnUrl(IQueryCollection vnpayData)
         {
             var vNPayHelper = new VnPayLibrary();
 
             //get all vnpay response data
             VNPayResponseDTO vnpayResponseDTO = GetAllVNPayResponseData(vnpayData, vNPayHelper);
-            return vnpayResponseDTO;
+            return new BaseResponseModel<VNPayResponseDTO>(StatusCodes.Status200OK, MessageConstants.CREATE_SUCCESS, vnpayResponseDTO); 
         }
 
        
 
         public async Task<string> GeneratePaymentUrlAsync(PaymentCreateRequest request)
         {
+            // Step 1: Tạo bản ghi Payment trạng thái Pending
+            var payment = new Payment
+            {
+                Id = Guid.NewGuid(),
+                UserId = request.UserId,
+                PackageId = request.BookingId, 
+                Amount = request.TotalAmount,
+                Status = PaymentStatus.Pending,
+                VnPayTxnRef = $"PAYMENT_{request.UserId}_{request.BookingId}", 
+                CreatedTime = DateTime.UtcNow,
+                CreatedBy = request.UserId.ToString()
+            };
+
+            await _unitOfWork.Repository<Payment, Guid>().AddAsync(payment);
+            await _unitOfWork.SaveChangesAsync();
+            // Step 2: Tạo URL thanh toán VNPay
+
             var payCommand = _configuration["VNPay:PayCommand"]!;
             var vnp_tmnCode = _configuration["VNPay:TmnCode"]!;
             string vnp_locale = _configuration["VNPay:Locale"]!;
             var vnp_booking_orderType = _configuration["VNPay:BookingPackageType"]!;
-             var vnp_returnURL = URLPrefix.HTTPS + _httpContextAccessor.HttpContext!.Request.Host + _configuration["VNPay:ReturnUrl"]!;
+             var vnp_returnURL = URLPrefix.HTTP + _httpContextAccessor.HttpContext!.Request.Host + _configuration["VNPay:ReturnUrl"]!;
             
             var vnp_url = _configuration["VNPay:Url"]!;
             var vnp_hashSet = _configuration["VNPay:HashSecret"]!;
@@ -102,13 +156,13 @@ namespace SmokingCessation.Application.Service.Implementations
             var ipAddress = Utils.GetIpAddress(_httpContextAccessor)!;
             //Build URL for VNPAY
             var vnpay = new VnPayLibrary();
-
+  
             vnpay.AddRequestData("vnp_Version", VnPayLibrary.VERSION);
             vnpay.AddRequestData("vnp_Command", payCommand);
             vnpay.AddRequestData("vnp_TmnCode", vnp_tmnCode);
             vnpay.AddRequestData("vnp_Locale", vnp_locale);
             vnpay.AddRequestData("vnp_CurrCode", request.MoneyUnit);
-            vnpay.AddRequestData("vnp_TxnRef", "payment-code_" + request.BookingId);
+            vnpay.AddRequestData("vnp_TxnRef", $"PAYMENT_{request.UserId}_{request.BookingId}");
             vnpay.AddRequestData("vnp_OrderInfo", request.PaymentContent);
             vnpay.AddRequestData("vnp_OrderType", vnp_booking_orderType);
             vnpay.AddRequestData("vnp_Amount", (request.TotalAmount * 100).ToString());
@@ -116,10 +170,10 @@ namespace SmokingCessation.Application.Service.Implementations
             vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(_httpContextAccessor)!);
             vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_ExpireDate", DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss"));
-
+               
             string paymentUrl = vnpay.CreateRequestUrl(vnp_url, vnp_hashSet);
             return paymentUrl;
-        }
+         }
         private VNPayResponseDTO GetAllVNPayResponseData(IQueryCollection vnpayData, VnPayLibrary vNPayHelper)
         {
             foreach (var s in vnpayData)

@@ -103,6 +103,29 @@ namespace SmokingCessation.Infrastracture.Data
 
             return result;
         }
+        public async Task BeginTransactionAsync()
+        {
+            await _context.Database.BeginTransactionAsync();
+        }
+
+        public async Task CommitAsync()
+        {
+            try
+            {
+                await _context.Database.CommitTransactionAsync();
+            }
+            catch
+            {
+                await _context.Database.RollbackTransactionAsync();
+                throw;
+            }
+        }
+
+        public async Task RollbackAsync()
+        {
+            await _context.Database.RollbackTransactionAsync();
+        }
+
 
         public void Dispose() => _context.Dispose();
     }

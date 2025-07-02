@@ -13,12 +13,10 @@ namespace SmokingCessation.Domain.Entities
     {
 
         public decimal Amount { get; set; }
-
         public PaymentStatus Status { get; set; }
-    
-
         public Guid PackageId { get; set; }
         public Guid UserId { get; set; }
+        public string VnPayTxnRef { get; set; } = string.Empty; // Mã giao dịch từ VNPay
         public virtual ApplicationUser User { get; set; }
         public virtual MembershipPackage Package { get; set; }
       

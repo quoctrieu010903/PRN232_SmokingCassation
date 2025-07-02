@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
+using SmokingCessation.Core.Response;
 
 namespace SmokingCessation.Application.Service.Interface
 {
     public interface IVNPayService
     {
         Task<string> GeneratePaymentUrlAsync(PaymentCreateRequest request);
-        Task<VnPaymentResponseModel> ProcessVnPayCallbackAsync(IQueryCollection vnpayData);
+        Task<BaseResponseModel<VNPayResponseDTO>> CallVNPayReturnUrl(IQueryCollection vnpayData);
+        Task<BaseResponseModel<TransactionResponseDTO>> CallVNPayIPN(IQueryCollection vnpayData);
 
 
     }

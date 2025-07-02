@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
@@ -26,12 +27,14 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IVNPayService _vnpayService; 
 
-        public UserPackageService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public UserPackageService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, IVNPayService vnpayService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _vnpayService = vnpayService;
         }
 
         public async Task<BaseResponseModel<UserPackageResponse>> CancelCurrentPackage()
@@ -123,30 +126,14 @@ namespace SmokingCessation.Application.Service.Implementations
             var response = _mapper.Map<List<UserPackageResponse>>(history);
             return new BaseResponseModel<List<UserPackageResponse>>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, response);
         }
-
-        public async Task<BaseResponseModel> RegisterPackage(UserPackageRequest request)
+        
+        public async Task<BaseResponseModel<VNPayReturnLink>> RegisterPackage(UserPackageRequest request)
         {
-            var userId =  Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            ;
+            var userId =  Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value);
+            
             var now = DateTime.UtcNow;
 
-            // Check for completed payment for this user  
-            var paymentRepo = _unitOfWork.Repository<Payment, Guid>();
-            var hasPaid = (await paymentRepo.GetAllWithSpecAsync(
-                new BaseSpecification<Payment>(p =>
-                    p.UserId == userId &&
-                    p.PackageId == request.MembershipPackageId &&
-                    p.Status == PaymentStatus.Success)))
-                .Any();
-
-            if (!hasPaid)
-            
-                throw new ErrorException(StatusCodes.Status403Forbidden,
-                                 ResponseCodeConstants.PAYMENT_REQUIRED,
-                                 MessageConstants.PAYMENT_REQUIRED
-                 );
-            
-
+           
             // Check for existing active package  
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
             var hasActive = (await userpackageRepo.GetAllWithSpecAsync(
@@ -159,31 +146,38 @@ namespace SmokingCessation.Application.Service.Implementations
                             ResponseCodeConstants.ACTIVE_PACKAGE_EXISTS,
                             MessageConstants.ACTIVE_PACKAGE_EXISTS);
    
-            
 
             // Get package info  
             var packageRepo = _unitOfWork.Repository<MembershipPackage, Guid>();
             var package = await packageRepo.GetByIdAsync(request.MembershipPackageId);
             if (package == null)
             {
-                return new BaseResponseModel(StatusCodes.Status404NotFound, ResponseCodeConstants.PACKAGE_NOT_FOUND, MessageConstants.PACKAGE_NOT_FOUND);
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.PACKAGE_NOT_FOUND, MessageConstants.PACKAGE_NOT_FOUND);
+            }           
+            string paymentURL = "";
+            try
+            {
+                //get paymentURL
+                var paymentCreateDTO = new PaymentCreateRequest
+                {
+                    UserId = userId,
+                    BookingId = package.Id,
+                    MoneyUnit = "VND",
+                    PaymentContent = $"Payment For {package.Name}",
+                    TotalAmount = package.Price,
+                };
+                paymentURL = await _vnpayService.GeneratePaymentUrlAsync(paymentCreateDTO);
+               
+            }
+            catch (System.Exception)
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
             }
 
-            var entity = new UserPackage
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                PackageId = request.MembershipPackageId,
-                StartDate = now,
-                EndDate = now.AddMonths(package.DurationMonths),
-                IsActive = true
-            };
 
 
-            await userpackageRepo.AddAsync(entity);
-            await _unitOfWork.SaveChangesAsync();
-
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.REGISTER_PACKAGE_SUCCESS, MessageConstants.REGISTER_PACKAGE_SUCCESS);
+            return new BaseResponseModel<VNPayReturnLink>(StatusCodes.Status200OK, ResponseCodeConstants.REGISTER_PACKAGE_SUCCESS, paymentURL);
         }
     }
 }

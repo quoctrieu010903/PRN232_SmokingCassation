@@ -24,6 +24,7 @@ namespace SmokingCessation.Application.DTOs.Response
         // Additional fields
         public int RemainingDays { get; set; }
         public bool IsExpired { get; set; }
+        public string PaymentUrl { get; set; } = string.Empty;
 
 
     }

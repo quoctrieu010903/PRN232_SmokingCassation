@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.Service.Interface;
@@ -22,6 +23,7 @@ namespace SmokingCessation.WebAPI.Controllers
         /// Đăng ký gói thành viên mới (sau khi đã thanh toán thành công)
         /// </summary>
         [HttpPost("register")]
+        [Authorize]
         public async Task<IActionResult> Register([FromBody] UserPackageRequest request)
         {
             var result = await _service.RegisterPackage(request);

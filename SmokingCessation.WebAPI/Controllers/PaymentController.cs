@@ -21,27 +21,18 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> CreatePaymentUrl([FromBody] PaymentCreateRequest request)
         {
             var url = await _paymentService.GeneratePaymentUrlAsync(request);
-            return Ok(new { paymentUrl = url });
+            return Ok(url);
+        }
+        [HttpGet("vnpay-ipn")]
+        public async Task<IActionResult> CallVNPayIPN()
+        {
+            return Ok(await _paymentService.CallVNPayIPN(Request.Query));
         }
 
         [HttpGet("vnpay-return")]
-            public async Task<IActionResult> VNPayReturn()
+        public async Task<IActionResult> VNPayReturn()
             {
-                try
-                {
-              
-                var result = await _paymentService.ProcessVnPayCallbackAsync(Request.Query);
-
-                    // Auto-register user package here if success
-                    if (result.isSuccess)
-                        return Redirect("/payment-success"); // frontend route
-
-                    return Redirect("/payment-failed");
-                }
-                catch
-                {
-                    return Redirect("/payment-error");
-                }
+                return Ok( await _paymentService.CallVNPayReturnUrl(Request.Query));
             }
     }
 }

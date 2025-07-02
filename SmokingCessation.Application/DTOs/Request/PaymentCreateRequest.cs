@@ -9,9 +9,9 @@ namespace SmokingCessation.Application.DTOs.Request
     public class PaymentCreateRequest
     {
         public string MoneyUnit { get; set; }
-        //TxnRef
+        public Guid UserId { get; set; }
         public Guid BookingId { get; set; } 
         public string PaymentContent { get; set; } = "";
-        public float TotalAmount { get; set; } = 0;
+        public decimal TotalAmount { get; set; } = 0;
     }
 }

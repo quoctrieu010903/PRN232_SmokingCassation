@@ -11,7 +11,7 @@ namespace SmokingCessation.Application.Service.Interface
 {
     public interface IUserPackageService
     {
-        Task<BaseResponseModel> RegisterPackage(UserPackageRequest request);
+        Task<BaseResponseModel<VNPayReturnLink>> RegisterPackage(UserPackageRequest request);
         Task<BaseResponseModel<UserPackageResponse>> GetCurrentPackage();
         Task<BaseResponseModel<UserPackageResponse>> CancelCurrentPackage();
         Task<BaseResponseModel<List<UserPackageResponse>>> GetPackageHistory();
