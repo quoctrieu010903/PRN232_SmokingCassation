@@ -33,6 +33,8 @@ namespace SmokingCessation.WebAPI.Controllers
         /// Lấy gói thành viên hiện tại còn hạn
         /// </summary>
         [HttpGet("current")]
+        [Authorize]
+
         public async Task<IActionResult> GetCurrent()
         {
             var result = await _service.GetCurrentPackage();
@@ -42,6 +44,8 @@ namespace SmokingCessation.WebAPI.Controllers
         /// Hủy gói thành viên hiện tại
         /// </summary>
         [HttpPost("cancel")]
+        [Authorize]
+
         public async Task<IActionResult> Cancel()
         {
             var result = await _service.CancelCurrentPackage();
@@ -52,6 +56,8 @@ namespace SmokingCessation.WebAPI.Controllers
         /// Lấy lịch sử các gói đã đăng ký
         /// </summary>
         [HttpGet("history")]
+        [Authorize]
+
         public async Task<IActionResult> GetHistory()
         {
             var result = await _service.GetPackageHistory();
@@ -60,7 +66,7 @@ namespace SmokingCessation.WebAPI.Controllers
             /// <summary>
             /// Lấy chi tiết một gói đã đăng ký theo Id
             /// </summary>
-            [HttpGet("{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _service.GetPackageById(id);

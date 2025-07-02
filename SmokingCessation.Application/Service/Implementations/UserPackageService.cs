@@ -41,7 +41,7 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<BaseResponseModel<UserPackageResponse>> CancelCurrentPackage()
         {
            
-            var id = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            var id = _httpContextAccessor.HttpContext?.User?.FindFirstValue("UserId");
             Console.WriteLine("id"+id);
             if (id == null)
                 return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status403Forbidden,
@@ -77,8 +77,9 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel<UserPackageResponse>> GetCurrentPackage()
         {
-            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var now = CoreHelper.SystemTimeNow;
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value);
+
+            var now = DateTime.UtcNow;
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
             var current = (await userpackageRepo.GetAllWithSpecWithInclueAsync(
@@ -100,7 +101,8 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel<UserPackageResponse>> GetPackageById(Guid id)
         {
-            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value);
+
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
             var package = await userpackageRepo.GetByIdAsync(id);
@@ -120,7 +122,8 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel<List<UserPackageResponse>>> GetPackageHistory()
         {
-            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value);
+
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
             var history = (await userpackageRepo.GetAllWithSpecAsync(
