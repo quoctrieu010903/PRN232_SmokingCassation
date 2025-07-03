@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -48,7 +42,7 @@ namespace SmokingCessation.Application.Service.Implementations
             // Tìm Payment theo VnPayTxnRef
             var paymentRepo = _unitOfWork.Repository<Payment, Guid>();
             var baseSpecific = new BaseSpecification<Payment>(p => p.VnPayTxnRef == txnRef);
-            var payment = await paymentRepo.GetWithSpecAsync(baseSpecific, true);
+
 
             // Parse txnRef để lấy UserId và PaymentId
             var parts = vnpayResponseDTO.vnp_TxnRef.Split('_');
@@ -57,6 +51,7 @@ namespace SmokingCessation.Application.Service.Implementations
             var userId = Guid.Parse(parts[1]);
             var paymentId = Guid.Parse(parts[2]);
 
+            var payment = await paymentRepo.GetByIdAsync(paymentId);
             // Kiểm tra phản hồi từ VNPay
             if (!vnpayResponseDTO.isSuccess)
             {
@@ -96,11 +91,12 @@ namespace SmokingCessation.Application.Service.Implementations
                 };
 
                 await _unitOfWork.Repository<UserPackage, Guid>().AddAsync(userPackage);
+                await _unitOfWork.Repository<Payment, Guid>().UpdateAsync(payment);
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
 
                 var result = _mapper.Map<TransactionResponseDTO>(payment);
-                return new BaseResponseModel<TransactionResponseDTO>(200, "SUCCESS", result);
+                return new BaseResponseModel<TransactionResponseDTO>(200, "SUCCESS", "");
             }
             catch
             {
@@ -115,25 +111,8 @@ namespace SmokingCessation.Application.Service.Implementations
 
             //get all vnpay response data
             VNPayResponseDTO vnpayResponseDTO = GetAllVNPayResponseData(vnpayData, vNPayHelper);
-            Guid id = Guid.Parse(vnpayResponseDTO.vnp_TxnRef);
 
-            var payment = await _unitOfWork.Repository<Payment, Guid>().GetByIdAsync(id);
-            Console.Write("Payment payment " + payment.Status);
-            
-            if (vnpayResponseDTO.isSuccess)
-            {
-                payment.Status = PaymentStatus.Success;
-            }
-            else
-            {
-                payment.Status = PaymentStatus.Failed;
-            }
-
-            await _unitOfWork.Repository<Payment, Guid>().UpdateAsync(payment);
-
-            var res = await _unitOfWork.Repository<Payment, Guid>().GetByIdAsync(id);
-
-            Console.Write("Payment test" + res.Status);
+            var a = await CallVNPayIPN(vnpayData);
 
             return new BaseResponseModel<VNPayResponseDTO>(StatusCodes.Status200OK, MessageConstants.CREATE_SUCCESS,
                 vnpayResponseDTO);
@@ -182,7 +161,7 @@ namespace SmokingCessation.Application.Service.Implementations
             vnpay.AddRequestData("vnp_TmnCode", vnp_tmnCode);
             vnpay.AddRequestData("vnp_Locale", vnp_locale);
             vnpay.AddRequestData("vnp_CurrCode", request.MoneyUnit);
-            vnpay.AddRequestData("vnp_TxnRef", $"{payment.Id}");
+            vnpay.AddRequestData("vnp_TxnRef", $"_{payment.UserId}_{payment.Id}");
             vnpay.AddRequestData("vnp_OrderInfo", request.PaymentContent);
             vnpay.AddRequestData("vnp_OrderType", vnp_booking_orderType);
             vnpay.AddRequestData("vnp_Amount", (request.TotalAmount * 100).ToString());
