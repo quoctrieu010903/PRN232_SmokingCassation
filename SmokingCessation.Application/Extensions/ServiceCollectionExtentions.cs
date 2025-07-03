@@ -48,6 +48,7 @@ namespace SmokingCessation.Application.Extensions
             services.AddScoped<IDeepSeekService, DeepSeekService>();
             services.AddScoped<ICoachAdviceLogService, CoachAdviceLogService>();
             services.AddScoped<IAchivementServie, AchivementService>();
+            services.AddScoped<IUserAchievementService, UserAchievementService>();
             services.AddScoped<IVNPayService, VNPaymentService>();
 
 

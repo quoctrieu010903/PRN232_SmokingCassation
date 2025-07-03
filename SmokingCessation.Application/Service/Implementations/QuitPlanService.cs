@@ -22,12 +22,14 @@ namespace SmokingCessation.Application.Service.Implementations
         private IUnitOfWork _unitOfWork;
         private IMapper _mapper;
         private IHttpContextAccessor _httpContextAccessor;
+        private readonly IUserAchievementService _userAchivement;
 
-        public QuitPlanService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        public QuitPlanService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, IMapper mapper , IUserAchievementService userAchievement)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
            _httpContextAccessor = httpContextAccessor;
+            _userAchivement = userAchievement;
         }
 
         #region check lại LUỒNG
@@ -205,6 +207,8 @@ namespace SmokingCessation.Application.Service.Implementations
             await _unitOfWork.Repository<QuitPlan, QuitPlan>().AddAsync(quitPlan);
             await _unitOfWork.SaveChangesAsync();
 
+            await _userAchivement.AssignAchievementsIfEligibleAsync(userGuid);
+
             return new BaseResponseModel(
                 StatusCodes.Status200OK,
                 "SUCCESS",
@@ -214,7 +218,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Delete(Guid id)
         {
-            var currentUser = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var currentUser = _httpContextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             var repo = _unitOfWork.Repository<QuitPlan, Guid>();
             var entity = await repo.GetByIdAsync(id);
 

@@ -24,12 +24,15 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUserAchievementService _userAchivement;
 
-        public FeedbackService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+
+        public FeedbackService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor , IUserAchievementService userAchievement)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _userAchivement = userAchievement;
         }
 
         //public async Task<BaseResponseModel> Approve(Guid id, bool isApproved)
@@ -63,6 +66,9 @@ namespace SmokingCessation.Application.Service.Implementations
             };
             await _unitOfWork.Repository<Feedback, Guid>().AddAsync(feedback);
             await _unitOfWork.SaveChangesAsync();
+
+            await _userAchivement.AssignAchievementsIfEligibleAsync(Guid.Parse(userId));
+
             return new BaseResponseModel(200, "SUCCESS", "Feedback created, pending approval");
 
         }

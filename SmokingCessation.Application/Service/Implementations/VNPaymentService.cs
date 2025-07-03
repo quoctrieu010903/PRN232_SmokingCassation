@@ -95,8 +95,8 @@ namespace SmokingCessation.Application.Service.Implementations
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
 
-                var result = _mapper.Map<TransactionResponseDTO>(payment);
-                return new BaseResponseModel<TransactionResponseDTO>(200, "SUCCESS", "");
+                //var result = _mapper.Map<TransactionResponseDTO>(payment);
+                return new BaseResponseModel<TransactionResponseDTO>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, "Create payment successfully");
             }
             catch
             {

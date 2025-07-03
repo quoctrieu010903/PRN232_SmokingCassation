@@ -23,12 +23,14 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly IMapper _mapper;
         private readonly IUserContext _userContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUserAchievementService _userAchivement;
 
-        public ProgressLogsService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public ProgressLogsService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, IUserAchievementService userAchivement)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _userAchivement = userAchivement;
         }
 
         public async Task<BaseResponseModel> Create(ProgressLogsRequest request)
@@ -49,6 +51,9 @@ namespace SmokingCessation.Application.Service.Implementations
 
             await _unitOfWork.Repository<ProgressLog, Guid>().AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
+
+            await _userAchivement.AssignAchievementsIfEligibleAsync(Guid.Parse(userId));
+
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.CREATE_SUCCESS);
         }
 
