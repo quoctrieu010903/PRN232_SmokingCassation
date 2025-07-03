@@ -129,7 +129,7 @@ namespace SmokingCessation.Application.Service.Implementations
             }
 
             // 2. Kiểm tra xem người dùng có gói user package còn hiệu lực không
-            var today =  DateTime.UtcNow.Date;
+            var today =  DateTime.UtcNow;
             var userPackageSpec = new BaseSpecification<UserPackage>(
                 x => x.UserId == userGuid &&
                      x.StartDate <= today &&
@@ -202,7 +202,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 CreatedTime = startDay,
             };
 
-            await _unitOfWork.Repository<QuitPlan, Guid>().AddAsync(quitPlan);
+            await _unitOfWork.Repository<QuitPlan, QuitPlan>().AddAsync(quitPlan);
             await _unitOfWork.SaveChangesAsync();
 
             return new BaseResponseModel(
@@ -240,7 +240,7 @@ namespace SmokingCessation.Application.Service.Implementations
            
             if (isCurrentUser)
             {
-                var userIdStr = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userIdStr = _httpContextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
                 if (!Guid.TryParse(userIdStr, out var userId))
                     throw new ErrorException(StatusCodes.Status400BadRequest,ResponseCodeConstants.NOT_FOUND,"Invalid or missing user id.");
                 currentUserId = userId;
@@ -257,7 +257,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 ))
             );
 
-            var response = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllWithSpecAsync(baseSpeci);
+            var response = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllWithSpecWithInclueAsync(baseSpeci, true,p=>p.MembershipPackage );
             var result = _mapper.Map<List<QuitPlanResponse>>(response);
             return PaginatedList<QuitPlanResponse>.Create(result, model.PageNumber, model.PageSize);
 
@@ -265,7 +265,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel<QuitPlanResponse?>> GetQuitPlanAsync(Guid? userId = null)
         {
-            var currentUserId = Guid.Parse(_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var currentUserId = Guid.Parse(_httpContextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value);
            
            
                 
@@ -315,7 +315,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 TargetDate = plan.TargetDate,
                 CigarettesPerDayBeforeQuit = plan.CigarettesPerDayBeforeQuit,
                 YearsSmokingBeforeQuit = plan.YearsSmokingBeforeQuit,
-                Status = plan.Status,
+                Status = plan.Status.ToString(),
                 UserId = plan.UserId,
                 PackageId = plan.MembershipPackage.Id,
                 PackageName = plan.MembershipPackage?.Name ?? "Không rõ",

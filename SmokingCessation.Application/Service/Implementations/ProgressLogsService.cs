@@ -33,7 +33,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Create(ProgressLogsRequest request)
         {   // 1. Lấy userId từ context
-            var userId = _userContext.GetUserId();
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("Không xác định được người dùng.");
 
@@ -55,7 +55,7 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<BaseResponseModel> CreateProgressLogFromAdviceAsync()
         {
             // 1. Lấy userId từ context
-            var userId = _userContext.GetUserId();
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             if (string.IsNullOrEmpty(userId))
                 throw new Exception("Không xác định được người dùng.");
 
@@ -105,7 +105,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel> Update(ProgressLogsRequest request, Guid id)
         {
-            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             var repo = _unitOfWork.Repository<ProgressLog, Guid>();
             var entity = await repo.GetByIdAsync(id);
             if (entity == null)
@@ -121,8 +121,8 @@ namespace SmokingCessation.Application.Service.Implementations
         }
 
         public async Task<BaseResponseModel> Delete(Guid id)
-        {
-            var userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            {
+                var userId = _httpContextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
             var repo = _unitOfWork.Repository<ProgressLog, Guid>();
             var entity = await repo.GetByIdAsync(id);
             if (entity == null)

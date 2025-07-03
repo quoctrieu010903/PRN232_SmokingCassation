@@ -15,7 +15,7 @@ namespace SmokingCessation.Application.DTOs.Response
         public DateTimeOffset TargetDate { get; set; }
         public int CigarettesPerDayBeforeQuit { get; set; }   // ✅ Bao nhiêu điếu mỗi ngày
         public int YearsSmokingBeforeQuit { get; set; }       // 
-        public QuitPlanStatus Status { get; set; }
+        public string Status { get; set; }
         public Guid UserId { get; set; }
         public Guid PackageId { get; set; }
         public string PackageName { get; set; }
