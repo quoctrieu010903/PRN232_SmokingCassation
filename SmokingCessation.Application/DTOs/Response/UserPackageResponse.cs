@@ -13,10 +13,10 @@ namespace SmokingCessation.Application.DTOs.Response
         public string FullName { get; set; }
         public Guid PackageId { get; set; }
         public string PackageName { get; set; }
-        public DateTimeOffset StartDate { get; set; }
-        public DateTimeOffset EndDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public bool IsActive { get; set; }
-        public DateTimeOffset? CancelledDate { get; set; }
+        public DateTime? CancelledDate { get; set; }
         public decimal Price { get; set; }
         public string Type { get; set; }
         public string Description { get; set; }

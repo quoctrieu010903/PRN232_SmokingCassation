@@ -23,6 +23,7 @@ namespace SmokingCessation.WebAPI.Controllers
             var url = await _paymentService.GeneratePaymentUrlAsync(request);
             return Ok(url);
         }
+
         [HttpGet("vnpay-ipn")]
         public async Task<IActionResult> CallVNPayIPN()
         {
@@ -31,8 +32,8 @@ namespace SmokingCessation.WebAPI.Controllers
 
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> VNPayReturn()
-            {
-                return Ok( await _paymentService.CallVNPayReturnUrl(Request.Query));
-            }
+        {
+            return Ok(await _paymentService.CallVNPayReturnUrl(Request.Query));
+        }
     }
 }

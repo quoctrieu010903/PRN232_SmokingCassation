@@ -27,9 +27,10 @@ namespace SmokingCessation.Application.Service.Implementations
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IVNPayService _vnpayService; 
+        private readonly IVNPayService _vnpayService;
 
-        public UserPackageService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, IVNPayService vnpayService)
+        public UserPackageService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor,
+            IVNPayService vnpayService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -39,16 +40,25 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<BaseResponseModel<UserPackageResponse>> CancelCurrentPackage()
         {
-            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+           
+            var id = _httpContextAccessor.HttpContext?.User?.FindFirstValue("UserId");
+            Console.WriteLine("id"+id);
+            if (id == null)
+                return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status403Forbidden,
+                    ResponseCodeConstants.UNAUTHORIZED, MessageConstants.FORBIDDEN);
+
+            var userId = Guid.Parse(id);
+
             var now = DateTime.UtcNow;
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
             var current = (await userpackageRepo.GetAllWithSpecAsync(
-                new BaseSpecification<UserPackage>(um => um.UserId == userId && um.IsActive && um.EndDate > now)))
+                    new BaseSpecification<UserPackage>(um => um.UserId == userId && um.IsActive && um.EndDate > now)))
                 .FirstOrDefault();
 
             if (current == null)
-                return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status404NotFound, ResponseCodeConstants.NO_ACTIVE_MEMBERSHIP, MessageConstants.NO_ACTIVE_MEMBERSHIP);
+                return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status404NotFound,
+                    ResponseCodeConstants.NO_ACTIVE_MEMBERSHIP, MessageConstants.NO_ACTIVE_MEMBERSHIP);
 
             current.IsActive = false;
             current.EndDate = now;
@@ -60,59 +70,64 @@ namespace SmokingCessation.Application.Service.Implementations
             var packageRepo = _unitOfWork.Repository<MembershipPackage, Guid>();
             current.Package = await packageRepo.GetByIdAsync(current.PackageId);
             var response = _mapper.Map<UserPackageResponse>(current);
-            return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status200OK, ResponseCodeConstants.CANCEL_PACKAGE_SUCCESS, response, null, MessageConstants.CANCEL_PACKAGE_SUCCESS);
+            return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status200OK,
+                ResponseCodeConstants.CANCEL_PACKAGE_SUCCESS, response, null, MessageConstants.CANCEL_PACKAGE_SUCCESS);
         }
-
-
 
 
         public async Task<BaseResponseModel<UserPackageResponse>> GetCurrentPackage()
         {
-            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            var now = CoreHelper.SystemTimeNow;
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value);
+
+            var now = DateTime.UtcNow;
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
             var current = (await userpackageRepo.GetAllWithSpecWithInclueAsync(
-                new BaseSpecification<UserPackage>(um => um.UserId == userId && um.IsActive && um.EndDate > now),true,f=>f.User, f => f.Package))
+                    new BaseSpecification<UserPackage>(um => um.UserId == userId && um.IsActive && um.EndDate > now),
+                    true, f => f.User, f => f.Package))
                 .FirstOrDefault();
 
             if (current == null)
-                return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status404NotFound, ResponseCodeConstants.NO_ACTIVE_MEMBERSHIP, MessageConstants.NO_ACTIVE_MEMBERSHIP);
+                return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status404NotFound,
+                    ResponseCodeConstants.NO_ACTIVE_MEMBERSHIP, MessageConstants.NO_ACTIVE_MEMBERSHIP);
 
             // Load navigation properties if needed
             var packageRepo = _unitOfWork.Repository<MembershipPackage, Guid>();
             current.Package = await packageRepo.GetByIdAsync(current.PackageId);
             var response = _mapper.Map<UserPackageResponse>(current);
-            return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, response);
-
+            return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS,
+                response);
         }
 
         public async Task<BaseResponseModel<UserPackageResponse>> GetPackageById(Guid id)
         {
-            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value);
+
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
             var package = await userpackageRepo.GetByIdAsync(id);
             if (package == null || package.UserId != userId)
-                return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+                return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status404NotFound,
+                    ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             // Load navigation properties if needed
             var packageRepo = _unitOfWork.Repository<MembershipPackage, Guid>();
             package.Package = await packageRepo.GetByIdAsync(package.PackageId);
 
             var response = _mapper.Map<UserPackageResponse>(package);
-            return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, response);
+            return new BaseResponseModel<UserPackageResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS,
+                response);
         }
-
 
 
         public async Task<BaseResponseModel<List<UserPackageResponse>>> GetPackageHistory()
         {
-            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value);
+
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
 
             var history = (await userpackageRepo.GetAllWithSpecAsync(
-                new BaseSpecification<UserPackage>(um => um.UserId == userId)))
+                    new BaseSpecification<UserPackage>(um => um.UserId == userId)))
                 .OrderByDescending(x => x.StartDate)
                 .ToList();
 
@@ -124,36 +139,39 @@ namespace SmokingCessation.Application.Service.Implementations
             }
 
             var response = _mapper.Map<List<UserPackageResponse>>(history);
-            return new BaseResponseModel<List<UserPackageResponse>>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, response);
+            return new BaseResponseModel<List<UserPackageResponse>>(StatusCodes.Status200OK,
+                ResponseCodeConstants.SUCCESS, response);
         }
-        
+
         public async Task<BaseResponseModel<VNPayReturnLink>> RegisterPackage(UserPackageRequest request)
         {
-            var userId =  Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value);
-            
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value);
+
             var now = DateTime.UtcNow;
 
-           
+
             // Check for existing active package  
             var userpackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
             var hasActive = (await userpackageRepo.GetAllWithSpecAsync(
-                new BaseSpecification<UserPackage>(um => um.UserId == userId && um.IsActive && um.EndDate > now)))
+                    new BaseSpecification<UserPackage>(um => um.UserId == userId && um.IsActive && um.EndDate > now)))
                 .Any();
 
             if (hasActive)
 
                 throw new ErrorException(StatusCodes.Status400BadRequest,
-                            ResponseCodeConstants.ACTIVE_PACKAGE_EXISTS,
-                            MessageConstants.ACTIVE_PACKAGE_EXISTS);
-   
+                    ResponseCodeConstants.ACTIVE_PACKAGE_EXISTS,
+                    MessageConstants.ACTIVE_PACKAGE_EXISTS);
+
 
             // Get package info  
             var packageRepo = _unitOfWork.Repository<MembershipPackage, Guid>();
             var package = await packageRepo.GetByIdAsync(request.MembershipPackageId);
             if (package == null)
             {
-                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.PACKAGE_NOT_FOUND, MessageConstants.PACKAGE_NOT_FOUND);
-            }           
+                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.PACKAGE_NOT_FOUND,
+                    MessageConstants.PACKAGE_NOT_FOUND);
+            }
+
             string paymentURL = "";
             try
             {
@@ -167,7 +185,6 @@ namespace SmokingCessation.Application.Service.Implementations
                     TotalAmount = Convert.ToSingle(package.Price),
                 };
                 paymentURL = await _vnpayService.GeneratePaymentUrlAsync(paymentCreateDTO);
-               
             }
             catch (System.Exception)
             {
@@ -176,8 +193,8 @@ namespace SmokingCessation.Application.Service.Implementations
             }
 
 
-
-            return new BaseResponseModel<VNPayReturnLink>(StatusCodes.Status200OK, ResponseCodeConstants.REGISTER_PACKAGE_SUCCESS, paymentURL);
+            return new BaseResponseModel<VNPayReturnLink>(StatusCodes.Status200OK,
+                ResponseCodeConstants.REGISTER_PACKAGE_SUCCESS, paymentURL);
         }
     }
 }
