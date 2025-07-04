@@ -110,6 +110,24 @@ namespace SmokingCessation.Application.Mapping
                 CreateMap<AchievementResponse, Achievement>().ReverseMap();
             #endregion
 
+            #region UserAchivement
+            CreateMap<UserAchievement, UserAchivementResponse>()
+                      .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
+                      .ForMember(dest => dest.Achievements, opt => opt.MapFrom(src => new List<AchievementResponse> { 
+                        // assuming 1 Achievement per UserAchievement
+                        new AchievementResponse {
+                            Id = src.Achievement.Id,
+                            Title = src.Achievement.Title,
+                            Description = src.Achievement.Description,
+                            iconUrl = src.Achievement.IconUrl,
+                            ConditionType = src.Achievement.ConditionType.ToString(),
+                            ConditionValue = src.Achievement.ConditionValue
+                        }
+                      }))
+                      .ReverseMap();
+
+            #endregion
+
 
         }
     }

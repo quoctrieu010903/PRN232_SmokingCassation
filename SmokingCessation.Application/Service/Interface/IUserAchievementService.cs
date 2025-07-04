@@ -1,3 +1,5 @@
+using SmokingCessation.Application.DTOs.Response;
+using SmokingCessation.Core.Response;
 using SmokingCessation.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -9,6 +11,6 @@ namespace SmokingCessation.Application.Service.Interface
     {
         Task AssignAchievementsIfEligibleAsync(Guid userId);
         Task<bool> HasAchievementAsync(Guid userId, Guid achievementId);
-        Task<List<Achievement>> GetUserAchievementsAsync(Guid userId);
+        Task<BaseResponseModel<List<UserAchivementResponse>>> GetUserAchievementsAsync(Guid userId);
     }
 } 

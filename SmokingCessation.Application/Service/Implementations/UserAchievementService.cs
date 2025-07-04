@@ -1,5 +1,10 @@
+using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
+using SmokingCessation.Core.Constants;
+using SmokingCessation.Core.Response;
 using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Interfaces;
@@ -16,10 +21,12 @@ namespace SmokingCessation.Application.Service.Implementations
     {
         
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _Imapper;
 
-        public UserAchievementService( IUnitOfWork unitOfWork)
+        public UserAchievementService( IUnitOfWork unitOfWork ,IMapper mapper )
         {
             _unitOfWork = unitOfWork;
+            _Imapper = mapper;
         }
 
         public async Task AssignAchievementsIfEligibleAsync(Guid userId)
@@ -58,9 +65,21 @@ namespace SmokingCessation.Application.Service.Implementations
         }
 
 
-        public Task<List<Achievement>> GetUserAchievementsAsync(Guid userId)
+        public async Task<BaseResponseModel<List<UserAchivementResponse>>> GetUserAchievementsAsync(Guid userId)
         {
-            throw new NotImplementedException();
+
+            var userAchievementRepo = _unitOfWork.Repository<UserAchievement, UserAchievement>();
+            var spec = new BaseSpecification<UserAchievement>(x => x.UserId == userId);
+          var result = await userAchievementRepo.GetAllWithSpecWithInclueAsync(spec,true,p => p.User , p => p.Achievement);
+            var response = _Imapper.Map<List<UserAchivementResponse>>(result);
+
+            return new BaseResponseModel<List<UserAchivementResponse>>(
+                StatusCodes.Status200OK,
+                ResponseCodeConstants.SUCCESS,
+                response
+            );
+
+
         }
 
         public Task<bool> HasAchievementAsync(Guid userId, Guid achievementId)
