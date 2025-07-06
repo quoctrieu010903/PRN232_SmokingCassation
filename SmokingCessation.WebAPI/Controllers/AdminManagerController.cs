@@ -38,14 +38,14 @@ namespace SmokingCessation.WebAPI.Controllers
         }
         [HttpGet("Blogs")]
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> GetBlogs([FromQuery] PagingRequestModel paging, BlogListFilter fillter)
+        public async Task<IActionResult> GetBlogs([FromQuery] PagingRequestModel paging,[FromQuery] BlogListFilter fillter)
         {
             var result = await _blogService.GetAll(paging,fillter);
             return Ok(result);
         }
         [HttpGet("QuitPlans")]
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> GetQuitPlans([FromQuery] PagingRequestModel paging, QuitPlanFillter fillter)
+        public async Task<IActionResult> GetQuitPlans([FromQuery] PagingRequestModel paging,[FromQuery] QuitPlanFillter fillter)
         {
             var result = await _quitPlanService.getAllQuitPlan(paging,fillter , false);
             return Ok(result);
@@ -77,7 +77,7 @@ namespace SmokingCessation.WebAPI.Controllers
       
         [HttpGet("MemberShipPackages")]
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> GetMemberShipPackages([FromQuery] PagingRequestModel paging, MemberShipPackageFillter fillter)
+        public async Task<IActionResult> GetMemberShipPackages([FromQuery] PagingRequestModel paging, [FromQuery] MemberShipPackageFillter fillter)
         {
             var result = await _memberShipPackageService.getAllPackage(paging,fillter);
             return Ok(result);
