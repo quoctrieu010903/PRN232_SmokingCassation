@@ -249,6 +249,12 @@ namespace SmokingCessation.Application.Service.Implementations
                     throw new ErrorException(StatusCodes.Status400BadRequest,ResponseCodeConstants.NOT_FOUND,"Invalid or missing user id.");
                 currentUserId = userId;
             }
+            if (fillter.StartDate != default)
+                fillter.StartDate = DateTime.SpecifyKind(fillter.StartDate, DateTimeKind.Utc);
+
+            if (fillter.TargetDate != default)
+                fillter.TargetDate = DateTime.SpecifyKind(fillter.TargetDate, DateTimeKind.Utc);
+
 
             var baseSpeci = new BaseSpecification<QuitPlan>(mp =>
                 !mp.DeletedTime.HasValue &&
@@ -256,10 +262,10 @@ namespace SmokingCessation.Application.Service.Implementations
                 (fillter == null || (
                     (fillter.Status == 0 || mp.Status == fillter.Status) &&
                     (string.IsNullOrEmpty(fillter.UserName) || mp.User.FullName.Contains(fillter.UserName)) &&
-                    (fillter.StartDate == default || mp.StartDate.Date == fillter.StartDate.Date) &&
-                    (fillter.TargetDate == default || mp.TargetDate.Date == fillter.TargetDate.Date)
+                           (fillter.StartDate == default || mp.StartDate.Date == fillter.StartDate.Date) &&
+                            (fillter.TargetDate == default || mp.TargetDate.Date == fillter.TargetDate.Date)
                 ))
-            );
+            ); ;
 
             var response = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllWithSpecWithInclueAsync(baseSpeci, true,p=>p.MembershipPackage , p=> p.AdviceLogs);
             var result = _mapper.Map<List<QuitPlanResponse>>(response);
