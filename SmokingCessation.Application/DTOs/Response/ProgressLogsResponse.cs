@@ -13,5 +13,6 @@ namespace SmokingCessation.Application.DTOs.Response
         public DateTimeOffset  LogDate { get; set; }
         public int SmokedToday { get; set; }
         public string Note { get; set; }
+        public string CoachAdvice { get; set; }
     }
 }

@@ -12,12 +12,12 @@ namespace SmokingCessation.Application.DTOs.Fillter
         /// <summary>
         /// Ngày bắt đầu kế hoạch bỏ thuốc
         /// </summary>
-        public DateTime StartDate { get; set; }
+        public string? StartDate { get; set; }
 
         /// <summary>
         /// Ngày mục tiêu kết thúc kế hoạch bỏ thuốc
         /// </summary>
-        public DateTime TargetDate { get; set; }
+        public string? TargetDate { get; set; }
 
         /// <summary>
         /// Trạng thái hiện tại của kế hoạch

@@ -34,15 +34,12 @@ namespace SmokingCessation.Application.Service.Implementations
         /// <summary>
         /// Tạo một log lời khuyên mới cho kế hoạch bỏ thuốc, sinh nội dung bằng AI DeepSeek.
         /// </summary>
-        public async Task CreateAdviceLogAsync()
+        public async Task CreateAdviceLogAsync(Guid useid)
         { // 1. Lấy userId từ context
-            var userId = _userContext.GetUserId();
-            if (string.IsNullOrEmpty(userId))
-                throw new Exception("Không xác định được người dùng.");
-
+         
             // 2. Lấy QuitPlan phù hợp của user hiện tại (ưu tiên đang hoạt động, nếu không có thì lấy mới nhất)
             var quitPlans = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllAsync();
-            var userQuitPlans = quitPlans.Where(q => q.UserId == Guid.Parse(userId));
+            var userQuitPlans = quitPlans.Where(q => q.UserId == useid);
             var quitPlan = userQuitPlans
                 .FirstOrDefault(q => q.Status == QuitPlanStatus.Active)
                 ?? userQuitPlans.OrderByDescending(q => q.CreatedTime).FirstOrDefault();

@@ -18,6 +18,15 @@ namespace SmokingCessation.Application.DTOs.Response
 
 
         }
+        public class UserFullResponse
+        {
+           public Guid Id { get; set; }
+            public string FullName { get; set; }
+            public string Email { get; set; }
+            public string UserImage { get; set; }
+            public string RoleName { get; set; }
+           
+         }
         public class CurrentUserResponse
         {
 

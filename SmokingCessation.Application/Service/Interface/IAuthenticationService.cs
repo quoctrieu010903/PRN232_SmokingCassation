@@ -1,7 +1,9 @@
 ﻿using System;
 
 using SmokingCessation.Application.DTOs.Request;
+using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Core.Response;
+using SmokingCessation.Domain.Specifications;
 using static SmokingCessation.Application.DTOs.Request.AuthenticationRequest;
 using static SmokingCessation.Application.DTOs.Response.AuthenticationResponse;
 
@@ -18,6 +20,7 @@ namespace SmokingCessation.Application.Service.Interface
         Task<BaseResponseModel<RevokeRefreshTokenResponse>> RevokeRefreshToken(RefreshTokenRequest refreshTokenRemoveRequest);
         Task<BaseResponseModel<CurrentUserResponse>> RefreshTokenAsync(RefreshTokenRequest request);
         Task<BaseResponseModel<UserResponse>> LoginAsync(UserLoginRequest request);
+        Task<PaginatedList<UserFullResponse>> GetAllUser(PagingRequestModel paging);
 
     }
 }

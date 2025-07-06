@@ -45,6 +45,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
             }
             var entity = _mapper.Map<ProgressLog>(request);
+            entity.QuitPlanId = quitPlan.Id; 
             entity.LogDate =  DateTime.UtcNow;
             entity.CreatedTime =  DateTime.UtcNow;
             entity.LastUpdatedTime =  DateTime.UtcNow;  

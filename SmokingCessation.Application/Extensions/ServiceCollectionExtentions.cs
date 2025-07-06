@@ -43,6 +43,7 @@ namespace SmokingCessation.Application.Extensions
             services.AddScoped<IBlogService, BlogService>();
             services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddScoped<IRatingService, RatingService>();
+            services.AddScoped<IRankingService, RankingService>();
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<IUserPackageService, UserPackageService>();
             services.AddScoped<IDeepSeekService, DeepSeekService>();
@@ -50,7 +51,7 @@ namespace SmokingCessation.Application.Extensions
             services.AddScoped<IAchivementServie, AchivementService>();
             services.AddScoped<IUserAchievementService, UserAchievementService>();
             services.AddScoped<IVNPayService, VNPaymentService>();
-
+            services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 
 
             #endregion

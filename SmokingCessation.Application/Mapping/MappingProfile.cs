@@ -19,8 +19,12 @@ namespace SmokingCessation.Application.Mapping
             CreateMap<ApplicationUser, CurrentUserResponse>()
                 .ForMember(dest => dest.UserImage ,opt => opt.MapFrom(src => src.ImageUrl)); 
             CreateMap<ApplicationUser, UserCurrenResponse>()
+
                 .ForMember(dest => dest.ImageUrl ,opt => opt.MapFrom(src => src.ImageUrl)).ReverseMap();
-            
+            CreateMap<ApplicationUser, UserFullResponse>()
+                .ForMember(dest => dest.UserImage, opt => opt.MapFrom(src => src.ImageUrl));
+
+
             CreateMap<UserRegisterRequest, ApplicationUser>();
             
             #region MemberShipPackage 
@@ -47,6 +51,7 @@ namespace SmokingCessation.Application.Mapping
                 .ForMember(dest => dest.StartDate , opt => opt.MapFrom(src => src.StartDate.ToString("yyyy-MM-dd HH:mm:ss")))
                 .ForMember(dest => dest.TargetDate, opt => opt.MapFrom(src => src.TargetDate.ToString("yyyy-MM-dd HH:mm:ss")))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                
                 .ForMember(dest => dest.PackageName, opt => opt.MapFrom(src => src.MembershipPackage.Name.ToString()));
                 
             //.ForMember(dest => dest.PackageName, opt => opt.MapFrom(src => src.MembershipPackage.Name)).ReverseMap();
@@ -57,6 +62,8 @@ namespace SmokingCessation.Application.Mapping
             #region ProgressLogs
             CreateMap<ProgressLogsRequest, ProgressLog>();
             CreateMap<ProgressLog, ProgressLogsResponse>()
+               .ForMember(dest => dest.CoachAdvice, opt => opt.MapFrom(
+                          src => src.QuitPlan.AdviceLogs.Select(x => x.AdviceText)))
                 .ForMember(dest => dest.QuitPlanName, opt => opt.MapFrom(src => src.QuitPlan.Reason));
             #endregion
 

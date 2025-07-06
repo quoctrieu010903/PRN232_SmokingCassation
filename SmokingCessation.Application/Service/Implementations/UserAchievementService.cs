@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
@@ -31,7 +32,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task AssignAchievementsIfEligibleAsync(Guid userId)
         {
-            // L?y danh sách AchievementId mà user ?ã có
+            // L?y danh sï¿½ch AchievementId mï¿½ user ?ï¿½ cï¿½
             var userAchievementRepo = _unitOfWork.Repository<UserAchievement, UserAchievement>();
             var achievementRepo = _unitOfWork.Repository<Achievement, Achievement>();
 
@@ -64,6 +65,19 @@ namespace SmokingCessation.Application.Service.Implementations
             await _unitOfWork.SaveChangesAsync();
         }
 
+        public Task<PaginatedList<UserAchivementResponse>> getAllUserAchivement(PagingRequestModel paging)
+        {
+            var userAchievementRepo = _unitOfWork.Repository<UserAchievement, UserAchievement>();
+            var response = userAchievementRepo.GetAllWithIncludeAsync(true, p => p.User, p => p.Achievement);
+            var result = _Imapper.Map<List<UserAchivementResponse>>(response);
+            return PaginatedList<UserAchivementResponse>.CreateAsync(
+                result.AsQueryable(),
+                paging.PageNumber,
+                paging.PageSize
+            );
+
+        }
+       
 
         public async Task<BaseResponseModel<List<UserAchivementResponse>>> GetUserAchievementsAsync(Guid userId)
         {

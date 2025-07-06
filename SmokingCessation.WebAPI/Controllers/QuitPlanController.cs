@@ -39,7 +39,7 @@ namespace SmokingCessation.WebAPI.Controllers
         /// <returns>Danh sách kế hoạch bỏ thuốc có phân trang.</returns>
         [HttpGet]
         [Authorize]
-        public async Task<ActionResult<PaginatedList<QuitPlansRequest>>> GetAll([FromQuery] PagingRequestModel paging, [FromQuery] QuitPlanFillter filter, bool isCurrentUser)
+        public async Task<ActionResult<PaginatedList<QuitPlansRequest>>> GetAll([FromQuery] PagingRequestModel paging, [FromQuery] QuitPlanFillter filter, bool isCurrentUser )
         {
             var result = await _service.getAllQuitPlan(paging, filter, isCurrentUser);
             return Ok(result);

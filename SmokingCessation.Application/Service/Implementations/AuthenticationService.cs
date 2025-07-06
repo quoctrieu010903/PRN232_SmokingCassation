@@ -14,6 +14,7 @@ using SmokingCessation.Core.CustomExceptionss;
 using SmokingCessation.Core.Response;
 using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
+using SmokingCessation.Domain.Specifications;
 using static System.Net.WebRequestMethods;
 using static SmokingCessation.Application.DTOs.Response.AuthenticationResponse;
 
@@ -252,6 +253,16 @@ namespace SmokingCessation.Application.Service.Implementations
 
             var response = _mapper.Map<UserCurrenResponse>(user);
             return new BaseResponseModel<UserCurrenResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, response, null, "Lấy thông tin user thành công");
+        }
+
+        public async Task<PaginatedList<UserFullResponse>> GetAllUser(PagingRequestModel paging)
+        {
+            var users = await _userManager.Users.ToListAsync();
+
+    
+            var userFullResponses = _mapper.Map<List<UserFullResponse>>(users);
+
+            return PaginatedList<UserFullResponse>.Create(userFullResponses, paging.PageNumber, paging.PageSize);
         }
     }
 }

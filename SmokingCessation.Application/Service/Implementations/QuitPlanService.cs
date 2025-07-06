@@ -14,6 +14,7 @@ using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Domain.Specifications;
+using System.Globalization;
 
 namespace SmokingCessation.Application.Service.Implementations
 {
@@ -23,13 +24,14 @@ namespace SmokingCessation.Application.Service.Implementations
         private IMapper _mapper;
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IUserAchievementService _userAchivement;
-
-        public QuitPlanService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, IMapper mapper , IUserAchievementService userAchievement)
+        private readonly ICoachAdviceLogService _coachAdviceLogService;
+        public QuitPlanService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, IMapper mapper , IUserAchievementService userAchievement, ICoachAdviceLogService coachAdviceLogService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
-           _httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor;
             _userAchivement = userAchievement;
+            _coachAdviceLogService = coachAdviceLogService;
         }
 
         #region check lại LUỒNG
@@ -208,6 +210,9 @@ namespace SmokingCessation.Application.Service.Implementations
             await _unitOfWork.SaveChangesAsync();
 
             await _userAchivement.AssignAchievementsIfEligibleAsync(userGuid);
+            await _coachAdviceLogService.CreateAdviceLogAsync(userGuid);
+
+
 
             return new BaseResponseModel(
                 StatusCodes.Status200OK,
@@ -249,11 +254,15 @@ namespace SmokingCessation.Application.Service.Implementations
                     throw new ErrorException(StatusCodes.Status400BadRequest,ResponseCodeConstants.NOT_FOUND,"Invalid or missing user id.");
                 currentUserId = userId;
             }
-            if (fillter.StartDate != default)
-                fillter.StartDate = DateTime.SpecifyKind(fillter.StartDate, DateTimeKind.Utc);
+            var culture = new CultureInfo("en-GB"); // dd/MM/yyyy
+            DateTime? parsedStartDate = null;
+            DateTime? parsedTargetDate = null;
 
-            if (fillter.TargetDate != default)
-                fillter.TargetDate = DateTime.SpecifyKind(fillter.TargetDate, DateTimeKind.Utc);
+            if (!string.IsNullOrEmpty(fillter.StartDate))
+                parsedStartDate = DateTime.SpecifyKind(DateTime.ParseExact(fillter.StartDate, "dd/MM/yyyy", culture), DateTimeKind.Utc);
+
+            if (!string.IsNullOrEmpty(fillter.TargetDate))
+                parsedTargetDate = DateTime.SpecifyKind(DateTime.ParseExact(fillter.TargetDate, "dd/MM/yyyy", culture), DateTimeKind.Utc);
 
 
             var baseSpeci = new BaseSpecification<QuitPlan>(mp =>
@@ -262,10 +271,10 @@ namespace SmokingCessation.Application.Service.Implementations
                 (fillter == null || (
                     (fillter.Status == 0 || mp.Status == fillter.Status) &&
                     (string.IsNullOrEmpty(fillter.UserName) || mp.User.FullName.Contains(fillter.UserName)) &&
-                           (fillter.StartDate == default || mp.StartDate.Date == fillter.StartDate.Date) &&
-                            (fillter.TargetDate == default || mp.TargetDate.Date == fillter.TargetDate.Date)
+                           (fillter.StartDate == default || mp.StartDate.Date == parsedStartDate) &&
+                            (fillter.TargetDate == default || mp.TargetDate.Date == parsedTargetDate)
                 ))
-            ); ;
+            ); 
 
             var response = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllWithSpecWithInclueAsync(baseSpeci, true,p=>p.MembershipPackage , p=> p.AdviceLogs);
             var result = _mapper.Map<List<QuitPlanResponse>>(response);
