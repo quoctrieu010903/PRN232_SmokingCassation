@@ -74,6 +74,31 @@ namespace SmokingCessation.Application.Service.Implementations
                 ResponseCodeConstants.CANCEL_PACKAGE_SUCCESS, response, null, MessageConstants.CANCEL_PACKAGE_SUCCESS);
         }
 
+        public async Task<BaseResponseModel<string>> DeleteUserPackageAsync(Guid userPackageId)
+        {
+            var userPackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
+
+            var userPackage = await userPackageRepo.GetByIdAsync(userPackageId);
+            if (userPackage == null)
+            {
+                throw new ErrorException(
+                    StatusCodes.Status404NotFound,
+                    ResponseCodeConstants.NOT_FOUND,
+                    "Không tìm thấy gói của người dùng.");
+            }
+
+            await _unitOfWork.Repository<UserPackage ,UserPackage>().DeleteAsync(userPackage); // Xoá cứng
+            await _unitOfWork.SaveChangesAsync();
+
+            return new BaseResponseModel<string>(
+                StatusCodes.Status200OK,
+                ResponseCodeConstants.SUCCESS,
+                null,
+                null,
+                "Xoá gói người dùng thành công.");
+        }
+
+
 
         public async Task<BaseResponseModel<UserPackageResponse>> GetCurrentPackage()
         {

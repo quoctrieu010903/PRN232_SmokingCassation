@@ -261,7 +261,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 ))
             );
 
-            var response = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllWithSpecWithInclueAsync(baseSpeci, true,p=>p.MembershipPackage );
+            var response = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllWithSpecWithInclueAsync(baseSpeci, true,p=>p.MembershipPackage , p=> p.AdviceLogs);
             var result = _mapper.Map<List<QuitPlanResponse>>(response);
             return PaginatedList<QuitPlanResponse>.Create(result, model.PageNumber, model.PageSize);
 

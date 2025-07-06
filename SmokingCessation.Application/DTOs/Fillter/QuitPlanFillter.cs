@@ -9,9 +9,25 @@ namespace SmokingCessation.Application.DTOs.Fillter
 {
     public class QuitPlanFillter
     {
-        public DateTimeOffset StartDate { get; set; }
-        public DateTimeOffset TargetDate { get; set; }
+        /// <summary>
+        /// Ngày bắt đầu kế hoạch bỏ thuốc
+        /// </summary>
+        public DateTime StartDate { get; set; }
+
+        /// <summary>
+        /// Ngày mục tiêu kết thúc kế hoạch bỏ thuốc
+        /// </summary>
+        public DateTime TargetDate { get; set; }
+
+        /// <summary>
+        /// Trạng thái hiện tại của kế hoạch
+        /// 0 is IsInactime, 1 is Active, 2 is Completed
+        /// </summary>
         public QuitPlanStatus Status { get; set; }
-        public String? UserName { get; set; }
+
+        /// <summary>
+        /// Tên người dùng cần tìm
+        /// </summary>
+        public string? UserName { get; set; }
     }
 }

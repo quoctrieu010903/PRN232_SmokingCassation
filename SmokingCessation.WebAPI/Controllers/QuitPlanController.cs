@@ -30,7 +30,15 @@ namespace SmokingCessation.WebAPI.Controllers
             var result = await _service.Create(request);
             return Ok(result);
         }
+        /// <summary>
+        /// Lấy danh sách kế hoạch bỏ thuốc theo phân trang và lọc.
+        /// </summary>
+        /// <param name="paging">Thông tin phân trang: số trang, kích thước trang.</param>
+        /// <param name="filter">Bộ lọc kế hoạch: ngày bắt đầu, ngày mục tiêu, trạng thái, tên người dùng.</param>
+        /// <param name="isCurrentUser">Lọc kế hoạch của người dùng hiện tại.</param>
+        /// <returns>Danh sách kế hoạch bỏ thuốc có phân trang.</returns>
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<PaginatedList<QuitPlansRequest>>> GetAll([FromQuery] PagingRequestModel paging, [FromQuery] QuitPlanFillter filter, bool isCurrentUser)
         {
             var result = await _service.getAllQuitPlan(paging, filter, isCurrentUser);

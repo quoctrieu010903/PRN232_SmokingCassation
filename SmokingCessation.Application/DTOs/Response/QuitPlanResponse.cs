@@ -19,6 +19,7 @@ namespace SmokingCessation.Application.DTOs.Response
         public Guid UserId { get; set; }
         public Guid PackageId { get; set; }
         public string PackageName { get; set; }
+        public string AdviceText { get; set; }
         public int SmokeFreeDays { get; set; }
         public HealthImpactProgress HealthImpact { get; set; }
     }

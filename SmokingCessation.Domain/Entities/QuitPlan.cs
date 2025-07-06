@@ -24,7 +24,6 @@ namespace SmokingCessation.Domain.Entities
         // ✅ Optional: nếu muốn biết kế hoạch thuộc gói nào
         public Guid? MembershipPackageId { get; set; } // Có thể nullable
         public MembershipPackage MembershipPackage { get; set; }
-
         public ICollection<ProgressLog> ProgressLogs { get; set; }
         public ICollection<CoachAdviceLog> AdviceLogs { get; set; }
 

@@ -40,9 +40,22 @@ namespace SmokingCessation.WebAPI.Extensions
 
                 });
                 // 🟢 Add this to include XML comments
-                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
-                c.IncludeXmlComments(xmlPath);
+                //var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+                //c.IncludeXmlComments(xmlPath);
+                // 🟢 Load tất cả các file XML tự động
+                var baseDir = AppContext.BaseDirectory;
+
+                var xmlFiles = Directory
+                    .EnumerateFiles(baseDir, "*.xml", SearchOption.TopDirectoryOnly)
+                    .Where(file => Path.GetFileName(file).StartsWith("SmokingCessation"))
+                    .ToList();
+
+                foreach (var xmlFile in xmlFiles)
+                {
+                    Console.WriteLine("✅ XML loaded: " + xmlFile);
+                    c.IncludeXmlComments(xmlFile, includeControllerXmlComments: true);
+                }
 
             });
           

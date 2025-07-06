@@ -10,11 +10,11 @@ namespace SmokingCessation.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserPackage : ControllerBase
+    public class UserPackageController : ControllerBase
     {
         private readonly IUserPackageService _service;
 
-        public UserPackage(IUserPackageService service)
+        public UserPackageController(IUserPackageService service)
         {
             _service = service;
         }
@@ -70,6 +70,12 @@ namespace SmokingCessation.WebAPI.Controllers
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _service.GetPackageById(id);
+            return Ok(result);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUserPackage(Guid id)
+        {
+            var result = await _service.DeleteUserPackageAsync(id);
             return Ok(result);
         }
 
