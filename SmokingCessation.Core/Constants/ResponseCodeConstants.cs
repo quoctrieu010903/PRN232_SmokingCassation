@@ -23,6 +23,7 @@ namespace SmokingCessation.Core.Constants
         public static string JWT_TOKEN_EXPIRED = "JWT Token expired";
         public const string FORBIDDEN = "FORBIDDEN";
         public const string VALIDATION_ERROR = "ValidationError";
+        public const string NO_CHANGE = "You don't have permission to change the status ";
 
         // Payment & Membership specific codes
         public const string PAYMENT_REQUIRED = "Payment required!";

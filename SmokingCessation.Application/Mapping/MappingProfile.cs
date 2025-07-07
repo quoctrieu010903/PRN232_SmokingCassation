@@ -64,6 +64,7 @@ namespace SmokingCessation.Application.Mapping
             CreateMap<ProgressLog, ProgressLogsResponse>()
                .ForMember(dest => dest.CoachAdvice, opt => opt.MapFrom(
                           src => src.QuitPlan.AdviceLogs.Select(x => x.AdviceText)))
+               .ForMember(dest => dest.UserName , opt => opt.MapFrom(src => src.QuitPlan.User.UserName))
                 .ForMember(dest => dest.QuitPlanName, opt => opt.MapFrom(src => src.QuitPlan.Reason));
             #endregion
 

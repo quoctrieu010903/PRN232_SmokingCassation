@@ -8,6 +8,7 @@ using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
 using SmokingCessation.Core.Response;
+using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Specifications;
 
 namespace SmokingCessation.WebAPI.Controllers
@@ -44,9 +45,8 @@ namespace SmokingCessation.WebAPI.Controllers
             var result = await _service.Delete(id);
             return Ok(result);
         }
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}/info")]
         [Authorize]
-
         public async Task<ActionResult<BaseResponseModel>> Update(Guid id, [FromBody] ProgressLogsRequest request)
         {
             var result = await _service.Update(request, id);
@@ -66,6 +66,24 @@ namespace SmokingCessation.WebAPI.Controllers
         {
             var response = await _service.CreateProgressLogFromAdviceAsync();
             return Ok(response);
+        }
+        /// <summary>
+        /// Update status cho ProgressLog dựa trên id
+        /// </summary>
+        /// 
+        [HttpPatch("{id}/Complete")]
+        [Authorize]
+        public async Task<ActionResult<BaseResponseModel>> Update(Guid id)
+        {
+            var result = await _service.UpdateStatusProgressLog(ProgressLogStatus.Completed, id);
+            return Ok(result);
+        }
+        [HttpPatch("{id}/Failed")]
+        [Authorize]
+        public async Task<ActionResult<BaseResponseModel>> UpdateFailedStatus(Guid id)
+        {
+            var result = await _service.UpdateStatusProgressLog(ProgressLogStatus.Failed, id);
+            return Ok(result);
         }
     }
 }

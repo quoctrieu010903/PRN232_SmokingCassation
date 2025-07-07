@@ -7,6 +7,7 @@ using SmokingCessation.Application.DTOs.Fillter;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Core.Response;
+using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Specifications;
 
 namespace SmokingCessation.Application.Service.Interface
@@ -20,6 +21,6 @@ namespace SmokingCessation.Application.Service.Interface
         Task<BaseResponseModel> Delete(Guid id);
         Task<BaseResponseModel> CreateProgressLogFromAdviceAsync();
         Task<BaseResponseModel> CreateProgesslogFromQuitPlain(Guid Userid, ProgressLogsRequest request, Guid QuiPlanId);
-
+        Task<BaseResponseModel> UpdateStatusProgressLog(ProgressLogStatus  request, Guid id);
     }
 }

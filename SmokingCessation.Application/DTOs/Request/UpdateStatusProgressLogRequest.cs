@@ -7,11 +7,8 @@ using SmokingCessation.Domain.Enums;
 
 namespace SmokingCessation.Application.DTOs.Request
 {
-    public class ProgressLogsRequest
+    public class UpdateStatusProgressLogRequest
     {
-
-        public int SmokedToday { get; set; }
-        public string Note { get; set; }
-      
+        public ProgressLogStatus Status { get; set; }
     }
 }
