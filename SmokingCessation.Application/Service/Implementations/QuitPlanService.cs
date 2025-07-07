@@ -193,6 +193,7 @@ namespace SmokingCessation.Application.Service.Implementations
             // 5. Tạo QuitPlan
             var quitPlan = new QuitPlan
             {
+                MembershipPackageId = package.Id, // Lưu gói đã thanh toán
                 Reason = request.Reason,
                 StartDate = startDay,
                 TargetDate = targetDate,
@@ -210,7 +211,7 @@ namespace SmokingCessation.Application.Service.Implementations
             await _unitOfWork.SaveChangesAsync();
 
             await _userAchivement.AssignAchievementsIfEligibleAsync(userGuid);
-            await _coachAdviceLogService.CreateAdviceLogAsync(userGuid);
+         
 
 
 

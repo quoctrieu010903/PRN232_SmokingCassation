@@ -1,4 +1,5 @@
 ﻿
+using System.Globalization;
 using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
@@ -50,7 +51,7 @@ namespace SmokingCessation.Application.Service.Implementations
             entity.CreatedTime =  DateTime.UtcNow;
             entity.LastUpdatedTime =  DateTime.UtcNow;  
 
-            await _unitOfWork.Repository<ProgressLog, Guid>().AddAsync(entity);
+            await _unitOfWork.Repository<ProgressLog, ProgressLog>().AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
 
             await _userAchivement.AssignAchievementsIfEligibleAsync(Guid.Parse(userId));
@@ -146,9 +147,18 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<PaginatedList<ProgressLogsResponse>> getAllProgressLogs(PagingRequestModel model, ProgressLogsFillter fillter)
         {
+            var culture = new CultureInfo("en-GB"); // "dd/MM/yyyy"
+            DateTime? parsedLogDate = null;
+
+            if (!string.IsNullOrEmpty(fillter.LogDate) &&
+                DateTime.TryParseExact(fillter.LogDate, "dd/MM/yyyy", culture, DateTimeStyles.None, out var tempDate))
+            {
+                parsedLogDate = tempDate.Date;
+            }
+
             var baseSpeci = new BaseSpecification<ProgressLog>(pl =>
                 (string.IsNullOrEmpty(fillter.QuitPlanName) || pl.QuitPlan.Reason.Contains(fillter.QuitPlanName)) &&
-                (fillter.LogDate == default || pl.LogDate.Date == fillter.LogDate.Date) &&
+                (!parsedLogDate.HasValue || (pl.LogDate.Date >= parsedLogDate.Value && pl.LogDate.Date <= DateTime.Now.Date)) &&
                 (string.IsNullOrEmpty(fillter.Note) || pl.Note.Contains(fillter.Note))
             );
 

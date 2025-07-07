@@ -75,7 +75,7 @@ namespace SmokingCessation.WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUserPackage(Guid id)
         {
-            var result = await _service.DeleteUserPackageAsync(id);
+            var result = await _service.DeleteUserPackageAsyncs(id);
             return Ok(result);
         }
 

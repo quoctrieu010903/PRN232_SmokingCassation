@@ -16,7 +16,7 @@ namespace SmokingCessation.Application.Service.Interface
         Task<BaseResponseModel<UserPackageResponse>> CancelCurrentPackage();
         Task<BaseResponseModel<List<UserPackageResponse>>> GetPackageHistory();
         Task<BaseResponseModel<UserPackageResponse>> GetPackageById(Guid id);
-        Task<BaseResponseModel<string>> DeleteUserPackageAsync(Guid userPackageId);
+        Task<BaseResponseModel<string>> DeleteUserPackageAsyncs(Guid userPackageId);
 
 
     }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
 using SmokingCessation.Application.Service.Interface;
@@ -220,6 +221,47 @@ namespace SmokingCessation.Application.Service.Implementations
 
             return new BaseResponseModel<VNPayReturnLink>(StatusCodes.Status200OK,
                 ResponseCodeConstants.REGISTER_PACKAGE_SUCCESS, paymentURL);
+        }
+
+        public async Task<BaseResponseModel<string>> DeleteUserPackageAsyncs(Guid userPackageId)
+        {
+            var userPackageRepo = _unitOfWork.Repository<UserPackage, Guid>();
+            var quitPlanRepo = _unitOfWork.Repository<QuitPlan, Guid>(); // Cần repository cho QuitPlan
+
+            var userPackage = await userPackageRepo.GetByIdAsync(userPackageId);
+            if (userPackage == null)
+            {
+                throw new ErrorException(
+                    StatusCodes.Status404NotFound,
+                    ResponseCodeConstants.NOT_FOUND,
+                    "Không tìm thấy gói của người dùng.");
+            }
+
+            var userId = userPackage.UserId; // Lấy UserId từ UserPackage
+            var packageIdOfDeletedUserPackage = userPackage.PackageId; // Lấy MembershipPackageId của gói đang bị xóa
+
+        var quiplanRepo = _unitOfWork.Repository<QuitPlan, Guid>();
+            var quitPlansToRemove = await quiplanRepo.GetAllWithSpecAsync(
+                new BaseSpecification<QuitPlan>(qp => qp.UserId == userId && qp.MembershipPackageId == packageIdOfDeletedUserPackage), true);
+            if (quitPlansToRemove.Any())
+            {
+                Guid[] quitPlanIdsToDelete = quitPlansToRemove.Select(qp => qp.Id).ToArray();
+
+                await quitPlanRepo.DeleteRangeAsync(quitPlanIdsToDelete); 
+
+            }
+         
+            await userPackageRepo.DeleteAsync(userPackageId); 
+
+       
+            await _unitOfWork.SaveChangesAsync();
+
+            return new BaseResponseModel<string>(
+                StatusCodes.Status200OK,
+                ResponseCodeConstants.SUCCESS,
+                null,
+                null,
+                "Xóa gói người dùng và các kế hoạch cai thuốc liên quan thành công.");
         }
     }
 }
