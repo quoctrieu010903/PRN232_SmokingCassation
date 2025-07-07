@@ -11,9 +11,10 @@ namespace SmokingCessation.Application.DTOs.Response
         public Guid Id { get; set; }
         public string  QuitPlanName { get; set; }
         public string UserName { get; set; }    
-        public DateTimeOffset  LogDate { get; set; }
+        public string  LogDate { get; set; }
         public int SmokedToday { get; set; }
         public string Note { get; set; }
+        public string Status { get; set; }
         public string CoachAdvice { get; set; }
     }
 }

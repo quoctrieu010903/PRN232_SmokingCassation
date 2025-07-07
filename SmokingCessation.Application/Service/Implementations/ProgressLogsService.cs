@@ -1,6 +1,5 @@
 ﻿
 using System.Globalization;
-using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +10,6 @@ using SmokingCessation.Application.Service.Interface;
 using SmokingCessation.Core.Constants;
 using SmokingCessation.Core.CustomExceptionss;
 using SmokingCessation.Core.Response;
-using SmokingCessation.Core.Utils;
 using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Enums;
 using SmokingCessation.Domain.Interfaces;
@@ -183,21 +181,31 @@ namespace SmokingCessation.Application.Service.Implementations
         public async Task<PaginatedList<ProgressLogsResponse>> getAllProgressLogs(PagingRequestModel model, ProgressLogsFillter fillter)
         {
             var userId = _httpContextAccessor.HttpContext?.User?.FindFirst("UserId")?.Value;
+        
             var culture = new CultureInfo("en-GB"); // "dd/MM/yyyy"
+            DateTime todayUtc = DateTime.UtcNow.Date;
             DateTime? parsedLogDate = null;
 
-            if (!string.IsNullOrEmpty(fillter.LogDate) &&
-                DateTime.TryParseExact(fillter.LogDate, "dd/MM/yyyy", culture, DateTimeStyles.None, out var tempDate))
+            if (!string.IsNullOrEmpty(fillter.LogDate))
             {
-                parsedLogDate = tempDate.Date;
+                // Parse ngày và đảm bảo nó là UTC
+                if (DateTime.TryParseExact(fillter.LogDate, "dd/MM/yyyy", culture, DateTimeStyles.None, out DateTime tempDate))
+                
+                    parsedLogDate = DateTime.SpecifyKind(tempDate.Date, DateTimeKind.Utc); // Chỉ lấy phần ngày và đặt 
             }
-
+           
             var baseSpeci = new BaseSpecification<ProgressLog>(pl =>
                  pl.CreatedBy == userId &&
                 (string.IsNullOrEmpty(fillter.QuitPlanName) || pl.QuitPlan.Reason.Contains(fillter.QuitPlanName)) &&
-                (!parsedLogDate.HasValue || (pl.LogDate.Date >= parsedLogDate.Value && pl.LogDate.Date <= DateTime.Now.Date)) &&
-                (string.IsNullOrEmpty(fillter.Note) || pl.Note.Contains(fillter.Note))
+                (
+                    (!parsedLogDate.HasValue && pl.LogDate.Date >= todayUtc) ||  // nếu không nhập thì lấy từ hôm nay trở đi
+                    (parsedLogDate.HasValue && pl.LogDate.Date >= parsedLogDate.Value) // nếu có nhập thì lấy từ ngày nhập
+                ) &&
+                (string.IsNullOrEmpty(fillter.Note) || pl.Note.Contains(fillter.Note)) && 
+                (fillter.status == null || pl.Status == fillter.status)
             );
+            
+
 
             var response = await _unitOfWork.Repository<ProgressLog, ProgressLog>().GetAllWithSpecWithInclueAsync(baseSpeci, true,p=> p.QuitPlan);
             var result = _mapper.Map<List<ProgressLogsResponse>>(response).OrderBy(x => x.LogDate).ToList();
@@ -215,7 +223,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
 
             var result = _mapper.Map<ProgressLogsResponse>(entity);
-            return new BaseResponseModel<ProgressLogsResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.GET_SUCCESS);
+            return new BaseResponseModel<ProgressLogsResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, result);
         }
         private async Task<QuitPlan?> GetUserActiveOrLatestQuitPlan(Guid userId)
         {

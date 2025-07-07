@@ -14,6 +14,7 @@ namespace SmokingCessation.Application.DTOs.Response
         public int TotalSmokeFreeDays { get; set; }
         public int Rank { get; set; }
         public decimal TotalMoneySaved { get; set; } // Số tiền tiết kiệm được
+        public List<BadgeDto> Badges { get; set; } = new();
         public string RelapseRisk { get; set; } = "Dữ liệu không đủ"; // Tỉ lệ/rủi ro mắc bệnh lại (ví dụ)
 
 

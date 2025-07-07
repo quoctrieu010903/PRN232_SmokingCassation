@@ -32,6 +32,7 @@ namespace SmokingCessation.WebAPI.Controllers
             return Ok(result);
         }
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<PaginatedList<QuitPlansRequest>>> GetAll([FromQuery] PagingRequestModel paging, [FromQuery] ProgressLogsFillter filter)
         {
             var result = await _service.getAllProgressLogs(paging, filter);

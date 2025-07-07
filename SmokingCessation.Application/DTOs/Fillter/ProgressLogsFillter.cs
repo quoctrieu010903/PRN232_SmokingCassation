@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmokingCessation.Domain.Enums;
 
 namespace SmokingCessation.Application.DTOs.Fillter
 {
@@ -11,5 +12,6 @@ namespace SmokingCessation.Application.DTOs.Fillter
         public string? QuitPlanName { get; set; }
         public string? LogDate { get; set; }
         public string? Note { get; set; }
+        public ProgressLogStatus? status { get; set; }
     }
 }
