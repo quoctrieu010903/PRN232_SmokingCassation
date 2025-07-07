@@ -68,6 +68,7 @@ namespace SmokingCessation.Infrastracture.Seeder
 
         public static List<ApplicationUser> GetUsers()
         {
+            var hasher = new PasswordHasher<ApplicationUser>();
             return new List<ApplicationUser>
             {
                 new ApplicationUser
@@ -76,7 +77,8 @@ namespace SmokingCessation.Infrastracture.Seeder
                     UserName = "john.doe",
                     FullName = "John Doe",
                     ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
+                   
+                    PasswordHash = hasher.HashPassword(null, "Ab@123456"),
                     Email = "john.doe@example.com",
                     EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
@@ -85,10 +87,13 @@ namespace SmokingCessation.Infrastracture.Seeder
                 {
                     Id = Guid.Parse("f77b8d8a-345e-4a63-8928-2ddbdcf7b93b"),
                     UserName = "jane.smith",
+                    NormalizedUserName = "jane.smith",
                     FullName = "Jane Smith",
                     ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
+
+                    PasswordHash = hasher.HashPassword(null, "Ab@123456"),
                     Email = "jane.smith@example.com",
+                    NormalizedEmail = "jane.smith@example.com",
                     EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
                 },
@@ -96,10 +101,13 @@ namespace SmokingCessation.Infrastracture.Seeder
                 {
                     Id = Guid.Parse("75075487-7FA2-4063-9CE7-3C85D2D88A12"),
                     UserName = "quoctrieu15",
+                    NormalizedUserName = "quoctrieu15",
                     FullName = "Quoc Trieu",
                     Email = "luongquoctrieu165@gmail.com", // Sửa lỗi định dạng email
+                    NormalizedEmail ="luongquoctrieu165@gmail.com",
                     ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
+
+                    PasswordHash = hasher.HashPassword(null, "Ab@123456"),
                     EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
                 },
@@ -107,10 +115,13 @@ namespace SmokingCessation.Infrastracture.Seeder
                 {
                     Id = Guid.Parse("BC790193-647D-420F-BC27-C8ABB27BCB53"),
                     UserName = "ThanhVu22",
+                    NormalizedUserName = "ThanhVu22",
                     FullName = "Lê Thanh Vũ",
                     Email = "vult2911@gmail.com",
+                    NormalizedEmail = "vult2911@gmail.com",
                     ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
+
+                    PasswordHash = hasher.HashPassword(null, "Ab@123456"),
                     EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
                 },
@@ -118,21 +129,27 @@ namespace SmokingCessation.Infrastracture.Seeder
                 {
                     Id = Guid.Parse("A0CBD7C7-D6A3-4912-B8C7-3029B55B5E3D"),
                     UserName = "VietQuoc01",
+                    NormalizedUserName = "VietQuoc01",
                     FullName = "Nguyễn Trần Việt Quốc",
                     Email = "ntvq88@gmail.com",
+                    NormalizedEmail = "ntvq88@gmail.com",
                     ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
+                    PasswordHash = hasher.HashPassword(null, "Ab@123456"),
                     EmailConfirmed = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+
                 },
                 new ApplicationUser
                 {
                     Id = Guid.Parse("4BD6B6BC-58E9-4A2A-B1CE-3FF3F11D5D4C"),
                     UserName = "NhatTruong02",
+                    NormalizedUserName = "NhatTruong02",
                     FullName = "Lê Nhật Trường",
                     Email = "ltn04098@gmail.com",
+                    NormalizedEmail = "ltn04098@gmail.com",
                     ImageUrl = "https://hoseiki.vn/wp-content/uploads/2025/03/avatar-mac-dinh-20.jpg",
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("Ab@123456"),
+
+                    PasswordHash = hasher.HashPassword(null, "Ab@123456"),
                     EmailConfirmed = true,
                     CreatedAt = DateTime.UtcNow
                 }
@@ -145,7 +162,8 @@ namespace SmokingCessation.Infrastracture.Seeder
             {
                       new Achievement
                 {
-                    Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                         
+                    Id = Guid.Parse("D7ECC0D7-08AD-4B55-89BD-49260A169BAB"),
                     Title = "Set Quit Date",
                     Description = "You have set your quit date. Your journey begins!",
                     IconUrl = "https://res.cloudinary.com/dae7xasfc/image/upload/v1750950458/SetQuitDate_n7dl5a.png",
@@ -158,7 +176,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                 },
                 new Achievement
                 {
-                    Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                    Id = Guid.Parse("843cb5c1-4351-4f62-8117-cb7d99e08d80"),
                     Title = "Superhero",
                     Description = "Stay smoke-free for 7 consecutive days.",
                     IconUrl = "https://res.cloudinary.com/dae7xasfc/image/upload/v1750950458/SupperHero_hfx2uv.png",
@@ -171,7 +189,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                 },
                 new Achievement
                 {
-                    Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                    Id = Guid.Parse("fd2030dd-7660-4627-a291-b50463a21fbd"),
                     Title = "Community Leader",
                     Description = "Post 5 comments or messages to support others.",
                     IconUrl = "https://res.cloudinary.com/dae7xasfc/image/upload/v1750950459/communityLeader_j2uqrt.png",
@@ -184,7 +202,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                 },
                 new Achievement
                 {
-                    Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
+                    Id = Guid.Parse("e29a85da-1bd0-460b-a1f8-66d3aacf8830"),
                     Title = "Gums & Teeth",
                     Description = "Stay smoke-free for 14 days and smile brighter!",
                     IconUrl = "https://res.cloudinary.com/dae7xasfc/image/upload/v1750950458/Gum_Teeth_ayncnf.png",
@@ -197,7 +215,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                 },
                 new Achievement
                 {
-                    Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
+                    Id = Guid.Parse("baf2ed29-2ae3-461c-85ef-49fa57b6bec2"),
                     Title = "Explorer",
                     Description = "Try 3 different features of the app.",
                     IconUrl = "https://res.cloudinary.com/dae7xasfc/image/upload/v1750950458/Explore_e4giw7.png",
@@ -210,7 +228,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                 },
                 new Achievement
                 {
-                    Id = Guid.Parse("66666666-6666-6666-6666-666666666666"),
+                    Id = Guid.Parse("2b1f0897-f3f1-4517-9198-3668c37ee64c"),
                     Title = "25 Missions Completed",
                     Description = "You've completed 25 tasks. Keep going!",
                     IconUrl = "https://res.cloudinary.com/dae7xasfc/image/upload/v1750950458/missionComplete_udtcn2.png",
@@ -223,7 +241,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                 },
                 new Achievement
                 {
-                    Id = Guid.Parse("77777777-7777-7777-7777-777777777777"),
+                    Id = Guid.Parse("26e8d8e2-caf0-4b29-84c0-3fcbe494027b"),
                     Title = "Diary Writer",
                     Description = "Write 10 journal entries to track your journey.",
                     IconUrl = "https://res.cloudinary.com/dae7xasfc/image/upload/v1750950458/diary_entries_xktwgu.png",
@@ -236,7 +254,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                 },
                 new Achievement
                 {
-                    Id = Guid.Parse("88888888-8888-8888-8888-888888888888"),
+                    Id = Guid.Parse("b44c860e-e888-4027-8721-1db5cf39d49f"),
                     Title = "1 Month Smoke-Free",
                     Description = "You’ve gone a full month without smoking!",
                     IconUrl = "https://res.cloudinary.com/dae7xasfc/image/upload/v1750950459/1_month_smoke_free_gz4lwz.png",
@@ -249,7 +267,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                 },
                 new Achievement
                 {
-                    Id = Guid.Parse("99999999-9999-9999-9999-999999999999"),
+                    Id = Guid.Parse("fde1b6d5-5f44-4b67-8389-70b3ac973067"),
                     Title = "Money Saved",
                     Description = "Saved over 1,000,000 VND from quitting smoking.",
                     IconUrl = "https://res.cloudinary.com/dae7xasfc/image/upload/v1750950458/money_saved_f63oob.png",
@@ -262,7 +280,7 @@ namespace SmokingCessation.Infrastracture.Seeder
                 },
                 new Achievement
                 {
-                    Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                    Id = Guid.Parse("caafcc33-64fa-4023-ac21-d01c9f049110"),
                     Title = "Cravings Resisted",
                     Description = "Resisted the urge to smoke 25 times.",
                     IconUrl = "https://res.cloudinary.com/dae7xasfc/image/upload/v1750950459/cravings_resisted_rizsac.png",

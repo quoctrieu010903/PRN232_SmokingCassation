@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SmokingCessation.Domain.Enums;
 
 namespace SmokingCessation.Application.DTOs.Request
 {
@@ -10,5 +11,6 @@ namespace SmokingCessation.Application.DTOs.Request
     {
         public int SmokedToday { get; set; }
         public string Note { get; set; }
+      
     }
 }

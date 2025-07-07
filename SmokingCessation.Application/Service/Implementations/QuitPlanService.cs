@@ -25,13 +25,15 @@ namespace SmokingCessation.Application.Service.Implementations
         private IHttpContextAccessor _httpContextAccessor;
         private readonly IUserAchievementService _userAchivement;
         private readonly ICoachAdviceLogService _coachAdviceLogService;
-        public QuitPlanService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, IMapper mapper , IUserAchievementService userAchievement, ICoachAdviceLogService coachAdviceLogService)
+        private readonly IProgressLogsService _progressLogsService;
+        public QuitPlanService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, IMapper mapper , IUserAchievementService userAchievement, ICoachAdviceLogService coachAdviceLogService, IProgressLogsService progressLogsService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
             _userAchivement = userAchievement;
             _coachAdviceLogService = coachAdviceLogService;
+            _progressLogsService = progressLogsService;
         }
 
         #region check lại LUỒNG
@@ -210,8 +212,14 @@ namespace SmokingCessation.Application.Service.Implementations
             await _unitOfWork.Repository<QuitPlan, QuitPlan>().AddAsync(quitPlan);
             await _unitOfWork.SaveChangesAsync();
 
+            var progresslog = new ProgressLogsRequest
+            {
+                SmokedToday = request.CigarettesPerDayBeforeQuit,
+                Note = "",
+            };
+
             await _userAchivement.AssignAchievementsIfEligibleAsync(userGuid);
-         
+            await _progressLogsService.CreateProgesslogFromQuitPlain(userGuid, progresslog, quitPlan.Id); 
 
 
 

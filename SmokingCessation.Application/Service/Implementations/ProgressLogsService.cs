@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using SmokingCessation.Application.DTOs.Fillter;
 using SmokingCessation.Application.DTOs.Request;
 using SmokingCessation.Application.DTOs.Response;
@@ -116,15 +117,48 @@ namespace SmokingCessation.Application.Service.Implementations
             var repo = _unitOfWork.Repository<ProgressLog, Guid>();
             var entity = await repo.GetByIdAsync(id);
             if (entity == null)
-                throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+            {
+                throw new ErrorException(
+                    StatusCodes.Status404NotFound,
+                    ResponseCodeConstants.NOT_FOUND,
+                    MessageConstants.NOT_FOUND
+                );
+            }
+
+            var today = DateTime.UtcNow.Date;
+
+            // ❌ Chỉ cho phép cập nhật log đúng ngày hiện tại
+            if (entity.LogDate.Date != today)
+            {
+                throw new ErrorException(
+                    StatusCodes.Status400BadRequest,
+                    ResponseCodeConstants.VALIDATION_ERROR,
+                    "Chỉ được phép cập nhật nhật ký của ngày hôm nay."
+                );
+            }
+
+            // ❌ Chỉ cho phép cập nhật nếu trạng thái là Pending hoặc Failed
+            if (entity.Status != ProgressLogStatus.Pending && entity.Status != ProgressLogStatus.Failed)
+            {
+                throw new ErrorException(
+                    StatusCodes.Status400BadRequest,
+                    ResponseCodeConstants.VALIDATION_ERROR,
+                    "Chỉ được phép cập nhật nhật ký khi trạng thái là Pending hoặc Failed."
+                );
+            }
 
             _mapper.Map(request, entity);
-            // Optionally update LogDate if you want to allow editing the date
             entity.LastUpdatedBy = userId;
-            entity.LastUpdatedTime =  DateTime.UtcNow;
+            entity.LastUpdatedTime = DateTime.UtcNow;
+
             await repo.UpdateAsync(entity);
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.CREATE_SUCCESS);
+
+            return new BaseResponseModel(
+                StatusCodes.Status200OK,
+                ResponseCodeConstants.SUCCESS,
+                MessageConstants.UPDATE_SUCCESS
+            );
         }
 
         public async Task<BaseResponseModel> Delete(Guid id)
@@ -200,6 +234,60 @@ namespace SmokingCessation.Application.Service.Implementations
             }
 
             return quitPlan;
+        }
+
+        public async Task<BaseResponseModel> CreateProgesslogFromQuitPlain(Guid Userid, ProgressLogsRequest request , Guid QuiPlanId)
+        {
+            var quitPlan = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetWithSpecAsync(new BaseSpecification<QuitPlan>(q => q.UserId == Userid && q.Id == QuiPlanId), true);
+       
+
+            if (quitPlan == null)
+            {
+               throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+            }
+
+            var startDate = quitPlan.StartDate.Date;
+            var endDate = startDate.AddDays(6); // ❗ Tạo trước 7 ngày (tức từ StartDate đến StartDate + 6)
+            var today = DateTime.UtcNow.Date;
+
+            var existingDates = (quitPlan.ProgressLogs ?? new List<ProgressLog>())
+                                 .Select(pl => pl.LogDate.Date)
+                                 .ToHashSet();
+            var newLogs = new List<ProgressLog>();
+
+            for (var date = startDate; date <= endDate; date = date.AddDays(1))
+            {
+                if (existingDates.Contains(date)) continue;
+
+                var status = date < today
+                    ? ProgressLogStatus.Failed
+                    : ProgressLogStatus.Pending;
+
+                newLogs.Add(new ProgressLog
+                {
+
+                    Id = Guid.NewGuid(),
+                    QuitPlanId = quitPlan.Id,
+                    LogDate = date,
+                    Status = status,
+                    SmokedToday = 0,
+                    Note = string.Empty,
+                    CreatedBy = Userid.ToString(),
+                    CreatedTime = DateTime.UtcNow,
+                    LastUpdatedBy = Userid.ToString(),
+                    LastUpdatedTime = DateTime.UtcNow
+
+
+                });
+            }
+
+            if (newLogs.Any())
+            {
+                await _unitOfWork.Repository<ProgressLog,ProgressLog>().AddRangeAsync(newLogs);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            return new BaseResponseModel(StatusCodes.Status200OK,ResponseCodeConstants.SUCCESS, MessageConstants.CREATE_SUCCESS);
         }
     }
 }

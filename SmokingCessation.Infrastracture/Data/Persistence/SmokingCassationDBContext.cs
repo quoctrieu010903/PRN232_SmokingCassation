@@ -27,7 +27,7 @@ namespace SmokingCessation.Infrastracture.Data.Persistence
         public DbSet<CoachAdviceLog> CoachAdviceLogs { get; set; }
        
         public DbSet<ProgressLog> ProgressLogs { get; set; }
-        public DbSet<Achievement> Achievements { get; set; }
+        public DbSet<Achievement> Achievements { get; set; }    
         public DbSet<UserAchievement> UserAchievements { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }

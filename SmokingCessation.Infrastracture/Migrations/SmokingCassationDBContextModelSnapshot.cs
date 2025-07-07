@@ -595,6 +595,9 @@ namespace SmokingCessation.Infrastracture.Migrations
                     b.Property<int>("SmokedToday")
                         .HasColumnType("integer");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");

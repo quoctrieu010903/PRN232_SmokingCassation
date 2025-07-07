@@ -12,8 +12,8 @@ using SmokingCessation.Infrastracture.Data.Persistence;
 namespace SmokingCessation.Infrastracture.Migrations
 {
     [DbContext(typeof(SmokingCassationDBContext))]
-    [Migration("20250702105553_UpdatePayment")]
-    partial class UpdatePayment
+    [Migration("20250707080032_initialDatabase")]
+    partial class initialDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -596,6 +596,9 @@ namespace SmokingCessation.Infrastracture.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<int>("SmokedToday")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");

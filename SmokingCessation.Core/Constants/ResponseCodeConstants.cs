@@ -22,6 +22,7 @@ namespace SmokingCessation.Core.Constants
         public const string UNPROCESSABLE_ENTITY = "Unprocessable Entity";
         public static string JWT_TOKEN_EXPIRED = "JWT Token expired";
         public const string FORBIDDEN = "FORBIDDEN";
+        public const string VALIDATION_ERROR = "ValidationError";
 
         // Payment & Membership specific codes
         public const string PAYMENT_REQUIRED = "Payment required!";

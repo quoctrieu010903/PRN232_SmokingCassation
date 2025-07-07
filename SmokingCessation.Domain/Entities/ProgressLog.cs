@@ -1,4 +1,5 @@
 ﻿using SmokingCessation.Core.Base;
+using SmokingCessation.Domain.Enums;
 
 namespace SmokingCessation.Domain.Entities
 {
@@ -8,6 +9,7 @@ namespace SmokingCessation.Domain.Entities
         public DateTime LogDate { get; set; }
         public int SmokedToday { get; set; }
         public string Note { get; set; }    
+        public ProgressLogStatus Status { get; set; } 
         public QuitPlan QuitPlan { get; set; }
 
     }
