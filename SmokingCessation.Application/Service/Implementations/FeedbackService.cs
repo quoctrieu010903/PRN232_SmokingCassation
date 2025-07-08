@@ -64,7 +64,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 LastUpdatedBy = userId,
                 LastUpdatedTime =  DateTime.UtcNow,
             };
-            await _unitOfWork.Repository<Feedback, Guid>().AddAsync(feedback);
+            await _unitOfWork.Repository<Feedback, Feedback>().AddAsync(feedback);
             await _unitOfWork.SaveChangesAsync();
 
             await _userAchivement.AssignAchievementsIfEligibleAsync(Guid.Parse(userId));
