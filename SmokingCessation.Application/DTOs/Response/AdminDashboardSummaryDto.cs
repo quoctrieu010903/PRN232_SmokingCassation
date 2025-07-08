@@ -16,4 +16,5 @@ namespace SmokingCessation.Application.DTOs.Response
         public int CompletedQuitPlans { get; set; }
         public decimal TotalRevenue { get; set; }
     }
+
 } 

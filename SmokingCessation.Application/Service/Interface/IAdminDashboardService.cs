@@ -7,6 +7,6 @@ namespace SmokingCessation.Application.Service.Interface
     public interface IAdminDashboardService
     {
         Task<BaseResponseModel<AdminDashboardSummaryDto>> GetSummaryAsync();
-
+        
     }
 } 

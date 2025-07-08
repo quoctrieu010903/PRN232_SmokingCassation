@@ -52,6 +52,7 @@ namespace SmokingCessation.Application.Extensions
             services.AddScoped<IUserAchievementService, UserAchievementService>();
             services.AddScoped<IVNPayService, VNPaymentService>();
             services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+            services.AddScoped<IUserDashboardService, UserDashboardService>();
 
 
             #endregion
