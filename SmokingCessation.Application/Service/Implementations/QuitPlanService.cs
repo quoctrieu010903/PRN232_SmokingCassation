@@ -284,8 +284,40 @@ namespace SmokingCessation.Application.Service.Implementations
                 ))
             ); 
 
-            var response = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllWithSpecWithInclueAsync(baseSpeci, true,p=>p.MembershipPackage , p=> p.AdviceLogs);
-            var result = _mapper.Map<List<QuitPlanResponse>>(response);
+            var quitPlans = await _unitOfWork.Repository<QuitPlan, QuitPlan>().GetAllWithSpecWithInclueAsync(baseSpeci, true,p=>p.MembershipPackage , p=> p.AdviceLogs);
+
+            var responses = new List<QuitPlanResponse>();
+
+            foreach (var plan in quitPlans)
+            {
+                // Lấy log theo UserId & StartDate
+                var logSpec = new BaseSpecification<ProgressLog>(
+                    p => p.CreatedBy == plan.UserId.ToString() && p.LogDate >= plan.StartDate.Date
+                );
+
+                var logs = await _unitOfWork.Repository<ProgressLog, ProgressLog>().GetAllWithSpecAsync(logSpec);
+
+                var smokeFreeDays = logs.Count(l => l.SmokedToday == 0 && l.LogDate <= DateTime.UtcNow);
+                var health = CalculateHealthImpact(smokeFreeDays,plan.CigarettesPerDayBeforeQuit, plan.YearsSmokingBeforeQuit);
+
+                responses.Add(new QuitPlanResponse
+                {
+                    Id = plan.Id,
+                    Reason = plan.Reason,
+                    StartDate = plan.StartDate,
+                    TargetDate = plan.TargetDate,
+                    CigarettesPerDayBeforeQuit = plan.CigarettesPerDayBeforeQuit,
+                    YearsSmokingBeforeQuit = plan.YearsSmokingBeforeQuit,
+                    Status = plan.Status.ToString(),
+                    UserId = plan.UserId,
+                    PackageId = plan.MembershipPackage.Id,
+                    PackageName = plan.MembershipPackage?.Name ?? "Không rõ",
+                    SmokeFreeDays = smokeFreeDays,
+                    HealthImpact = health
+                });
+            }
+
+            var result = _mapper.Map<List<QuitPlanResponse>>(responses);
             return PaginatedList<QuitPlanResponse>.Create(result, model.PageNumber, model.PageSize);
 
         }
@@ -332,7 +364,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 .GetAllWithSpecAsync(baseSpeci);
 
             var smokeFreeDays = logs.Count(l => l.SmokedToday == 0);
-            var health = CalculateHealthImpact(smokeFreeDays);
+            var health = CalculateHealthImpact(smokeFreeDays,plan.CigarettesPerDayBeforeQuit, plan.YearsSmokingBeforeQuit);
 
             var response = new QuitPlanResponse
             {
@@ -401,17 +433,31 @@ namespace SmokingCessation.Application.Service.Implementations
 
         }
 
-        private HealthImpactProgress CalculateHealthImpact(int smokeFreeDays)
+        private HealthImpactProgress CalculateHealthImpact(int smokeFreeDays, int cigarettesPerDay, int yearsSmoking)
         {
-            var cancer = Math.Min(100.0 * smokeFreeDays / 7300.0, 50.0);  // 20 năm = max 50%
-            var heart = Math.Min(100.0 * smokeFreeDays / 3650.0, 95.0);   // 10 năm = max 95%
+            // Tổng số điếu đã hút trong đời
+            int totalCigarettesSmoked = cigarettesPerDay * yearsSmoking * 365;
+
+            // Mức tổn thương tương đối (càng cao thì hồi phục càng chậm)
+            // Giới hạn tối đa: nếu hút trên 100.000 điếu thì damageFactor = 1.0
+            double damageFactor = Math.Min(1.0, totalCigarettesSmoked / 100000.0); // 100k điếu = tổn thương nặng
+            double recoveryFactor = 1.0 - (damageFactor * 0.5); // giảm tối đa 50% hiệu quả phục hồi
+
+            // Công thức tính tỉ lệ hồi phục
+            double cancerRecovery = Math.Min((smokeFreeDays / 7300.0) * 100 * recoveryFactor, 50.0);  // 20 năm = 7300 ngày
+            double heartRecovery = Math.Min((smokeFreeDays / 3650.0) * 100 * recoveryFactor, 95.0);   // 10 năm = 3650 ngày
+
+            // Làm tròn
+            cancerRecovery = Math.Round(cancerRecovery, 1);
+            heartRecovery = Math.Round(heartRecovery, 1);
 
             return new HealthImpactProgress
             {
-                CancerRiskReductionPercent = Math.Round(cancer, 1),
-                HeartRiskReductionPercent = Math.Round(heart, 1),
-                Summary = $"Bạn đã giảm {Math.Round(cancer, 1)}% nguy cơ ung thư và {Math.Round(heart, 1)}% nguy cơ bệnh tim."
+                CancerRiskReductionPercent = cancerRecovery,
+                HeartRiskReductionPercent = heartRecovery,
+                Summary = $"Bạn đã giảm {cancerRecovery}% nguy cơ ung thư và {heartRecovery}% nguy cơ bệnh tim."
             };
         }
+
     }
 }
