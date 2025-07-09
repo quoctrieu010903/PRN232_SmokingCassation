@@ -198,7 +198,7 @@ namespace SmokingCessation.Application.Service.Implementations
                  pl.CreatedBy == userId &&
                 (string.IsNullOrEmpty(fillter.QuitPlanName) || pl.QuitPlan.Reason.Contains(fillter.QuitPlanName)) &&
                 (
-                    (!parsedLogDate.HasValue && pl.LogDate.Date >= todayUtc) ||  // nếu không nhập thì lấy từ hôm nay trở đi
+                    (!parsedLogDate.HasValue ) ||  // nếu không nhập thì lấy từ hôm nay trở đi
                     (parsedLogDate.HasValue && pl.LogDate.Date >= parsedLogDate.Value) // nếu có nhập thì lấy từ ngày nhập
                 ) &&
                 (string.IsNullOrEmpty(fillter.Note) || pl.Note.Contains(fillter.Note)) && 

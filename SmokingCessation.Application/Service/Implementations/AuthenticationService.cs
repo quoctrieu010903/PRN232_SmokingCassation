@@ -102,7 +102,8 @@ namespace SmokingCessation.Application.Service.Implementations
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password))
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.FAILED, "Invalid email or password");
-
+            var roles = await _userManager.GetRolesAsync(user);
+            var roleName = roles.FirstOrDefault(); // Vì chỉ có 1 role nên lấy cái đầu tiên
             var token = await _tokenService.GenerateToken(user);
             var refreshToken = _tokenService.GenerateRefeshToken();
 
@@ -116,6 +117,7 @@ namespace SmokingCessation.Application.Service.Implementations
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.FAILED, "Failed to update user");
 
             var userResponse = _mapper.Map<UserResponse>(user);
+           userResponse.Role = roleName;
             userResponse.AccessToken = token;
             return new BaseResponseModel<UserResponse>(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, userResponse, null, "Đăng nhập thành công");
         }

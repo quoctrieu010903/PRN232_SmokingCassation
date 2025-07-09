@@ -136,6 +136,7 @@ namespace SmokingCessation.Application.Service.Implementations
             feedback.LastUpdatedTime = DateTime.UtcNow;
 
             feedback.Comment = request.Comment;
+            
             await repo.UpdateAsync(feedback);
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(200, "SUCCESS", "Feedback updated");

@@ -239,12 +239,11 @@ namespace SmokingCessation.Application.Service.Implementations
             if (entity == null)
                 return new BaseResponseModel(StatusCodes.Status404NotFound, "NOT_FOUND", "QuitPlan not found");
           
-            entity.LastUpdatedBy = currentUser;
-            entity.LastUpdatedTime =  DateTime.UtcNow;
+            
      
 
 
-            await repo.UpdateAsync(entity);
+            await repo.DeleteAsync(entity.Id);
 
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(StatusCodes.Status200OK, "SUCCESS", "Change Status  successfully");
