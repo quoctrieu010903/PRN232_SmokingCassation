@@ -107,19 +107,19 @@ namespace SmokingCessation.Application.Service.Implementations
                         b.Status == BlogStatus.Published || b.AuthorId == currentUserId
                     ).ToList();
                 }
-               blogs = blogs.Where(b => b.Status == BlogStatus.Published).ToList();
+               blogs = blogs.Where(b => !b.DeletedTime.HasValue && b.Status == BlogStatus.Published).ToList();
             }
             else
             {
                 // Admin có thể filter theo status nếu truyền lên
                 if (filter.Status.HasValue)
-                    blogs = blogs.Where(b => b.Status == filter.Status.Value).ToList();
+                    blogs = blogs.Where(b => !b.DeletedTime.HasValue &&  b.Status == filter.Status.Value).ToList();
             }
 
             if (!string.IsNullOrWhiteSpace(filter.Search))
             {
                 var searchLower = filter.Search.Trim().ToLower();
-                blogs = blogs.Where(b =>
+                blogs = blogs.Where(b => !b.DeletedTime.HasValue &&
                     (!string.IsNullOrEmpty(b.Title) && b.Title.ToLower().Contains(searchLower)) ||
                     (!string.IsNullOrEmpty(b.Content) && b.Content.ToLower().Contains(searchLower)) ||
                     (b.Author != null && !string.IsNullOrEmpty(b.Author.FullName) && b.Author.FullName.ToLower().Contains(searchLower))

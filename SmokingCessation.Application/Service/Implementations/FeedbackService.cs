@@ -87,7 +87,7 @@ namespace SmokingCessation.Application.Service.Implementations
             feedback.LastUpdatedBy = userId;
             feedback.LastUpdatedTime =  DateTime.UtcNow;
             
-            await _unitOfWork.Repository<Feedback, Guid>().UpdateAsync(feedback);
+            await _unitOfWork.Repository<Feedback, Feedback>().UpdateAsync(feedback);
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(200, "SUCCESS", "Feedback deleted");
 
@@ -95,7 +95,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<PaginatedList<FeedbackResponse>> GetByBlogId(Guid blogId, PagingRequestModel paging)
         {
-            var baseSpeci = new Domain.Specifications.BaseSpecification<Feedback>(f => f.BlogId == blogId);
+            var baseSpeci = new Domain.Specifications.BaseSpecification<Feedback>(f => !f.DeletedTime.HasValue && f.BlogId == blogId);
             var feedbacks = await _unitOfWork.Repository<Feedback, Feedback>().GetAllWithSpecWithInclueAsync(baseSpeci, true,  f => f.User,
                                                                                                                                 f => f.Blog);
             var result = _mapper.Map<List<FeedbackResponse>>(feedbacks);
