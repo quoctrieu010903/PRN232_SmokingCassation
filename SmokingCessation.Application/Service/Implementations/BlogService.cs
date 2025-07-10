@@ -83,7 +83,7 @@ namespace SmokingCessation.Application.Service.Implementations
             blog.DeletedTime = DateTime.UtcNow;
             blog.LastUpdatedBy = userId;
             blog.LastUpdatedTime = DateTime.UtcNow;
-            await _unitOfWork.Repository<Blog, Blog>().UpdateAsync(blog);
+            await _unitOfWork.Repository<Blog, Guid>().UpdateAsync(blog);
 
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.BLOG_DELETE_SUCCESS);
@@ -92,7 +92,7 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<PaginatedList<BlogResponse>> GetAll(PagingRequestModel model , BlogListFilter filter)
         {
-            var blogs = await _unitOfWork.Repository<Blog, Blog>().GetAllWithIncludeAsync(true, p=>p.Ratings , p => p.Feedbacks , p => p.Author);
+            var blogs = await _unitOfWork.Repository<Blog, Blog>().GetAllWithSpecWithInclueAsync(new BaseSpecification<Blog>(x=>!x.DeletedTime.HasValue),true, p=>p.Ratings , p => p.Feedbacks , p => p.Author);
 
             var currentUser = _httpContextAccessor.HttpContext?.User;
             bool isAdmin = currentUser != null && currentUser.IsInRole(UserRoles.Admin);
@@ -103,9 +103,9 @@ namespace SmokingCessation.Application.Service.Implementations
 
                 if (Guid.TryParse(userId, out var currentUserId))
                 {
-                    blogs = blogs.Where(b =>
+                    blogs = blogs.Where(b => !b.DeletedTime.HasValue && (
                         b.Status == BlogStatus.Published || b.AuthorId == currentUserId
-                    ).ToList();
+                   )).ToList();
                 }
                blogs = blogs.Where(b => !b.DeletedTime.HasValue && b.Status == BlogStatus.Published).ToList();
             }
