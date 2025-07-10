@@ -77,6 +77,7 @@ namespace SmokingCessation.Application.Service.Implementations
             if (user == null)
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, "User not found.");
             user.DeletedTime =  DateTime.UtcNow;
+
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
                 throw new ErrorException(StatusCodes.Status400BadRequest, ResponseCodeConstants.FAILED, "Failed to delete user.");
@@ -259,10 +260,16 @@ namespace SmokingCessation.Application.Service.Implementations
 
         public async Task<PaginatedList<UserFullResponse>> GetAllUser(PagingRequestModel paging)
         {
-            var users = await _userManager.Users.ToListAsync();
+            var users = await _userManager.Users.Where(x=>!x.DeletedTime.HasValue).ToListAsync();
+            // Assign roles to each user
+           
 
-    
             var userFullResponses = _mapper.Map<List<UserFullResponse>>(users);
+            for (int i = 0; i < users.Count; i++)
+            {
+                var roles = await _userManager.GetRolesAsync(users[i]);
+                userFullResponses[i].RoleName = roles.FirstOrDefault() ?? string.Empty;
+            }
 
             return PaginatedList<UserFullResponse>.Create(userFullResponses, paging.PageNumber, paging.PageSize);
         }
