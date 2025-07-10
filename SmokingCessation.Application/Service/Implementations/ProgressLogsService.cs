@@ -173,7 +173,7 @@ namespace SmokingCessation.Application.Service.Implementations
             entity.DeletedBy = userId;
             entity.DeletedTime = DateTime.UtcNow;
 
-            await repo.UpdateAsync(entity);
+            await _unitOfWork.Repository<ProgressLog, ProgressLog>().UpdateAsync(entity);
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.DELETE_SUCCESS);
         }
@@ -195,7 +195,7 @@ namespace SmokingCessation.Application.Service.Implementations
             }
            
             var baseSpeci = new BaseSpecification<ProgressLog>(pl =>
-                 pl.CreatedBy == userId &&
+                 pl.CreatedBy == userId && !pl.DeletedTime.HasValue &&
                 (string.IsNullOrEmpty(fillter.QuitPlanName) || pl.QuitPlan.Reason.Contains(fillter.QuitPlanName)) &&
                 (
                     (!parsedLogDate.HasValue ) ||  // nếu không nhập thì lấy từ hôm nay trở đi

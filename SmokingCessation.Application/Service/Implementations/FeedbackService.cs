@@ -87,7 +87,7 @@ namespace SmokingCessation.Application.Service.Implementations
             feedback.LastUpdatedBy = userId;
             feedback.LastUpdatedTime =  DateTime.UtcNow;
             
-            await repo.UpdateAsync(feedback);
+            await _unitOfWork.Repository<Feedback, Guid>().UpdateAsync(feedback);
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(200, "SUCCESS", "Feedback deleted");
 

@@ -83,7 +83,7 @@ namespace SmokingCessation.Application.Service.Implementations
             blog.DeletedTime = DateTime.UtcNow;
             blog.LastUpdatedBy = userId;
             blog.LastUpdatedTime = DateTime.UtcNow;
-            await _unitOfWork.Repository<Blog, Guid>().UpdateAsync(blog);
+            await _unitOfWork.Repository<Blog, Blog>().UpdateAsync(blog);
 
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.BLOG_DELETE_SUCCESS);

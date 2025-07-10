@@ -64,7 +64,7 @@ namespace SmokingCessation.Application.Service.Implementations
             entity.DeletedTime =  DateTime.UtcNow;
             
 
-            await repo.UpdateAsync(entity);
+            await _unitOfWork.Repository<MembershipPackage, MembershipPackage>().UpdateAsync(entity);
 
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(StatusCodes.Status200OK, ResponseCodeConstants.SUCCESS, MessageConstants.DELETE_SUCCESS);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -192,10 +193,14 @@ namespace SmokingCessation.Application.Service.Implementations
         /// </summary>
         public async Task<bool> DeleteAdviceAsync(Guid adviceLogId)
         {
+            var userId = Guid.Parse(_userContext.GetUserId());  
             var log = await _unitOfWork.Repository<CoachAdviceLog, Guid>().GetByIdAsync(adviceLogId);
             if (log == null) return false;
-
-            await _unitOfWork.Repository<CoachAdviceLog, Guid>().DeleteAsync(adviceLogId);
+            log.DeletedBy = userId.ToString();
+            log.DeletedTime = DateTime.UtcNow;
+            log.LastUpdatedBy = userId.ToString();
+            log.LastUpdatedTime = DateTime.UtcNow;
+            await _unitOfWork.Repository<CoachAdviceLog, CoachAdviceLog>().UpdateAsync(log);
             await _unitOfWork.SaveChangesAsync();
             return true;
         }

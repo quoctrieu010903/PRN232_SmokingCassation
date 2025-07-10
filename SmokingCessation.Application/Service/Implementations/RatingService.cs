@@ -14,6 +14,7 @@ using SmokingCessation.Core.Response;
 using SmokingCessation.Domain.Entities;
 using SmokingCessation.Domain.Interfaces;
 using SmokingCessation.Domain.Specifications;
+using SmokingCessation.Infrastracture.Data;
 
 namespace SmokingCessation.Application.Service.Implementations
 {
@@ -84,9 +85,13 @@ namespace SmokingCessation.Application.Service.Implementations
             var rating = await repo.GetByIdAsync(id);
             if (rating == null)
                 throw new ErrorException(StatusCodes.Status404NotFound, ResponseCodeConstants.NOT_FOUND, MessageConstants.NOT_FOUND);
+            rating.DeletedBy = _userContext.GetUserId();
+            rating.LastUpdatedBy = _userContext.GetUserId();
+            rating.LastUpdatedTime = DateTime.UtcNow;
+            rating.DeletedTime = DateTime.UtcNow;
+            
 
-
-            await repo.DeleteAsync(id);
+            await _unitOfWork.Repository<Rating, Rating>().UpdateAsync(rating);
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponseModel(200, "SUCCESS", "Rating deleted");
         }
